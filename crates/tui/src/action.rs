@@ -1,7 +1,9 @@
 use app::{search::ValidSearchQuery, Config};
 use std::collections::HashSet;
 
-use lib::{search::OrderBy, KafkaRecord, TopicDetail};
+use lib::{kafka::SchemaId, search::OrderBy, KafkaRecord, TopicDetail};
+
+use crate::schema_detail::SchemaDetail;
 
 use super::component::{ComponentName, Shortcut};
 
@@ -41,6 +43,8 @@ pub enum Action {
     StopConsuming(),
     /// Request the app to fetch details (consumer groups, members...) of the given topics
     RequestTopicDetails(HashSet<String>),
+    RequestSchemasOf(Option<SchemaId>, Option<SchemaId>),
+    Schemas(Option<SchemaDetail>, Option<SchemaDetail>),
     /// Notify the UI the list of topics
     Topics(Vec<String>),
     /// Notify the UI that a new record has been polled
@@ -52,7 +56,7 @@ pub enum Action {
     /// Dispatch the new configuration to the UI
     NewConfig(Config),
     /// Copy the given record to the clipboard
-    CopyToClipboard(KafkaRecord),
+    CopyToClipboard(String),
     /// Notify the UI that a new component has been be displayed
     NewView(ComponentName),
     /// Notify the UI the visible components and their order in the stack view

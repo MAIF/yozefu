@@ -2,7 +2,6 @@
 //! and renders components based on the current context.
 use app::Config;
 use copypasta::{ClipboardContext, ClipboardProvider};
-use lib::ExportedKafkaRecord;
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
@@ -21,8 +20,8 @@ use crate::{error::TuiError, records_buffer::BufferAction, Action, Notification}
 use super::{
     footer_component::FooterComponent, help_component::HelpComponent,
     progress_bar_component::ProgressBarComponent, record_details_component::RecordDetailsComponent,
-    records_component::RecordsComponent, search_component::SearchComponent,
-    topic_details_component::ScrollableTopicDetailsComponent,
+    records_component::RecordsComponent, schemas_component::SchemasComponent,
+    search_component::SearchComponent, topic_details_component::ScrollableTopicDetailsComponent,
     topics_and_records_component::TopicsAndRecordsComponent, topics_component::TopicsComponent,
     Component, ComponentName, ConcurrentRecordsBuffer, State,
 };
@@ -51,7 +50,7 @@ impl RootComponent {
         let mut footer = FooterComponent::default();
         footer.show_shortcuts(config.show_shortcuts);
 
-        let mut components: [Arc<Mutex<dyn Component>>; 8] = [
+        let mut components: [Arc<Mutex<dyn Component>>; 9] = [
             Arc::new(Mutex::new(TopicsComponent::new(selected_topics))),
             Arc::new(Mutex::new(RecordsComponent::new(records))),
             Arc::new(Mutex::new(ScrollableTopicDetailsComponent::default())),
@@ -62,6 +61,7 @@ impl RootComponent {
             ))),
             Arc::new(Mutex::new(footer)),
             Arc::new(Mutex::new(HelpComponent::default())),
+            Arc::new(Mutex::new(SchemasComponent::new())),
             Arc::new(Mutex::new(FooterComponent::default())),
         ];
 
@@ -77,7 +77,6 @@ impl RootComponent {
                 (id, c)
             })
             .collect();
-
         Self {
             components,
             buffer_rx,
@@ -306,7 +305,14 @@ impl Component for RootComponent {
                 self.views.push(action.clone());
                 match self.focus_order.contains(&last_focused) {
                     true => self.focus(last_focused),
-                    false => self.focus(self.focus_order.first().unwrap().clone()),
+                    false => self.focus(
+                        self.focus_order
+                            .first()
+                            .unwrap_or_else(|| {
+                                panic!("I think you forgot to define focus order of '{}'", action)
+                            })
+                            .clone(),
+                    ),
                 }?;
                 self.notify_footer()?;
             }
@@ -314,9 +320,8 @@ impl Component for RootComponent {
                 self.progress_bar.set_length(length);
             }
             Action::Close(_) => self.close(),
-            Action::CopyToClipboard(ref record) => {
+            Action::CopyToClipboard(ref content) => {
                 let mut ctx = ClipboardContext::new().unwrap();
-                let exported_record: ExportedKafkaRecord = record.into();
                 self.action_tx
                     .as_ref()
                     .unwrap()
@@ -324,8 +329,7 @@ impl Component for RootComponent {
                         log::Level::Info,
                         "Copied to clipboard".to_string(),
                     )))?;
-                ctx.set_contents(serde_json::to_string_pretty(&exported_record)?)
-                    .unwrap();
+                ctx.set_contents(content.to_string()).unwrap();
             }
             _ => (),
         }
@@ -339,10 +343,13 @@ impl Component for RootComponent {
         let mut a = self.buffer_rx.clone();
         let BufferAction::Count(count) = *a.borrow_and_update();
         self.progress_bar.set_progress(count.1);
-
         f.render_widget(Clear, rect);
 
-        let main_component = self.components.get(self.views.last().unwrap()).unwrap();
+        let last_view = self.views.last().unwrap();
+        let main_component = self
+            .components
+            .get(last_view)
+            .unwrap_or_else(|| panic!("Unable to find component '{}'", last_view));
 
         let chunks: std::rc::Rc<[Rect]> = Layout::default()
             .direction(Direction::Vertical)
@@ -389,6 +396,7 @@ pub fn focus_order_of(component: &ComponentName) -> Vec<ComponentName> {
     match component {
         ComponentName::RecordDetails => vec![ComponentName::RecordDetails, ComponentName::Search],
         ComponentName::Records => vec![ComponentName::Records, ComponentName::Search],
+        ComponentName::Schemas => vec![ComponentName::Schemas, ComponentName::Search],
         ComponentName::TopicsAndRecords => vec![
             ComponentName::Topics,
             ComponentName::Records,

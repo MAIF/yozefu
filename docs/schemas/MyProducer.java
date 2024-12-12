@@ -1,6 +1,7 @@
 //JAVA 21+
 //REPOS central,confluent=https://packages.confluent.io/maven
-//DEPS com.fasterxml.jackson.core:jackson-databind:2.18.1
+//DEPS com.fasterxml.jackson.core:jackson-databind:2.18.2
+//DEPS com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.18.2
 //DEPS org.apache.kafka:kafka-clients:3.9.0
 //DEPS io.confluent:kafka-protobuf-serializer:7.7.1
 //DEPS io.confluent:kafka-avro-serializer:7.7.1
@@ -10,6 +11,7 @@
 //DEPS tech.allegro.schema.json2avro:converter:0.2.15
 //DEPS com.google.protobuf:protobuf-java:3.25.4
 //DEPS info.picocli:picocli:4.7.6
+
 
 //FILES avro/key-schema.json=avro/key-schema.json
 //FILES avro/value-schema.json=avro/value-schema.json
@@ -21,8 +23,10 @@
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import io.confluent.kafka.schemaregistry.json.JsonSchemaUtils;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import io.confluent.kafka.serializers.json.KafkaJsonSchemaSerializer;
@@ -56,7 +60,7 @@ import tech.allegro.schema.json2avro.converter.JsonAvroConverter;
 
 
 enum SerializerType {
-    avro, json, jsonSchema, protobuf, text, malformed
+    avro, json, jsonSchema, protobuf, text, malformed, invalidJson, xml
 }
 
 @Command(name = "MyProducer.java", version = "1.0.0", mixinStandardHelpOptions = true,
@@ -67,7 +71,7 @@ class MyProducer implements Callable<Integer> {
     @CommandLine.Option(names = {"--topic"}, description = "The topic to produce records to.")
     private String topic = "public-french-addresses";
 
-    @CommandLine.Option(names = {"--type"}, description = "avro, json, jsonSchema, protobuf, text or malformed", defaultValue = "json")
+    @CommandLine.Option(names = {"--type"}, description = "avro, json, jsonSchema, protobuf, text, malformed or invalidJson", defaultValue = "json")
     private SerializerType type = SerializerType.json;
 
     @CommandLine.Parameters(description = "Your query passed to 'https://api-adresse.data.gouv.fr/search/?q='", defaultValue = "kafka")
@@ -123,6 +127,18 @@ class MyProducer implements Callable<Integer> {
                 props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class);
                 KafkaProducer<byte[], byte[]> producer = new KafkaProducer<>(props);
                 produce(producer, new IntoMalformed(), data, topic);
+            }
+            case invalidJson -> {
+                props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaJsonSchemaSerializer.class.getName());
+                props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaJsonSchemaSerializer.class.getName());
+                KafkaProducer<JsonNode, JsonNode> producer = new KafkaProducer<>(props);
+                produce(producer, new IntoInvalidJson(), data, topic);
+            }
+            case xml -> {
+                props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+                props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+                KafkaProducer<String, String> producer = new KafkaProducer<>(props);
+                produce(producer, new IntoXml(), data, topic);
             }
             default -> {
                 System.err.printf(" ❕ Format '%s' is unknown. Known formats are ['avro', 'json', 'json-schema', 'text', 'malformed']\n", type);
@@ -185,8 +201,8 @@ class MyProducer implements Callable<Integer> {
 
     public static void main(String[] args) {
         int exitCode = new CommandLine(new MyProducer())
-        .setCaseInsensitiveEnumValuesAllowed(true)
-        .execute(args);
+                .setCaseInsensitiveEnumValuesAllowed(true)
+                .execute(args);
         System.exit(exitCode);
     }
 
@@ -282,6 +298,8 @@ class IntoMalformed implements Into<byte[], byte[]> {
         keyOutput.write(header);
         keyOutput.write((generateKey() + " key").getBytes());
 
+        randomSchemaId = (byte) ((Math.random() * (127 - 1)) + 1);
+        header = new byte[]{0, 0, 0, 0, randomSchemaId};
         ByteArrayOutputStream valueOutput = new ByteArrayOutputStream();
         valueOutput.write(header);
         var objectMapper = new ObjectMapper();
@@ -289,5 +307,34 @@ class IntoMalformed implements Into<byte[], byte[]> {
         valueOutput.write(object.get("properties").get("context").asText().getBytes(StandardCharsets.UTF_8));
 
         return new ProducerRecord<>(topic, keyOutput.toByteArray(), valueOutput.toByteArray());
+    }
+}
+
+
+class IntoInvalidJson implements Into<JsonNode, JsonNode> {
+    public ProducerRecord<JsonNode, JsonNode> into(String input, String topic) throws Exception {
+        var objectMapper = new ObjectMapper();
+        var keySchemaString = readResource("/json-schema/key-schema.json");
+        var valueSchemaString = readResource("/json-schema/value-schema.json");
+        var keySchema = objectMapper.readTree(keySchemaString);
+        var valueSchema = objectMapper.readTree(valueSchemaString);
+
+        var key = TextNode.valueOf(generateKey());
+        var keyEnvelope = JsonSchemaUtils.envelope(keySchema, key);
+
+        var value = objectMapper.readTree(input);
+        ((ObjectNode) value).put("updatedAt", "2007");
+        var valueEnvelope = JsonSchemaUtils.envelope(valueSchema, value);
+
+        return new ProducerRecord<>(topic, keyEnvelope, valueEnvelope);
+    }
+}
+
+class IntoXml implements Into<String, String> {
+    public ProducerRecord<String, String> into(String input, String topic) throws Exception {
+        var objectMapper = new ObjectMapper();
+        var xmlMapper = new XmlMapper();
+        var value = objectMapper.readTree(input);
+        return new ProducerRecord<>(topic, generateKey(), xmlMapper.writeValueAsString(value));
     }
 }

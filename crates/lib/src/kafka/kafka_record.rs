@@ -60,6 +60,10 @@ impl KafkaRecord {
         self.timestamp_as_utc_date_time()
             .map(DateTime::<Local>::from)
     }
+
+    pub fn has_schemas(&self) -> bool {
+        self.key_schema.is_some() || self.value_schema.is_some()
+    }
 }
 
 #[cfg(feature = "native")]

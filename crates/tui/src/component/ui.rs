@@ -22,6 +22,7 @@ use tokio_util::sync::CancellationToken;
 use crate::action::{Action, Notification};
 use crate::component::{Component, RootComponent};
 use crate::error::TuiError;
+use crate::schema_detail::SchemaDetail;
 use crate::tui;
 
 use super::{ConcurrentRecordsBuffer, State, BUFFER};
@@ -46,13 +47,14 @@ impl Ui {
         selected_topics: Vec<String>,
         state: State,
     ) -> Result<Self, TuiError> {
+        let config = app.config.clone();
         Ok(Self {
             should_quit: false,
             worker: CancellationToken::new(),
-            app: app.clone(),
+            app,
             records: &BUFFER,
             topics: vec![],
-            root: RootComponent::new(query, selected_topics, &app.config, &BUFFER, state),
+            root: RootComponent::new(query, selected_topics, &config, &BUFFER, state),
             records_sender: None,
             last_tick_key_events: Vec::new(),
             last_time_consuming: Instant::now(),
@@ -266,6 +268,8 @@ impl Ui {
         self.root.register_action_handler(action_tx.clone())?;
         self.root.init()?;
         action_tx.send(Action::SelectedTopics(topics))?;
+
+        let mut schema_registry = self.app.schema_registry();
         loop {
             if let Some(e) = tui.next().await {
                 match e {
@@ -333,6 +337,14 @@ impl Ui {
                     }
                     Action::Export(ref record) => {
                         self.export_record(record, action_tx.clone())?;
+                    }
+                    Action::RequestSchemasOf(ref key, ref value) => {
+                        if let Some(sr) = &mut schema_registry {
+                            action_tx.send(Action::Schemas(
+                                SchemaDetail::from(sr, key).await,
+                                SchemaDetail::from(sr, value).await,
+                            ))?;
+                        }
                     }
                     Action::Render => {
                         tui.draw(|f| {

@@ -160,7 +160,7 @@ jobs:
         name: Link Checker
         # https://github.com/lycheeverse/lychee/issues/1405
         with:
-          args: --exclude-loopback README.md './crates/bin/README.md' './crates/app/README.md' './crates/command/README.md' './crates/lib/README.md' './crates/wasm-types/README.md' './crates/bin/src/**' './crates/app/src/**' './crates/command/src/**' './crates/lib/src/**' './crates/wasm-types/src/**' './docs/*.md' --exclude-path ./docs/url-templates/README.md --exclude-path ./docs/schema-registry/README.md  --exclude 'https://docs.rs'
+          args: --exclude-loopback README.md './crates/app/README.md' './crates/command/README.md' './crates/lib/README.md' './crates/wasm-types/README.md' './crates/bin/src/**' './crates/app/src/**' './crates/command/src/**' './crates/lib/src/**' './crates/wasm-types/src/**' './docs/*.md' --exclude-path ./docs/url-templates/README.md --exclude-path ./docs/schema-registry/README.md  --exclude 'https://docs.rs'
 
   # https://docs.github.com/en/actions/use-cases-and-examples/publishing-packages/publishing-docker-images
   docker:

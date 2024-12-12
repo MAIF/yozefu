@@ -102,13 +102,18 @@ impl SearchComponent {
     }
 
     fn update_history(&mut self, prompt: &str) -> Result<(), TuiError> {
-        if !self.history.contains(&prompt.to_string()) {
-            self.history.push(prompt.into());
+        // Do not accept empty prompts in the history
+        if prompt.trim().is_empty() {
+            return Ok(());
+        }
+        let prompt = prompt.trim().to_string();
+        if !self.history.contains(&prompt) {
+            self.history.push(prompt.to_string());
             self.index_history = self.history.len() - 1;
             self.action_tx
                 .as_ref()
                 .unwrap()
-                .send(Action::NewSearchPrompt(prompt.to_string()))?;
+                .send(Action::NewSearchPrompt(prompt))?;
         }
         Ok(())
     }

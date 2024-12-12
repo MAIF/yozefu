@@ -3,7 +3,7 @@ use bytesize::ByteSize;
 use crossterm::event::{KeyCode, KeyEvent};
 
 use itertools::Itertools;
-use lib::KafkaRecord;
+use lib::{ExportedKafkaRecord, KafkaRecord};
 use ratatui::{
     layout::{Margin, Rect},
     style::{Style, Stylize},
@@ -23,10 +23,11 @@ use super::{Component, ComponentName, Shortcut, State};
 #[derive(Default)]
 pub struct RecordDetailsComponent<'a> {
     pub record: Option<KafkaRecord>,
-    pub scroll: usize,
-    pub lines: usize,
     pub text: Paragraph<'a>,
     pub rect: Rect,
+    pub search_query: String,
+    pub scroll: usize,
+    pub lines: usize,
     pub scroll_size: u16,
     pub scrollbar_state: ScrollbarState,
     pub action_tx: Option<UnboundedSender<Action>>,
@@ -47,6 +48,28 @@ impl RecordDetailsComponent<'_> {
             ),
             Span::styled(value.to_string(), Style::default()),
         ])
+    }
+
+    fn show_schema(&mut self) -> Result<(), TuiError> {
+        if self.record.as_ref().map(|r| r.has_schemas()) == Some(false) {
+            return Ok(());
+        };
+
+        let r = self.record.as_ref().unwrap();
+
+        self.action_tx
+            .as_ref()
+            .unwrap()
+            .send(Action::RequestSchemasOf(
+                r.key_schema.as_ref().map(|s| s.id.clone()),
+                r.value_schema.as_ref().map(|s| s.id.clone()),
+            ))?;
+
+        self.action_tx
+            .as_ref()
+            .unwrap()
+            .send(Action::NewView(ComponentName::Schemas))?;
+        Ok(())
     }
 
     pub fn set_scroll_bar_state(&mut self, lines: usize) {
@@ -227,12 +250,18 @@ impl Component for RecordDetailsComponent<'_> {
                         .send(Action::Open(record.clone()))?;
                 }
             }
+            KeyCode::Char('s') => self.show_schema()?,
             KeyCode::Char('c') => {
                 if let Some(record) = &self.record {
+                    let mut exported_record: ExportedKafkaRecord = record.into();
+                    exported_record.search_query = self.search_query.to_string();
                     self.action_tx
                         .as_ref()
                         .unwrap()
-                        .send(Action::CopyToClipboard(record.clone()))?;
+                        .send(Action::CopyToClipboard(
+                            serde_json::to_string_pretty(&exported_record)
+                                .expect("Unable to serialize record as json for the clipboard"),
+                        ))?;
                 }
             }
             KeyCode::Char('e') => {
@@ -250,18 +279,33 @@ impl Component for RecordDetailsComponent<'_> {
     }
 
     fn update(&mut self, action: Action) -> Result<Option<Action>, TuiError> {
-        if let Action::ShowRecord(record) = action {
-            self.record = Some(record);
-            self.compute_record_rendering();
+        match action {
+            Action::ShowRecord(record) => {
+                self.record = Some(record);
+                self.compute_record_rendering();
+            }
+            Action::Search(e) => self.search_query = e.query().to_string(),
+            _ => {}
         };
         Ok(None)
     }
 
     fn shortcuts(&self) -> Vec<Shortcut> {
-        vec![
+        let mut shortcuts = vec![
             Shortcut::new("J/K", "Scroll"),
             Shortcut::new("↑↓", "Previous/next record"),
-        ]
+        ];
+
+        if self
+            .record
+            .as_ref()
+            .map(|r| r.key_schema.is_some() || r.value_schema.is_some())
+            .unwrap_or(false)
+        {
+            shortcuts.push(Shortcut::new("s", "Schemas"))
+        }
+
+        shortcuts
     }
 
     fn draw(&mut self, f: &mut Frame<'_>, rect: Rect, state: &State) -> Result<(), TuiError> {

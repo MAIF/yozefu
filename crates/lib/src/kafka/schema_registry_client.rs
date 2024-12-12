@@ -69,11 +69,7 @@ impl SimpleSchemaRegistryClient {
 
     async fn schema(&self, id: u32) -> Result<Option<SchemaResponse>, Error> {
         // TODO https://github.com/servo/rust-url/issues/333
-        let mut url = self.url.clone();
-        let mut segments = url.path_segments_mut().unwrap();
-        segments.extend(vec!["schemas", "ids", &id.to_string()]);
-        drop(segments);
-
+        let url = self.schema_url(id);
         let response = self.client.get(url).send().await;
 
         match response {
@@ -88,6 +84,15 @@ impl SimpleSchemaRegistryClient {
 
             Err(e) => Err(Error::SchemaRegistry(e.to_string())),
         }
+    }
+
+    fn schema_url(&self, id: u32) -> String {
+        // TODO https://github.com/servo/rust-url/issues/333
+        let mut url = self.url.clone();
+        let mut segments = url.path_segments_mut().unwrap();
+        segments.extend(vec!["schemas", "ids", &id.to_string()]);
+        drop(segments);
+        url.to_string()
     }
 }
 
@@ -119,6 +124,10 @@ impl SchemaRegistryClient {
             }
         }
     }
+
+    pub fn schema_url(&self, id: u32) -> String {
+        self.client.schema_url(id)
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, Hash, PartialEq, Eq)]
@@ -126,4 +135,17 @@ impl SchemaRegistryClient {
 pub struct SchemaResponse {
     pub schema: String,
     pub schema_type: Option<SchemaType>,
+}
+
+impl SchemaResponse {
+    pub fn schema_to_string_pretty(&self) -> String {
+        match self.schema_type {
+            Some(SchemaType::Avro) | Some(SchemaType::Json) => {
+                let json = serde_json::from_str::<Value>(&self.schema)
+                    .unwrap_or(Value::String("".to_string()));
+                serde_json::to_string_pretty(&json).unwrap()
+            }
+            _ => self.schema.clone(),
+        }
+    }
 }

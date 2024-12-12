@@ -4,6 +4,7 @@ mod action;
 mod component;
 pub mod error;
 mod records_buffer;
+mod schema_detail;
 pub mod theme;
 mod tui;
 pub use action::Action;

@@ -5,6 +5,7 @@ mod progress_bar_component;
 mod record_details_component;
 mod records_component;
 mod root_component;
+mod schemas_component;
 mod search_component;
 mod shortcut;
 mod state;
@@ -60,6 +61,7 @@ pub enum ComponentName {
     Search,
     Dialog,
     Help,
+    Schemas,
 }
 
 impl ComponentName {
