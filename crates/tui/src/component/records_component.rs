@@ -444,7 +444,7 @@ impl Component for RecordsComponent<'_> {
             // Shortcut::new("]", "Last record"),
             Shortcut::new("E", "Export"),
             Shortcut::new(
-                "f",
+                "F",
                 match self.follow {
                     true => "Unfollow",
                     false => "Follow",

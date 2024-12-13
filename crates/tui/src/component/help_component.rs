@@ -3,21 +3,21 @@
 use crossterm::event::{KeyCode, KeyEvent};
 use itertools::Itertools;
 use ratatui::{
-    layout::{Margin, Rect},
+    layout::Rect,
     style::Stylize,
     text::{Line, Span},
-    widgets::{
-        Block, BorderType, Borders, Clear, Padding, Paragraph, Scrollbar, ScrollbarOrientation,
-        ScrollbarState, Wrap,
-    },
+    widgets::{Block, BorderType, Borders, Clear, Padding, Paragraph, Wrap},
     Frame,
 };
 
 use crate::{error::TuiError, Action};
 
-use super::{issue_component::IssueComponent, Component, ComponentName, Shortcut, State};
+use super::{
+    issue_component::IssueComponent, scroll_state::ScrollState, Component, ComponentName, Shortcut,
+    State,
+};
 
-const HELP_HEIGHT: u16 = 42;
+const HELP_HEIGHT: usize = 42;
 const TEN_MINUTES_FRAME: usize = 30 * 60 * 10;
 const REPOSITORY_URL: &str = concat!(
     "      https://github.com/MAIF/yozefu/tree/v",
@@ -26,9 +26,7 @@ const REPOSITORY_URL: &str = concat!(
 
 #[derive(Default)]
 pub struct HelpComponent {
-    pub scroll: u16,
-    pub scroll_length: u16,
-    pub scrollbar_state: ScrollbarState,
+    pub scroll: ScrollState,
     pub rendered: usize,
 }
 
@@ -45,16 +43,16 @@ impl Component for HelpComponent {
         self.rendered = 0;
         match key.code {
             KeyCode::Char('k') | KeyCode::Down => {
-                self.scroll = (self.scroll + 1).min(self.scroll_length);
+                self.scroll.scroll_to_next_line();
             }
             KeyCode::Char('j') | KeyCode::Up => {
-                self.scroll = self.scroll.saturating_sub(1);
+                self.scroll.scroll_to_previous_line();
             }
             KeyCode::Char('[') => {
-                self.scroll = 0;
+                self.scroll.scroll_to_top();
             }
             KeyCode::Char(']') => {
-                self.scroll = self.scroll_length;
+                self.scroll.scroll_to_bottom();
             }
             _ => (),
         }
@@ -143,40 +141,17 @@ impl Component for HelpComponent {
             Line::from(""),
         ];
 
-        self.scrollbar_state = self.scrollbar_state.content_length(0);
-        if rect.height < HELP_HEIGHT {
-            self.scroll_length = HELP_HEIGHT - rect.height + 2;
-            self.scrollbar_state = self
-                .scrollbar_state
-                .content_length(self.scroll_length as usize)
-                .position(self.scroll as usize);
-        } else {
-            self.scrollbar_state = self.scrollbar_state.content_length(0);
-            self.scroll = 0;
-        }
-
         let paragraph = Paragraph::new(text)
             .wrap(Wrap { trim: false })
-            .scroll((self.scroll, 0));
+            .scroll((self.scroll.value(), 0));
         f.render_widget(paragraph.block(block), rect);
-
-        let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
-            .begin_symbol(Some("▲"))
-            .end_symbol(Some("▼"));
 
         if self.rendered > TEN_MINUTES_FRAME {
             let mut issue = IssueComponent::default();
             issue.draw(f, rect, state)?;
         }
 
-        f.render_stateful_widget(
-            scrollbar,
-            rect.inner(Margin {
-                vertical: 1,
-                horizontal: 0,
-            }),
-            &mut self.scrollbar_state,
-        );
+        self.scroll.draw(f, rect, HELP_HEIGHT);
         self.rendered += 1;
 
         Ok(())

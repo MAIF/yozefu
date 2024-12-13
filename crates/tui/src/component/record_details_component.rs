@@ -5,31 +5,24 @@ use crossterm::event::{KeyCode, KeyEvent};
 use itertools::Itertools;
 use lib::{ExportedKafkaRecord, KafkaRecord};
 use ratatui::{
-    layout::{Margin, Rect},
+    layout::Rect,
     style::{Style, Stylize},
     text::{Line, Span, Text},
-    widgets::{
-        Block, Borders, Clear, Padding, Paragraph, Scrollbar, ScrollbarOrientation, ScrollbarState,
-        Wrap,
-    },
+    widgets::{Block, Borders, Clear, Padding, Paragraph, Wrap},
     Frame,
 };
 use tokio::sync::mpsc::UnboundedSender;
 
 use crate::{error::TuiError, Action};
 
-use super::{Component, ComponentName, Shortcut, State};
+use super::{scroll_state::ScrollState, Component, ComponentName, Shortcut, State};
 
 #[derive(Default)]
 pub struct RecordDetailsComponent<'a> {
     pub record: Option<KafkaRecord>,
-    pub text: Paragraph<'a>,
-    pub rect: Rect,
+    pub lines: Vec<Line<'a>>,
     pub search_query: String,
-    pub scroll: usize,
-    pub lines: usize,
-    pub scroll_size: u16,
-    pub scrollbar_state: ScrollbarState,
+    pub scroll: ScrollState,
     pub action_tx: Option<UnboundedSender<Action>>,
 }
 
@@ -72,21 +65,6 @@ impl RecordDetailsComponent<'_> {
         Ok(())
     }
 
-    pub fn set_scroll_bar_state(&mut self, lines: usize) {
-        self.lines = lines;
-        if self.lines < self.rect.height as usize {
-            self.scroll = 0;
-            self.scroll_size = 0;
-        } else {
-            self.scroll = 0;
-            self.scroll_size = self
-                .lines
-                .saturating_sub(self.rect.height.saturating_sub(10) as usize)
-                as u16;
-        }
-        self.scrollbar_state = ScrollbarState::new(self.scroll_size.into()).position(self.scroll);
-    }
-
     fn compute_record_rendering(&mut self) {
         if self.record.is_none() {
             self.record = Some(KafkaRecord::default());
@@ -119,25 +97,6 @@ impl RecordDetailsComponent<'_> {
             Self::generate_span("Size", ByteSize(record.size as u64).to_string()),
             Self::generate_span("Headers", "".to_string()),
         ];
-
-        if let Some(s) = &record.key_schema {
-            match &s.schema_type {
-                Some(t) => to_render.push(Self::generate_span(
-                    "Key schema",
-                    format!("{} - {}", s.id, t),
-                )),
-                None => to_render.push(Self::generate_span("Key schema", s.id.to_string())),
-            }
-        }
-        if let Some(s) = &record.value_schema {
-            match &s.schema_type {
-                Some(t) => to_render.push(Self::generate_span(
-                    "Value schema",
-                    format!("{} - {}", s.id, t),
-                )),
-                None => to_render.push(Self::generate_span("Value schema", s.id.to_string())),
-            }
-        }
 
         let longest_header_key = self
             .record
@@ -176,7 +135,7 @@ impl RecordDetailsComponent<'_> {
 
         if !formatted_headers.is_empty() {
             let first = formatted_headers.iter().take(3).collect_vec();
-            let line = to_render.last_mut().unwrap();
+            let line: &mut Line<'_> = to_render.last_mut().unwrap();
             line.spans.remove(1);
             for span in first {
                 line.push_span(span.clone());
@@ -185,6 +144,25 @@ impl RecordDetailsComponent<'_> {
 
         for ppp in &formatted_headers.into_iter().skip(3).chunks(3) {
             to_render.push(Line::from(ppp.collect_vec()));
+        }
+
+        if let Some(s) = &record.key_schema {
+            match &s.schema_type {
+                Some(t) => to_render.push(Self::generate_span(
+                    "Key schema",
+                    format!("{} - {}", s.id, t),
+                )),
+                None => to_render.push(Self::generate_span("Key schema", s.id.to_string())),
+            }
+        }
+        if let Some(s) = &record.value_schema {
+            match &s.schema_type {
+                Some(t) => to_render.push(Self::generate_span(
+                    "Value schema",
+                    format!("{} - {}", s.id, t),
+                )),
+                None => to_render.push(Self::generate_span("Value schema", s.id.to_string())),
+            }
         }
 
         to_render.extend(vec![
@@ -206,11 +184,8 @@ impl RecordDetailsComponent<'_> {
         let text = Text::from(record.value.to_string_pretty());
         to_render.extend(text.lines);
 
-        let p = Paragraph::new(to_render)
-            .wrap(Wrap { trim: true })
-            .scroll((self.scroll as u16, 0));
-        self.set_scroll_bar_state(p.line_count(self.rect.width) + 4);
-        self.text = p;
+        self.lines = to_render;
+        self.scroll.reset();
     }
 }
 
@@ -227,20 +202,16 @@ impl Component for RecordDetailsComponent<'_> {
     fn handle_key_events(&mut self, key: KeyEvent) -> Result<Option<Action>, TuiError> {
         match key.code {
             KeyCode::Char('k') => {
-                self.scroll = (self.scroll + 1)
-                    .min(self.lines)
-                    .min(self.scroll_size as usize);
-                self.scrollbar_state = self.scrollbar_state.position(self.scroll);
+                self.scroll.scroll_to_next_line();
             }
-            KeyCode::Char('j') if self.scroll > 0 => {
-                self.scroll -= 1;
-                self.scrollbar_state = self.scrollbar_state.position(self.scroll);
+            KeyCode::Char('j') => {
+                self.scroll.scroll_to_previous_line();
             }
             KeyCode::Char('[') => {
-                self.scroll = 0;
+                self.scroll.scroll_to_top();
             }
             KeyCode::Char(']') => {
-                self.scroll = self.scroll_size.into();
+                self.scroll.scroll_to_bottom();
             }
             KeyCode::Char('o') => {
                 if let Some(record) = &self.record {
@@ -274,7 +245,6 @@ impl Component for RecordDetailsComponent<'_> {
             }
             _ => (),
         }
-        self.scrollbar_state = self.scrollbar_state.position(self.scroll);
         Ok(None)
     }
 
@@ -302,26 +272,16 @@ impl Component for RecordDetailsComponent<'_> {
             .map(|r| r.key_schema.is_some() || r.value_schema.is_some())
             .unwrap_or(false)
         {
-            shortcuts.push(Shortcut::new("s", "Schemas"))
+            shortcuts.push(Shortcut::new("S", "Schemas"))
         }
 
         shortcuts
     }
 
     fn draw(&mut self, f: &mut Frame<'_>, rect: Rect, state: &State) -> Result<(), TuiError> {
-        if self.rect != rect {
-            self.rect = rect;
-            self.compute_record_rendering();
-        }
-        let p = self
-            .text
-            .clone()
+        let p = Paragraph::new(self.lines.clone())
             .wrap(Wrap { trim: false })
-            .scroll((self.scroll as u16, 0));
-
-        let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
-            .begin_symbol(Some("▲"))
-            .end_symbol(Some("▼"));
+            .scroll((self.scroll.value(), 0));
 
         f.render_widget(Clear, rect);
         let block = Block::new()
@@ -331,15 +291,7 @@ impl Component for RecordDetailsComponent<'_> {
         let block = self.make_block_focused_with_state(state, block);
 
         f.render_widget(p.block(block), rect);
-
-        f.render_stateful_widget(
-            scrollbar,
-            rect.inner(Margin {
-                vertical: 1,
-                horizontal: 0,
-            }),
-            &mut self.scrollbar_state,
-        );
+        self.scroll.draw(f, rect, self.lines.len() + 2);
         Ok(())
     }
 }

@@ -2,7 +2,7 @@ use reqwest::header::{self, HeaderMap, HeaderName, HeaderValue};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::{collections::HashMap, str::FromStr, time::Duration};
-use url::{PathSegmentsMut, Url};
+use url::Url;
 
 use crate::Error;
 
@@ -89,7 +89,7 @@ impl SimpleSchemaRegistryClient {
     fn schema_url(&self, id: u32) -> String {
         // TODO https://github.com/servo/rust-url/issues/333
         let mut url = self.url.clone();
-        if let Ok(mut segments)  = url.path_segments_mut() {
+        if let Ok(mut segments) = url.path_segments_mut() {
             segments.extend(vec!["schemas", "ids", &id.to_string()]);
         };
         url.to_string()
