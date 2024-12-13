@@ -100,5 +100,6 @@ yozf -c localhost
  - [URL templates to switch to web applications.](./docs/url-templates/README.md)
  - [Schema registry.](./docs/schema-registry/README.md)
  - [Themes.](./docs/themes/README.md)
+ - [Keybindings.](./docs/keybindings/README.md)
  - [Releasing a new version.](./docs/release/README.md)
  

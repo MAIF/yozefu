@@ -268,7 +268,9 @@ impl Component for RootComponent {
         };
         let focused_component = self.components.get(&self.state.focused).unwrap();
         focused_component.lock().unwrap().handle_key_events(key)?;
-        if self.state.focused == ComponentName::RecordDetails {
+        if self.state.focused == ComponentName::RecordDetails
+            && (key.code == KeyCode::Up || key.code == KeyCode::Down)
+        {
             self.components
                 .get(&ComponentName::Records)
                 .unwrap()

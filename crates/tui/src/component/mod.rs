@@ -6,6 +6,7 @@ mod record_details_component;
 mod records_component;
 mod root_component;
 mod schemas_component;
+mod scroll_state;
 mod search_component;
 mod shortcut;
 mod state;

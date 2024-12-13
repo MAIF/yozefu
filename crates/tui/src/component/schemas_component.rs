@@ -19,14 +19,15 @@ use crate::{
     Action,
 };
 
-use super::{Component, ComponentName, Shortcut, State};
+use super::{scroll_state::ScrollState, Component, ComponentName, Shortcut, State};
 
 #[derive(Default)]
 pub struct SchemasComponent<'a> {
     key: Option<SchemaDetail>,
     value: Option<SchemaDetail>,
-    text: Paragraph<'a>,
+    lines: Vec<Line<'a>>,
     pub action_tx: Option<UnboundedSender<Action>>,
+    pub scroll: ScrollState,
 }
 
 impl SchemasComponent<'_> {
@@ -78,9 +79,7 @@ impl SchemasComponent<'_> {
             )]));
             to_render.extend(schema.lines);
         }
-
-        let p = Paragraph::new(to_render).wrap(Wrap { trim: false });
-        self.text = p;
+        self.lines = to_render;
     }
 }
 
@@ -99,42 +98,58 @@ impl Component for SchemasComponent<'_> {
             self.key = key;
             self.value = value;
             self.compute_schemas_rendering();
+            self.scroll.reset();
         };
         Ok(None)
     }
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Result<Option<Action>, TuiError> {
-        if key.code == KeyCode::Char('c') {
-            let exported_schemas = ExportedSchemasDetails {
-                key: self.key.clone(),
-                value: self.value.clone(),
-            };
-
-            self.action_tx
-                .as_ref()
-                .unwrap()
-                .send(Action::CopyToClipboard(
-                    serde_json::to_string_pretty(&exported_schemas)
-                        .expect("Unable to serialize schemas"),
-                ))?;
+        match key.code {
+            KeyCode::Char('k') | KeyCode::Down => {
+                self.scroll.scroll_to_next_line();
+            }
+            KeyCode::Char('j') | KeyCode::Up => {
+                self.scroll.scroll_to_previous_line();
+            }
+            KeyCode::Char('[') => {
+                self.scroll.scroll_to_top();
+            }
+            KeyCode::Char(']') => {
+                self.scroll.scroll_to_bottom();
+            }
+            KeyCode::Char('c') => {
+                let exported_schemas = ExportedSchemasDetails {
+                    key: self.key.clone(),
+                    value: self.value.clone(),
+                };
+                self.action_tx
+                    .as_ref()
+                    .unwrap()
+                    .send(Action::CopyToClipboard(
+                        serde_json::to_string_pretty(&exported_schemas)
+                            .expect("Unable to serialize schemas"),
+                    ))?;
+            }
+            _ => (),
         }
         Ok(None)
     }
 
     fn draw(&mut self, f: &mut Frame<'_>, rect: Rect, state: &State) -> Result<(), TuiError> {
-        //let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
-        //    .begin_symbol(Some("▲"))
-        //    .end_symbol(Some("▼"));
-
         f.render_widget(Clear, rect);
         let block = Block::new()
             .borders(Borders::ALL)
             .padding(Padding::symmetric(4, 0))
             .title(" Schemas ");
+
+        let paragraph = Paragraph::new(self.lines.clone())
+            .wrap(Wrap { trim: false })
+            .scroll((self.scroll.value(), 0));
+
         let block = self.make_block_focused_with_state(state, block);
+        f.render_widget(paragraph.block(block), rect);
 
-        f.render_widget(self.text.clone().block(block), rect);
-
+        self.scroll.draw(f, rect, self.lines.len() + 2);
         Ok(())
     }
 
