@@ -6,11 +6,16 @@
 </p>
 
 
+
 This page helps you configure TLS settings for different providers.
 The steps are always the same:
 1. Open the configuration with `yozf configure`
 2. Edit the configuration file by adding a new cluster.
 3. Save the file and run start the tool `yozf -c my-cluster`
+
+
+> [!WARNING]
+> `SASL_SSL` security protocol is not available for `aarch64-unknown-linux-gnu` and `windows` targets. I'm facing some compilation issues.
 
 
 ## Confluent
