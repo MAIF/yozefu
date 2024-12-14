@@ -55,15 +55,3 @@ tag-message = "chore: Release version {{version}}"
 pre-release-commit-message = "chore: Release version {{version}}"
 tag-name = "{{version}}"
 
-[workspace.metadata.cross.target.aarch64-unknown-linux-gnu]
-pre-build = [
-    "dpkg --add-architecture $CROSS_DEB_ARCH",
-    "apt-get update && apt-get --assume-yes install libssl-dev:$CROSS_DEB_ARCH",
-]
-
-[workspace.metadata.cross.target.'cfg(target_os = "windows")']
-pre-build = [
-    "echo \"VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT\" | Out-File -FilePath $env:GITHUB_ENV -Append",
-    "vcpkg install openssl:x64-windows-static-md",
-    "vcpkg install openssl:x64-windows-static",
-]

@@ -39,8 +39,6 @@ tokio = { version = "1", features = ["full", "tracing"] }
 rdkafka = { version = "0.37.0", features = [
     "libz-static",
     "cmake-build",
-    "ssl",
-    "gssapi-vendored", "sasl",
     "libz-static",
     "curl-static",
     "libz",
@@ -56,5 +54,12 @@ reqwest = { version = "0.12.9", features = ["json"] }
 
 [features]
 ssl-vendored = [
-    "rdkafka/ssl-vendored"
+    "rdkafka/ssl-vendored",
+    "tui/ssl-vendored",
+    "app/ssl-vendored"
+]
+gssapi-vendored = [
+    "rdkafka/gssapi-vendored",
+    "tui/gssapi-vendored",
+    "app/gssapi-vendored"
 ]

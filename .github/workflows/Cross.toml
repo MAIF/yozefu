@@ -1,0 +1,20 @@
+[target.aarch64-unknown-linux-gnu]
+pre-build = [
+    "apt-get update && apt-get --assume-yes install libsasl2-dev libssl-dev:$CROSS_DEB_ARCH",
+]
+
+[target.aarch64-unknown-linux-gnu.env]
+# Fix build for transitive dependency rdkafka -> rdkafka-sys -> sasl2-sys -> krb5-src
+# Introduced by https://github.com/MaterializeInc/rust-krb5-src/pull/27
+passthrough = [
+    "krb5_cv_attr_constructor_destructor=yes",
+    "ac_cv_func_regcomp=yes",
+    "ac_cv_printf_positional=yes",
+]
+
+[target.'cfg(target_os = "windows")']
+pre-build = [
+    "echo \"VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT\" | Out-File -FilePath $env:GITHUB_ENV -Append",
+    "vcpkg install openssl:x64-windows-static-md",
+    "vcpkg install openssl:x64-windows-static",
+]
