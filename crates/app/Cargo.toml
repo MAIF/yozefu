@@ -23,3 +23,12 @@ rdkafka = { version = "0.37.0", features = ["cmake-build"] }
 async-trait = "0.1.83"
 extism = "1.9.1"
 url = { version = "2.5.4", features = ["serde"] }
+
+
+[features]
+ssl-vendored = [
+    "rdkafka/ssl-vendored"
+]
+gssapi-vendored = [
+    "rdkafka/gssapi-vendored"
+]

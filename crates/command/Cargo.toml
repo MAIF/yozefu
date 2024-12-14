@@ -54,5 +54,12 @@ reqwest = { version = "0.12.9", features = ["json"] }
 
 [features]
 ssl-vendored = [
-    "rdkafka/ssl-vendored"
+    "rdkafka/ssl-vendored",
+    "tui/ssl-vendored",
+    "app/ssl-vendored"
+]
+gssapi-vendored = [
+    "rdkafka/gssapi-vendored",
+    "tui/gssapi-vendored",
+    "app/gssapi-vendored"
 ]

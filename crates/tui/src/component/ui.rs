@@ -2,6 +2,7 @@
 
 use app::search::{Search, SearchContext};
 use app::App;
+use chrono::DateTime;
 use crossterm::event::KeyEvent;
 use futures::{StreamExt, TryStreamExt};
 use itertools::Itertools;
@@ -177,9 +178,13 @@ impl Ui {
                     tx_dd.send(message).unwrap();
                     if current_time.elapsed() > Duration::from_secs(20) {
                         current_time = Instant::now();
+
                         tx.send(Action::Notification(Notification::new(
                             log::Level::Info,
-                            format!("Checkpoint: {}", timestamp),
+                            format!(
+                                "Checkpoint: {}",
+                                DateTime::from_timestamp_millis(timestamp).unwrap()
+                            ),
                         )))
                         .unwrap();
                     }
