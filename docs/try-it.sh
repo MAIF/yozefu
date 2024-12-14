@@ -93,6 +93,7 @@ docker compose -f "${repo}/compose.yml" exec -T kafka \
   --topic "${topic}"
 
 if jbang --version &> /dev/null; then
+    echo " 🤖 jbang run ${repo}/docs/schemas/MyProducer.java --type "$type" --topic "$topic" "$query""
     jbang run ${repo}/docs/schemas/MyProducer.java --type "$type" --topic "$topic" "$query"
 else
     echo " ℹ️ About to use the default producer 'kafka-console-producer.sh'. Install jbang to create a kafka producer using the schema registry."

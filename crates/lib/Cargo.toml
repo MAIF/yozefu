@@ -19,7 +19,7 @@ itertools = "0.13.0"
 strum = { version = "0.26.3", features = ["derive", "strum_macros"], optional = true }
 fuzzydate = {version = "0.2.2", optional = true }
 nom = "8.0.0-beta.1"
-rdkafka = { version = "0.37.0", features = ["cmake-build"], optional = true}
+rdkafka = { version = "0.37.0", features = [], optional = true}
 url = "2.5.4"
 apache-avro = "0.17.0"
 reqwest = { version = "0.12.9", features = ["json"] }
