@@ -19,7 +19,7 @@ lib = { workspace = true, features = ["native"] }
 itertools = "0.13.0"
 thousands = "0.2.0"
 indexmap = "2.7.0"
-rdkafka = { version = "0.37.0", features = ["cmake-build"] }
+rdkafka = { version = "0.37.0", features = ["cmake-build", "ssl", "gssapi-vendored", "sasl"] }
 async-trait = "0.1.83"
 extism = "1.9.1"
 url = { version = "2.5.4", features = ["serde"] }

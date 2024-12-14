@@ -39,4 +39,4 @@ copypasta = "0.10.1"
 rayon = "1.10.0"
 lib = { workspace = true }
 app = { workspace = true }
-rdkafka = { version = "0.37.0", features = ["cmake-build"] }
+rdkafka = { version = "0.37.0", features = ["cmake-build", "ssl", "gssapi-vendored", "sasl"] }

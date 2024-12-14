@@ -1,4 +1,4 @@
-FROM rust:1.82.0-slim-bullseye AS builder
+FROM rust:1.83.0-slim-bullseye AS builder
 WORKDIR /app
 RUN --mount=type=bind,source=crates,target=crates \
     --mount=type=bind,source=Cargo.toml,target=Cargo.toml \
