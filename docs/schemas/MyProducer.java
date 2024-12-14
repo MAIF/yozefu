@@ -40,12 +40,14 @@ import java.util.*;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchemaUtils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -67,19 +69,18 @@ class MyProducer implements Callable<Integer> {
     @CommandLine.Option(names = {"--topic"}, description = "The topic to produce records to.")
     private String topic = "public-french-addresses";
 
-    @CommandLine.Option(names = {"--type"}, description = "avro, json, jsonSchema, protobuf, text or malformed", defaultValue = "json")
+    @CommandLine.Option(names = {"--type"}, description = "avro, json, jsonSchema, protobuf, text, xml or malformed", defaultValue = "json")
     private SerializerType type = SerializerType.json;
 
     @CommandLine.Parameters(description = "Your query passed to 'https://api-adresse.data.gouv.fr/search/?q='", defaultValue = "kafka")
     private String query;
 
+    @CommandLine.Option(names = {"--properties"}, description = "Properties file for creating the kafka producer")
+    private Optional<Path> properties = Optional.empty();
+
     @Override
     public Integer call() throws Exception {
-        Properties props = new Properties();
-        props.put("bootstrap.servers", "localhost:9092");
-        var schemaRegistryUrl = System.getenv().getOrDefault("YOZEFU_SCHEMA_REGISTRY_URL", "http://localhost:8081");
-        props.put("schema.registry.url", System.getenv().getOrDefault("YOZEFU_SCHEMA_REGISTRY_URL", schemaRegistryUrl));
-        System.err.printf(" 📖 schema registry URL is %s\n", schemaRegistryUrl);
+        Properties props = this.kafkaProperties();
 
         var url = System.getenv().getOrDefault("YOZEFU_API_URL", "https://api-adresse.data.gouv.fr/search/?q=%s");
         System.err.printf(" 🔩 The API is '%s'\n", url);
@@ -133,6 +134,24 @@ class MyProducer implements Callable<Integer> {
             }
         }
         return 0;
+    }
+
+    public Properties kafkaProperties() {
+        Properties props = new Properties();
+        if(this.properties.isPresent()) {
+            try {
+                props.load(new FileInputStream(this.properties.get().toFile()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        props.putIfAbsent("bootstrap.servers", "localhost:9092");
+        props.putIfAbsent("schema.registry.url", System.getenv().getOrDefault("YOZEFU_SCHEMA_REGISTRY_URL", "http://localhost:8081"));
+        var schemaRegistryUrl = props.getProperty("schema.registry.url");
+        System.err.printf(" 📖 schema registry URL is %s\n", schemaRegistryUrl);
+
+        return props;
     }
 
     public static <K, V> void produce(KafkaProducer<K, V> producer, Into<K, V> mapper, List<String> addresses, String topic) throws Exception {

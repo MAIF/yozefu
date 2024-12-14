@@ -22,3 +22,5 @@ dump
 docs/avro-tools.jar
 yozefu-exports/
 .env
+certificates
+docs/schemas/kafka.properties
