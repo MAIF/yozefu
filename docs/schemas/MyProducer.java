@@ -170,7 +170,7 @@ class MyProducer implements Callable<Integer> {
         return props;
     }
 
-    public static <K, V> void produce(KafkaProducer<K, V> producer, Into<K, V> mapper, List<String> addresses, String topic) throws Exception {
+    public static <K, V> void produce(final KafkaProducer<K, V> producer, final Into<K, V> mapper, final List<String> addresses, final String topic) throws Exception {
         for (var address : addresses) {
             var record = mapper.into(address, topic);
             producer.send(record, onSend());
@@ -189,7 +189,7 @@ class MyProducer implements Callable<Integer> {
         };
     }
 
-    private static List<String> get(String apiUrl, String query) throws IOException, InterruptedException {
+    private static List<String> get(final String apiUrl, String query) throws IOException, InterruptedException {
         System.err.printf(" 🏡 Searching french addresses matching the query '%s'\n", query);
         var url = String.format(apiUrl, query.trim().toLowerCase());
 
@@ -229,7 +229,7 @@ class MyProducer implements Callable<Integer> {
 
 
 interface Into<K, V> {
-    ProducerRecord<K, V> into(String value, String topic) throws Exception;
+    ProducerRecord<K, V> into(final String value, final String topic) throws Exception;
 
     default String generateKey() {
         return UUID.randomUUID().toString();
@@ -243,7 +243,7 @@ interface Into<K, V> {
 }
 
 class IntoText implements Into<String, String> {
-    public ProducerRecord<String, String> into(String value, String topic) throws JsonProcessingException {
+    public ProducerRecord<String, String> into(final String value, final String topic) throws JsonProcessingException {
         var objectMapper = new ObjectMapper();
         var object = objectMapper.readTree(value);
         return new ProducerRecord<>(topic, this.generateKey(), object.get("properties").get("label").asText());
@@ -251,13 +251,13 @@ class IntoText implements Into<String, String> {
 }
 
 class IntoJson implements Into<String, String> {
-    public ProducerRecord<String, String> into(String value, String topic) {
+    public ProducerRecord<String, String> into(final String value, final String topic) {
         return new ProducerRecord<>(topic, generateKey(), value);
     }
 }
 
 class IntoJsonSchema implements Into<JsonNode, JsonNode> {
-    public ProducerRecord<JsonNode, JsonNode> into(String input, String topic) throws Exception {
+    public ProducerRecord<JsonNode, JsonNode> into(final String input, final String topic) throws Exception {
         var objectMapper = new ObjectMapper();
         var keySchemaString = readResource("/json-schema/key-schema.json");
         var valueSchemaString = readResource("/json-schema/value-schema.json");
@@ -275,7 +275,7 @@ class IntoJsonSchema implements Into<JsonNode, JsonNode> {
 }
 
 class IntoAvro implements Into<GenericRecord, GenericRecord> {
-    public ProducerRecord<GenericRecord, GenericRecord> into(String input, String topic) throws Exception {
+    public ProducerRecord<GenericRecord, GenericRecord> into(final String input, final String topic) throws Exception {
         var keySchemaString = readResource("/avro/key-schema.json");
         var valueSchemaString = readResource("/avro/value-schema.json");
 
@@ -293,7 +293,7 @@ class IntoAvro implements Into<GenericRecord, GenericRecord> {
 
 // TODO work in progress
 class IntoProtobuf implements Into<Object, Object> {
-    public ProducerRecord<Object, Object> into(String input, String topic) throws Exception {
+    public ProducerRecord<Object, Object> into(final String input, final String topic) throws Exception {
         var keySchemaString = readResource("/protobuf/key-schema.proto");
         var valueSchemaString = readResource("/protobuf/value-schema.proto");
 
@@ -309,7 +309,7 @@ class IntoProtobuf implements Into<Object, Object> {
 }
 
 class IntoMalformed implements Into<byte[], byte[]> {
-    public ProducerRecord<byte[], byte[]> into(String input, String topic) throws Exception {
+    public ProducerRecord<byte[], byte[]> into(final String input, final String topic) throws Exception {
         byte randomSchemaId = (byte) ((Math.random() * (127 - 1)) + 1);
         var header = new byte[]{0, 0, 0, 0, randomSchemaId};
 
@@ -329,9 +329,8 @@ class IntoMalformed implements Into<byte[], byte[]> {
     }
 }
 
-
 class IntoInvalidJson implements Into<JsonNode, JsonNode> {
-    public ProducerRecord<JsonNode, JsonNode> into(String input, String topic) throws Exception {
+    public ProducerRecord<JsonNode, JsonNode> into(final String input, final String topic) throws Exception {
         var objectMapper = new ObjectMapper();
         var keySchemaString = readResource("/json-schema/key-schema.json");
         var valueSchemaString = readResource("/json-schema/value-schema.json");
@@ -350,7 +349,7 @@ class IntoInvalidJson implements Into<JsonNode, JsonNode> {
 }
 
 class IntoXml implements Into<String, String> {
-    public ProducerRecord<String, String> into(String input, String topic) throws Exception {
+    public ProducerRecord<String, String> into(final String input, final String topic) throws Exception {
         var objectMapper = new ObjectMapper();
         var xmlMapper = new XmlMapper();
         var value = objectMapper.readTree(input);

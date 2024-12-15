@@ -3,7 +3,6 @@
 <!--
 <a href="https://github.com/MAIF/yozefu/releases"><img src="https://img.shields.io/github/v/release/MAIF/yozefu?style=flatd&color=f8be75&logo=GitHub"></a>-->
 <a href="https://crates.io/crates/yozefu/"><img src="https://img.shields.io/crates/v/yozefu?logo=Rust"></a>
-<a href="https://github.com/MAIF/yozefu/actions/workflows/build.yml"><img src="https://github.com/MAIF/yozefu/actions/workflows/build.yml/badge.svg" alt="Build status"/></a>
 <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/MSRV-1.80.1+-lightgray.svg?logo=rust" alt="Minimum supported Rust version: 1.80.1 or plus"/></a>
 <a href="https://github.com/MAIF/yozefu/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="Licence"/></a>
 
@@ -96,7 +95,7 @@ yozf -c localhost
 
  - [The query language.](./docs/query-language/README.md)
  - [Creating a search filter.](./docs/search-filter/README.md)
- - [Configuring the tool with TLS.](./docs/tls/README.md)
+ - [TLS encryption and authentication](./docs/tls/README.md).
  - [URL templates to switch to web applications.](./docs/url-templates/README.md)
  - [Schema registry.](./docs/schema-registry/README.md)
  - [Themes.](./docs/themes/README.md)

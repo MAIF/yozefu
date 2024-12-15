@@ -1,4 +1,4 @@
-# TLS Support
+# TLS encryption and authentication
 <p>
 <a href="https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md">
         <img src="https://img.shields.io/badge/librdkafka-Global_configuration_properties-black.svg?logo=github"></a> <a href="https://github.com/confluentinc/librdkafka/wiki/Using-SSL-with-librdkafka#configure-librdkafka-client">
@@ -6,14 +6,11 @@
 </p>
 
 
-
 This page helps you configure TLS settings for different providers.
 The steps are always the same:
 1. Open the configuration with `yozf configure`
 2. Edit the configuration file by adding a new cluster.
 3. Save the file and run start the tool `yozf -c my-cluster`
-
-If you use any of the following properties:`ssl.ca.location`, `ssl.certificate.location`, `ssl.key.location`, make sure to provide an absolute path, using `~` in the path doesn't work.
 
 > [!WARNING]
 > `SASL_SSL` security protocol is not available for `aarch64-unknown-linux-gnu` and `windows` targets. I'm facing some compilation issues.
@@ -138,10 +135,13 @@ Please note that, according to [the documentation](https://github.com/confluenti
 [Contributions are welcomed](https://github.com/MAIF/yozefu/edit/main/docs/tls.md) to improve this page.
 
 
-| Provider              | Tested  | Documentation                                                                                                                 |
-| --------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| Google Cloud Platform | `false` | https://cloud.google.com/managed-service-for-apache-kafka/docs/quickstart#cloud-shell                                         |
-| Amazon Web Services   | `false` | https://docs.aws.amazon.com/msk/latest/developerguide/produce-consume.html                                                    |
-| Microsoft Azure       | `false` | https://learn.microsoft.com/fr-fr/azure/event-hubs/azure-event-hubs-kafka-overview                                            |
-| DigitalOcean          | `false` | https://docs.digitalocean.com/products/databases/kafka/how-to/connect/                                                        |
-| OVH                   | `false` | https://help.ovhcloud.com/csm/en-ie-public-cloud-databases-kafka-getting-started?id=kb_article_view&sysparm_article=KB0048944 |
+| Provider                | Compatible | Documentation                                                                                                                 |
+| ----------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Google Cloud Platform   | ?          | https://cloud.google.com/managed-service-for-apache-kafka/docs/quickstart#cloud-shell                                         |
+| Amazon Web Services     | ?          | https://docs.aws.amazon.com/msk/latest/developerguide/produce-consume.html                                                    |
+| Microsoft Azure         | ?          | https://learn.microsoft.com/fr-fr/azure/event-hubs/azure-event-hubs-kafka-overview                                            |
+| DigitalOcean            | ?          | https://docs.digitalocean.com/products/databases/kafka/how-to/connect/                                                        |
+| OVH                     | ?          | https://help.ovhcloud.com/csm/en-ie-public-cloud-databases-kafka-getting-started?id=kb_article_view&sysparm_article=KB0048944 |
+| Aiven for Apache Kafka® | `true`     | https://aiven.io/docs/products/kafka/howto/list-code-samples                                                                  |
+| Confluent Cloud         | `true`     | https://confluent.cloud/environments                                                                                          |
+| Redpanda                | `true`     | https://cloud.redpanda.com/clusters                                                                                           |

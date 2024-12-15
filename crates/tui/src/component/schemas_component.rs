@@ -56,7 +56,9 @@ impl SchemasComponent<'_> {
                 s.response
                     .as_ref()
                     .map(|r| r.schema_to_string_pretty())
-                    .unwrap_or("Schema is unavailable".to_string()),
+                    .unwrap_or(
+                        "Schema is unavailable. Are you sure the schema is accessible?".to_string(),
+                    ),
             );
             to_render.push(Line::from(vec![Span::styled(
                 "Key schema: ",
@@ -71,7 +73,9 @@ impl SchemasComponent<'_> {
                 s.response
                     .as_ref()
                     .map(|r| r.schema_to_string_pretty())
-                    .unwrap_or("Schema is unavailable".to_string()),
+                    .unwrap_or(
+                        "Schema is unavailable. Are you sure the schema is accessible?".to_string(),
+                    ),
             );
             to_render.push(Line::from(vec![Span::styled(
                 "Value schema: ",
