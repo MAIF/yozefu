@@ -210,7 +210,6 @@ impl Ui {
     ) -> Result<(), TuiError> {
         let app = self.app.clone();
         tokio::spawn(async move {
-            info!("Loading topics");
             match app.topic_details(topics) {
                 Ok(details) => action_tx.send(Action::TopicDetails(details)).unwrap(),
                 Err(e) => action_tx
