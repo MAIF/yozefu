@@ -38,7 +38,7 @@ jobs:
       - name: Run try-it.sh
         run: bash docs/try-it.sh 
         env: 
-          YOZEFU_API_URL: http://localhost:8082/schemas/types
+          YOZEFU_API_URL: http://localhost:8081/schemas/types
 
   wasm-rust:
     runs-on: ubuntu-latest

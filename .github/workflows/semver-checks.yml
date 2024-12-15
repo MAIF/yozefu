@@ -62,10 +62,10 @@ jobs:
       - name: Make sure version is updated
         if: ${{ steps.current.outputs.version == steps.next.outputs.version }}
         run: |
-          echo "::warning title=Next version:: Last public version is '${{ steps.current.outputs.version }}' but version of this branch is '${{ steps.next.outputs.version }}'. Did you forget to update the version? More details at https://github.com/MAIF/yozefu/blob/main/docs/release.md"
+          echo "::warning title=Next version:: Last public version is '${{ steps.current.outputs.version }}' but version of this branch is '${{ steps.next.outputs.version }}'. Did you forget to update the version? More details at https://github.com/MAIF/yozefu/blob/main/docs/release/README.md"
           printf 'This pull request is not ready because the crate version is equals to the latest git tag version `' > report.md
           printf "${{ steps.next.outputs.version }}" >> report.md
-          printf '`. I think you forgot to bump the version. More details at https://github.com/MAIF/yozefu/blob/main/docs/release.md' >> report.md
+          printf '`. I think you forgot to bump the version. More details at https://github.com/MAIF/yozefu/blob/main/docs/release/README.md' >> report.md
           gh pr comment ${{ github.event.number }} --body-file ./report.md
           exit 1
         env:
@@ -88,7 +88,7 @@ jobs:
       - name: Run cargo semver-checks
         if: ${{ steps.next.outputs.version != '' && steps.semver.outputs.release  != '' }}
         id: check
-        run: cargo semver-checks --color never --package yozefu-lib --package yozefu-app --package yozefu-types --baseline-rev "${{ steps.current.outputs.version }}" --release-type "${{ steps.semver.outputs.release }}" >> "$GITHUB_OUTPUT"
+        run: cargo semver-checks --color never --package yozefu-lib --package yozefu-app --package yozefu-wasm-types --package yozefu-command --baseline-rev "${{ steps.current.outputs.version }}" --release-type "${{ steps.semver.outputs.release }}" >> "$GITHUB_OUTPUT"
       - name: Publish semver-checks report
         if: ${{ steps.check.outcome != 'success' && steps.check.outcome != 'skipped' }}
         run: |
