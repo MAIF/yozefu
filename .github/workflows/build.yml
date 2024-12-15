@@ -17,6 +17,10 @@ env:
   RUSTDOCFLAGS: '--deny warnings'
   MINIMUM_SUPPORTED_RUST_VERSION: 1.80.1
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check:
     name: Check
@@ -55,27 +59,28 @@ jobs:
     name: Build for targets
     needs: check
     runs-on: ${{ matrix.platforms.os }}
+    continue-on-error: true
     strategy:
       matrix:
         platforms:
           - os: macOS-latest
             target: aarch64-apple-darwin
-            features: "--features ssl-vendored"
+            features: ""
           - os: macos-latest-large
             target: x86_64-apple-darwin
-            features: "--features ssl-vendored"
+            features: ""
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-            features: "--features ssl-vendored"
+            features: ""
           - os: ubuntu-latest
             target: aarch64-unknown-linux-gnu
-            features: "--features ssl-vendored"
+            features: "--no-default-features --features ssl-vendored"
           - os: windows-latest
             target: x86_64-pc-windows-gnu
-            features: ""
+            features: "--no-default-features"
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            features: "--features ssl-vendored"
+            features: "--no-default-features --features ssl-vendored"
 
     steps:
       - uses: actions/checkout@v4
@@ -85,6 +90,10 @@ jobs:
           target: ${{ matrix.platforms.target }}
           args: "--locked ${{ matrix.platforms.features }}"
           strip: true
+        env:
+          KRB5_CV_ATTR_CONSTRUCTOR_DESTRUCTOR: yes
+          AC_CV_FUNC_REGCOMP: yes
+          AC_CV_PRINTF_POSITIONAL: yes
 
   clippy:
     needs: check

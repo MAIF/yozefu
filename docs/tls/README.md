@@ -6,11 +6,17 @@
 </p>
 
 
+
 This page helps you configure TLS settings for different providers.
 The steps are always the same:
 1. Open the configuration with `yozf configure`
 2. Edit the configuration file by adding a new cluster.
 3. Save the file and run start the tool `yozf -c my-cluster`
+
+If you use any of the following properties:`ssl.ca.location`, `ssl.certificate.location`, `ssl.key.location`, make sure to provide an absolute path, using `~` in the path doesn't work.
+
+> [!WARNING]
+> `SASL_SSL` security protocol is not available for `aarch64-unknown-linux-gnu` and `windows` targets. I'm facing some compilation issues.
 
 
 ## Confluent
@@ -114,9 +120,9 @@ Please note that, according to [the documentation](https://github.com/confluenti
       "kafka": {
         "bootstrap.servers": "kafka-1.acme:9092,kafka-2.acme:9092",
         "security.protocol": "SSL",
-        "ssl.ca.location": "path/to/ca-certificate.pem",
-        "ssl.certificate.location": "path/to/certificate.pem",
-        "ssl.key.location": "path/to/client.key",
+        "ssl.ca.location": "/absolute-path/to/ca-certificate.pem",
+        "ssl.certificate.location": "/absolute-path/to/certificate.pem",
+        "ssl.key.location": "/absolute-path/to/client.key",
         "ssl.key.password": "<key-password>",
       }
     }
