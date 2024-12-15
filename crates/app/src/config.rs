@@ -3,6 +3,7 @@
 use indexmap::IndexMap;
 use itertools::Itertools;
 use lib::Error;
+use resolve_path::PathResolveExt;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::{
@@ -14,7 +15,17 @@ use url::Url;
 
 use crate::APPLICATION_NAME;
 
-static EXAMPLE_PROMPTS: &[&str] = &[
+/// List of kafka properties that are a file location.
+const KAFKA_PROPERTIES_WITH_LOCATIONS: [&str; 6] = [
+    "ssl.ca.location",
+    "ssl.certificate.location",
+    "ssl.key.location",
+    "ssl.keystore.location",
+    "ssl.crl.location",
+    "ssl.engine.location",
+];
+
+const EXAMPLE_PROMPTS: &[&str] = &[
     r#"timestamp between "2 hours ago" and "1 hour ago" limit 100 from beginning"#,
     r#"offset > 100000 and value contains "music" limit 10"#,
     r#"key == "ABC" and timestamp >= "2 days ago""#,
@@ -164,7 +175,6 @@ impl Config {
     /// Returns the kafka properties for the given cluster.
     pub fn kafka_config_of(&self, cluster: &str) -> Result<HashMap<String, String>, Error> {
         let mut config = HashMap::new();
-
         config.extend(self.default_kafka_config.clone());
 
         if !self.clusters.contains_key(cluster) {
@@ -177,7 +187,24 @@ impl Config {
 
         let env_config = self.clusters.get(cluster.trim()).unwrap();
         config.extend(env_config.kafka.clone());
+        config = Self::normalize_path_locations(config);
+
         Ok(config)
+    }
+
+    /// Returns the kafka properties for the given cluster.
+    fn normalize_path_locations(mut config: HashMap<String, String>) -> HashMap<String, String> {
+        for key in KAFKA_PROPERTIES_WITH_LOCATIONS {
+            if let Some(path) = config.get(key) {
+                let normalized_path = PathBuf::from(path)
+                    .resolve()
+                    .canonicalize()
+                    .map(|d| d.display().to_string())
+                    .unwrap_or(path.to_string());
+                config.insert(key.to_string(), normalized_path);
+            }
+        }
+        config
     }
 
     /// Returns the schema registry configuration for the given cluster.
