@@ -1,3 +1,21 @@
+## What's Changed in v0.0.2
+* Release/v0.0.2 by @Mcdostone in [#7](https://github.com/MAIF/yozefu/pull/7)
+* chore: Release version 0.0.2 by @Mcdostone
+* fix: fix rust imports with `native` feature by @Mcdostone
+* feat: allow tilde paths in kafka properties (`ssl.ca.location` for instance), update dependencies by @Mcdostone
+* feat: enable `sasl` authentication by @Mcdostone
+* refactor: ScrollState structure by @Mcdostone
+* fix: get rid of an `unwrap` call when crafting the schema URL in the schema registry client by @Mcdostone
+* feat: by pressing `s` on a given record, you can read its schemas by @Mcdostone
+* docs: fix CI and update crate metadata by @Mcdostone
+* Changelog for 0.0.1 by @github-actions[bot] in [#1](https://github.com/MAIF/yozefu/pull/1)
+* ci: fix package name by @Mcdostone
+
+## New Contributors
+* @github-actions[bot] made their first contribution in [#1](https://github.com/MAIF/yozefu/pull/1)
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.1...v0.0.2
+
 ## What's Changed in v0.0.1
 * feat: first commit by @Mcdostone
 
