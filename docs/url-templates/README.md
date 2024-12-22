@@ -20,7 +20,6 @@ This list gives the different URL templates depending on the web application you
 | [Kouncil](https://kouncil.io/)                                                         | https://kouncil.acme/topics/messages/{topic}                                                                                                                                      |
 | [Kafbat UI](https://ui.docs.kafbat.io/)                                                | https://kafbat-ui.acme/ui/clusters/acme-cluster/all-topics/{topic}/messages?limit=1&mode=FROM_OFFSET&offset={offset}&partitions={partition}                                       |
 | [Aiven](https://aiven.io/kafka)                                                        | https://console.aiven.io/account/{todo-account-id}/project/{todo-project-id}/services/{todo-service-id}/topics/{topic}/messages?format=json&offset={offset}&partition={partition} |
-|                                                                                        |
 
 
 At this time, [3 variables can be used](https://github.com/MAIF/yozefu/blob/main/crates/tui/src/component/ui.rs#L312-L318) in the URL template: `{topic}`, `{partition}` and `{offset}`.
