@@ -13,7 +13,7 @@ repository.workspace = true
 
 [dependencies]
 serde = { version = "1.0.216", features = ["derive"] }
-serde_json = { version = "1.0.133", features = ["preserve_order"] }
+serde_json = { version = "1.0.134", features = ["preserve_order"] }
 chrono = { version = "0.4.39", features = ["serde"], optional = true }
 itertools = "0.13.0"
 strum = { version = "0.26.3", features = ["derive", "strum_macros"], optional = true }

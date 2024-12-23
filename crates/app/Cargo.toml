@@ -13,7 +13,7 @@ repository.workspace = true
 
 [dependencies]
 serde = { version = "1.0.216", features = ["derive"] }
-serde_json = { version = "1.0.133", features = ["preserve_order"] }
+serde_json = { version = "1.0.134", features = ["preserve_order"] }
 log = "0.4.22"
 lib = { workspace = true, features = ["native"] }
 itertools = "0.13.0"
