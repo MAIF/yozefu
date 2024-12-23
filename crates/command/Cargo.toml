@@ -26,7 +26,7 @@ clap = { version = "4.5.23", features = [
 ] }
 serde_json = { version = "1.0.133", features = ["preserve_order"] }
 log = "0.4.22"
-env_logger = "0.11.5"
+env_logger = "0.11.6"
 chrono = "0.4.39"
 strum = { version = "0.26.3", features = ["derive", "strum_macros"] }
 directories = "5.0.1"
