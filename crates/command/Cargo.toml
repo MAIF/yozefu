@@ -50,7 +50,7 @@ indexmap = "2.7.0"
 tui = { workspace = true }
 app = { workspace = true }
 lib = { workspace = true }
-reqwest = { version = "0.12.9", features = ["json"] }
+reqwest = { version = "0.12.11", features = ["json"] }
 
 [features]
 ssl-vendored = [
