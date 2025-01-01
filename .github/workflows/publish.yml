@@ -121,7 +121,7 @@ jobs:
             features: "--no-default-features --features ssl-vendored"
     steps:
       - uses: actions/checkout@v4
-      - uses: houseabsolute/actions-rust-cross@v0.0.17
+      - uses: houseabsolute/actions-rust-cross@v1
         with:
           target: ${{ matrix.platforms.target }}
           args: "--verbose --locked --release ${{ matrix.platforms.features }}"
