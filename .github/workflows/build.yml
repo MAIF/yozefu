@@ -84,7 +84,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: houseabsolute/actions-rust-cross@v0.0.17
+      - uses: houseabsolute/actions-rust-cross@v1
         # if: (github.event.pull_request.base.ref  == 'main' && matrix.platforms.os == 'macos-latest-large') == false
         with:
           target: ${{ matrix.platforms.target }}
