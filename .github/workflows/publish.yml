@@ -152,7 +152,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Attest
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@v2
         with:
           subject-path: "${{ steps.variables.outputs.source }}"
           subject-name: "${{ steps.variables.outputs.archive }}-${{ needs.version.outputs.version }}"
@@ -245,7 +245,7 @@ jobs:
         annotations: ${{ steps.meta.outputs.annotations }}
     # https://github.com/actions/attest-build-provenance
     - name: Generate artifact attestation
-      uses: actions/attest-build-provenance@v1
+      uses: actions/attest-build-provenance@v2
       with:
         subject-name: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}
         subject-digest: ${{ steps.push.outputs.digest }}
