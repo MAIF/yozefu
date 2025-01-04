@@ -52,6 +52,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -82,15 +84,46 @@ class MyProducer implements Callable<Integer> {
     @CommandLine.Option(names = {"--properties"}, description = "Properties file for creating the kafka producer")
     private Optional<Path> properties = Optional.empty();
 
+    @CommandLine.Option(names = {"--every"}, description = "Produce records every X ms")
+    private Optional<Long> every = Optional.empty();
+
     @Override
     public Integer call() throws Exception {
         Properties props = this.kafkaProperties();
 
         var url = System.getenv().getOrDefault("YOZEFU_API_URL", "https://api-adresse.data.gouv.fr/search/?q=%s");
         System.err.printf(" 🔩 The API is '%s'\n", url);
-        var data = get(url, query);
 
         System.err.printf(" 📣 About to producing records to topic '%s', serialization type is '%s'\n", topic, type);
+        if(this.every.isPresent()) {
+            this.produceEvery(props, url);
+        } else {
+            this.produceOnce(props, url);
+        }
+
+        return 0;
+    }
+
+    public Properties kafkaProperties() {
+        Properties props = new Properties();
+        if(this.properties.isPresent()) {
+            try {
+                props.load(new FileInputStream(this.properties.get().toFile()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        props.putIfAbsent("bootstrap.servers", "localhost:9092");
+        props.putIfAbsent("schema.registry.url", System.getenv().getOrDefault("YOZEFU_SCHEMA_REGISTRY_URL", "http://localhost:8081"));
+        var schemaRegistryUrl = props.getProperty("schema.registry.url");
+        System.err.printf(" 📖 schema registry URL is %s\n", schemaRegistryUrl);
+
+        return props;
+    }
+
+    public void produceOnce(Properties props, String url) throws Exception {
+        var data = get(url, query);
         switch (type) {
             case avro -> {
                 props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getName());
@@ -149,25 +182,19 @@ class MyProducer implements Callable<Integer> {
                 produce(producer, new IntoText(), data, topic);
             }
         }
-        return 0;
     }
 
-    public Properties kafkaProperties() {
-        Properties props = new Properties();
-        if(this.properties.isPresent()) {
-            try {
-                props.load(new FileInputStream(this.properties.get().toFile()));
-            } catch (IOException e) {
-                e.printStackTrace();
+    public void produceEvery(Properties props, String url) throws Exception {
+        // run produceOnce every x ms
+        var every = this.every.get();
+        while(true) {
+            Instant start = Instant.now();
+            this.produceOnce(props, url);
+            Duration timeElapsed = Duration.between(start, Instant.now()); 
+            if(timeElapsed.toMillis() < every) {
+                Thread.sleep(every - timeElapsed.toMillis());
             }
         }
-
-        props.putIfAbsent("bootstrap.servers", "localhost:9092");
-        props.putIfAbsent("schema.registry.url", System.getenv().getOrDefault("YOZEFU_SCHEMA_REGISTRY_URL", "http://localhost:8081"));
-        var schemaRegistryUrl = props.getProperty("schema.registry.url");
-        System.err.printf(" 📖 schema registry URL is %s\n", schemaRegistryUrl);
-
-        return props;
     }
 
     public static <K, V> void produce(final KafkaProducer<K, V> producer, final Into<K, V> mapper, final List<String> addresses, final String topic) throws Exception {
