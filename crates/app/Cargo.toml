@@ -12,15 +12,15 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
-serde = { version = "1.0.216", features = ["derive"] }
-serde_json = { version = "1.0.133", features = ["preserve_order"] }
+serde = { version = "1.0.217", features = ["derive"] }
+serde_json = { version = "1.0.134", features = ["preserve_order"] }
 log = "0.4.22"
 lib = { workspace = true, features = ["native"] }
-itertools = "0.13.0"
+itertools = "0.14.0"
 thousands = "0.2.0"
 indexmap = "2.7.0"
 rdkafka = { version = "0.37.0", features = ["cmake-build"] }
-async-trait = "0.1.83"
+async-trait = "0.1.84"
 extism = "1.9.1"
 url = { version = "2.5.4", features = ["serde"] }
 resolve-path = "0.1.0"
