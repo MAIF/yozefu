@@ -1,3 +1,23 @@
+## What's Changed in v0.0.3
+* fix `KeyEvent` on windows by @Mcdostone in [#19](https://github.com/MAIF/yozefu/pull/19)
+* test: snapshots tests for `KafkaRecord::parse` by @Mcdostone
+* feat: Try its best to deserialize the record payload when the schema registry is not configured by @Mcdostone
+* build: update dependencies by @Mcdostone
+* fix: get rid of `unwrap()` when fetching the schema registry config given a cluster name by @Mcdostone
+* fix: trying to make yozefu work on windows by @Mcdostone
+* update dependencies by @Mcdostone in [#16](https://github.com/MAIF/yozefu/pull/16)
+* build(deps): bump houseabsolute/actions-rust-cross from 0.0.17 to 1 by @dependabot[bot]
+* build(deps): bump actions/attest-build-provenance from 1 to 2 by @dependabot[bot]
+* docs: add option '--every' to MyProducer.java by @Mcdostone
+* docs: remove empty line by @Mcdostone
+* docs: fix URLs in README.md by @Mcdostone
+* Changelog for 0.0.2 by @github-actions[bot] in [#9](https://github.com/MAIF/yozefu/pull/9)
+
+## New Contributors
+* @dependabot[bot] made their first contribution
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.2...v0.0.3
+
 ## What's Changed in v0.0.2
 * Release/v0.0.2 by @Mcdostone in [#7](https://github.com/MAIF/yozefu/pull/7)
 * chore: Release version 0.0.2 by @Mcdostone
