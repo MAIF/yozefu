@@ -57,7 +57,7 @@ impl SchemasComponent<'_> {
                     .as_ref()
                     .map(|r| r.schema_to_string_pretty())
                     .unwrap_or(
-                        "Schema is unavailable. Are you sure the schema is accessible?".to_string(),
+                        format!("The Schema {} is unavailable. Please make sure you configured Yozefu to use the schema registry.", s.id),
                     ),
             );
             to_render.push(Line::from(vec![Span::styled(
@@ -74,7 +74,7 @@ impl SchemasComponent<'_> {
                     .as_ref()
                     .map(|r| r.schema_to_string_pretty())
                     .unwrap_or(
-                        "Schema is unavailable. Are you sure the schema is accessible?".to_string(),
+                        format!("The Schema {} is unavailable. Please make sure you configured Yozefu to use the schema registry.", s.id),
                     ),
             );
             to_render.push(Line::from(vec![Span::styled(

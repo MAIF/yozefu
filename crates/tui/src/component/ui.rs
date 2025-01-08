@@ -343,12 +343,10 @@ impl Ui {
                         self.export_record(record, action_tx.clone())?;
                     }
                     Action::RequestSchemasOf(ref key, ref value) => {
-                        if let Some(sr) = &mut schema_registry {
-                            action_tx.send(Action::Schemas(
-                                SchemaDetail::from(sr, key).await,
-                                SchemaDetail::from(sr, value).await,
-                            ))?;
-                        }
+                        action_tx.send(Action::Schemas(
+                            SchemaDetail::from(&mut schema_registry, key).await,
+                            SchemaDetail::from(&mut schema_registry, value).await,
+                        ))?;
                     }
                     Action::Render => {
                         tui.draw(|f| {

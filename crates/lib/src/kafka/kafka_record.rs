@@ -2,6 +2,8 @@
 use apache_avro::from_avro_datum;
 use serde::Deserialize;
 use serde::Serialize;
+#[cfg(feature = "native")]
+use serde_json::Error;
 use std::collections::BTreeMap;
 
 /// Inspired of the `[rdkafka::Message]` struct.
@@ -127,12 +129,22 @@ impl KafkaRecord {
 
     /// Fallback to String if this is not json
     /// Will I regret it ? Maybe
-    fn deserialize_json(payload: Option<&[u8]>) -> DataType {
+    fn try_deserialize_json(payload: Option<&[u8]>) -> Result<DataType, Error> {
         let payload = payload.unwrap_or_default();
         match serde_json::from_slice(payload) {
-            Ok(e) => DataType::Json(e),
-            Err(_e) => DataType::String(String::from_utf8(payload.to_vec()).unwrap_or_default()),
-            //Err(e) => DataType::String(format!("This is a Yozefu error. The Record can't be deserialized. For your information, avro and protobuf records are not supported yet.\n\n  Error: {}\nPayload: {:?}", e, payload.to_vec())),
+            Ok(e) => Ok(DataType::Json(e)),
+            Err(e) => Err(e),
+        }
+    }
+
+    /// Fallback to String if this is not json
+    /// Will I regret it ? Maybe
+    fn deserialize_json(payload: Option<&[u8]>) -> DataType {
+        match Self::try_deserialize_json(payload) {
+            Ok(e) => e,
+            Err(_e) => DataType::String(
+                String::from_utf8(payload.unwrap_or_default().to_vec()).unwrap_or_default(),
+            ),
         }
     }
 
@@ -169,6 +181,14 @@ impl KafkaRecord {
         ))
     }
 
+    /// Extract the data section from the payload prefixed with a schema section.
+    fn extract_data_from_payload_with_schema_header(payload: &[u8]) -> Option<&[u8]> {
+        if payload.len() <= 5 {
+            return None;
+        }
+        Some(&payload[5..])
+    }
+
     async fn extract_data_and_schema(
         payload: Option<&[u8]>,
         schema_registry: &mut Option<SchemaRegistryClient>,
@@ -180,8 +200,13 @@ impl KafkaRecord {
                 let payload = payload.unwrap_or_default();
                 match serde_json::from_slice(payload) {
                     Ok(e) => (DataType::Json(e), None),
-                    Err(_e) => (DataType::String(format!("Yozefu was not able to retrieve the schema {} because there is no schema registry configured. Please visit https://github.com/MAIF/yozefu/blob/main/docs/schema-registry/README.md for more details.\nPayload: {:?}\n String: {}", id, payload,
-                    String::from_utf8(payload.to_vec()).unwrap_or_default())), None)
+                    Err(_e) => {
+                        match Self::try_deserialize_json(Self::extract_data_from_payload_with_schema_header(payload)) {
+                            Ok(e) => (e, Some(Schema::new(id, None))),
+                            Err(_e) => (DataType::String(format!("Yozefu was not able to retrieve the schema {} because there is no schema registry configured. Please visit https://github.com/MAIF/yozefu/blob/main/docs/schema-registry/README.md for more details.\nPayload: {:?}\n String: {}", id, payload,
+                            String::from_utf8(payload.to_vec()).unwrap_or_default())), Some(Schema::new(id, None)))
+                        }
+                    }
                 }
             }
             (Some(s), Some(schema_registry)) => {
