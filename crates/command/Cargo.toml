@@ -18,13 +18,13 @@ repository.workspace = true
 
 
 [dependencies]
-clap = { version = "4.5.23", features = [
+clap = { version = "4.5.24", features = [
     "derive",
     "env",
     "color",
     "suggestions",
 ] }
-serde_json = { version = "1.0.134", features = ["preserve_order"] }
+serde_json = { version = "1.0.135", features = ["preserve_order"] }
 log = "0.4.22"
 env_logger = "0.11.6"
 chrono = "0.4.39"
