@@ -40,7 +40,7 @@ impl SchemasComponent<'_> {
 
         if let Some(s) = &self.key {
             to_render.push(Line::from(vec![
-                Span::styled("Key schema URL:   ", Style::default().bold()),
+                Span::styled("Key schema URL  : ", Style::default().bold()),
                 Span::styled(s.url.to_string(), Style::default()),
             ]));
         }

@@ -1,10 +1,13 @@
 use insta::{assert_debug_snapshot, glob};
+use rdkafka::message::OwnedMessage;
+use serde::Deserialize;
 use std::fs;
+use tokio::runtime::Runtime;
 use yozefu_lib::{parse_search_query, ExportedKafkaRecord, KafkaRecord};
 
 #[test]
 fn test_inputs() {
-    glob!("inputs/*.sql", |path| {
+    glob!("inputs/search-queries/*.sql", |path| {
         unsafe {
             use std::env;
             // Set the timezone to Paris to have a fixed timezone for the tests
@@ -25,9 +28,37 @@ fn test_inputs() {
 
 #[test]
 fn test_exported_record() {
-    glob!("inputs/record*.json", |path| {
+    glob!("inputs/parsed-records/record*.json", |path| {
         let input = fs::read_to_string(path).unwrap();
         let record: KafkaRecord = serde_json::from_str(&input).unwrap();
         assert_debug_snapshot!(ExportedKafkaRecord::from(&record));
     });
+}
+
+#[test]
+fn test_parse_records() {
+    let rt = Runtime::new().unwrap();
+    glob!("inputs/raw-records/record*.json", |path| {
+        let input = fs::read_to_string(path).unwrap();
+        let key_value: KeyValue = serde_json::from_str(&input).unwrap();
+        let owned_message = OwnedMessage::new(
+            key_value.value,
+            key_value.key,
+            "my-topic".to_string(),
+            rdkafka::Timestamp::CreateTime(0),
+            0,
+            0,
+            None,
+        );
+        rt.block_on(async {
+            assert_debug_snapshot!(KafkaRecord::parse(owned_message, &mut None).await);
+        });
+    });
+}
+
+#[derive(Clone, Debug, Deserialize, Hash, PartialEq, Eq, Default)]
+#[serde(rename_all = "lowercase")]
+struct KeyValue {
+    pub key: Option<Vec<u8>>,
+    pub value: Option<Vec<u8>>,
 }
