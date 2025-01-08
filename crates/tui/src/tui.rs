@@ -5,7 +5,7 @@ use std::{
 
 use crossterm::{
     cursor,
-    event::{Event as CrosstermEvent, KeyEvent, MouseEvent},
+    event::{Event as CrosstermEvent, KeyEvent, KeyEventKind, MouseEvent},
     terminal::{EnterAlternateScreen, LeaveAlternateScreen},
 };
 use futures::{FutureExt, StreamExt};
@@ -88,7 +88,13 @@ impl Tui {
                       Some(Ok(evt)) => {
                         match evt {
                           CrosstermEvent::Key(key) => {
-                            event_tx.send(Event::Key(key)).unwrap();
+                                // On Windows, when you press a key, 2 events are emitted:
+                                //   - one with `KeyEventKind::Press`
+                                //   - one with `KeyEventKind::Release`
+                                // We only care of the `Press` kind.
+                                if key.kind == KeyEventKind::Press {
+                                    event_tx.send(Event::Key(key)).unwrap();
+                                }
                           },
                           CrosstermEvent::Mouse(mouse) => {
                             event_tx.send(Event::Mouse(mouse)).unwrap();
