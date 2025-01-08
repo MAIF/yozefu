@@ -209,7 +209,8 @@ impl Config {
 
     /// Returns the schema registry configuration for the given cluster.
     pub fn schema_registry_config_of(&self, cluster: &str) -> Option<SchemaRegistryConfig> {
-        let cluster_config = self.clusters.get(cluster.trim()).unwrap();
-        cluster_config.schema_registry.clone()
+        self.clusters
+            .get(cluster.trim())
+            .and_then(|config| config.schema_registry.clone())
     }
 }
