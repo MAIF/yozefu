@@ -20,7 +20,7 @@ repository.workspace = true
 tokio = { version = "1", features = ["full", "tracing"] }
 serde = { version = "1.0.217", features = ["derive"] }
 serde_json = { version = "1.0.135", features = ["preserve_order"] }
-log = "0.4.22"
+log = "0.4.25"
 tui-input = "0.11.1"
 chrono = "0.4.39"
 strum = { version = "0.26.3", features = ["derive", "strum_macros"] }
