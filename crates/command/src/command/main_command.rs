@@ -67,7 +67,7 @@ where
     )]
     pub topics: Vec<String>,
     /// Override kafka consumer properties, see <https://docs.confluent.io/platform/current/installation/configuration/consumer-configs.html>
-    #[clap(short, long, use_value_delimiter = true, value_delimiter = ',')]
+    #[clap(short, long)]
     pub properties: Vec<String>,
     #[clap(long)]
     /// Disable the TUI, print results in stdout instead.
@@ -111,8 +111,14 @@ where
     <T as FromStr>::Err: Display,
 {
     /// Create a new `MainCommandWithClient` with a `ClientConfig`.
-    pub fn with_client(self, client_config: ClientConfig) -> MainCommandWithClient<T> {
-        MainCommandWithClient::new(self, client_config)
+    pub fn with_client(
+        self,
+        client_config: ClientConfig,
+    ) -> Result<MainCommandWithClient<T>, Error> {
+        let kafka_properties = client_config.config_map().clone();
+        let kafka_properties = self.override_kafka_config_properties(kafka_properties)?;
+        let client_config = Self::kafka_client_config_from_properties(kafka_properties)?;
+        Ok(MainCommandWithClient::new(self, client_config))
     }
 
     /// Returns the search query to use.
@@ -318,21 +324,29 @@ where
         }
     }
 
-    /// Returns the kafka client config from the configuration file
-    pub(crate) fn kafka_client_config(&self) -> Result<ClientConfig, Error> {
-        let config = self.config()?;
-        let mut kafka_properties = config.kafka_config_of(&self.cluster().to_string())?;
-
+    /// Overrides the kafka properties with the properties provided by the user
+    fn override_kafka_config_properties(
+        &self,
+        mut config: HashMap<String, String>,
+    ) -> Result<HashMap<String, String>, Error> {
         for property in &self.properties {
             match property.split_once('=') {
                 Some((key, value)) => {
-                    kafka_properties.insert(key.trim().into(), value.into());
+                    config.insert(key.trim().into(), value.into());
                 }
                 None => {
                     return Err(Error::Error(format!("Invalid kafka property '{}', expected a '=' symbol to separate the property and its value.", property)));
                 }
             }
         }
+        Ok(config)
+    }
+
+    /// Returns the kafka client config from the configuration file
+    pub(crate) fn kafka_client_config(&self) -> Result<ClientConfig, Error> {
+        let config = self.config()?;
+        let mut kafka_properties = config.kafka_config_of(&self.cluster().to_string())?;
+        kafka_properties = self.override_kafka_config_properties(kafka_properties)?;
 
         // Default properties
         for (key, value) in [
@@ -344,6 +358,13 @@ where
             }
         }
 
+        Self::kafka_client_config_from_properties(kafka_properties)
+    }
+
+    /// Returns the kafka client config from kafka properties
+    pub fn kafka_client_config_from_properties(
+        kafka_properties: HashMap<String, String>,
+    ) -> Result<ClientConfig, Error> {
         let mut config = ClientConfig::new();
         config.set_log_level(rdkafka::config::RDKafkaLogLevel::Emerg);
         debug!(

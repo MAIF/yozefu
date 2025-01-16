@@ -89,7 +89,7 @@ docker compose -f "${repo}/compose.yml" exec -T kafka \
   /usr/bin/kafka-topics \
   --create --if-not-exists          \
   --bootstrap-server localhost:9092 \
-  --partitions 1                    \
+  --partitions 3                    \
   --topic "${topic}"
 
 if jbang --version &> /dev/null; then

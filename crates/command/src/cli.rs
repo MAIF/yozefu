@@ -69,7 +69,7 @@ where
                     None => self.kafka_client_config()?,
                     Some(c) => c,
                 };
-                let command = self.default_command.clone().with_client(config_client);
+                let command = self.default_command.clone().with_client(config_client)?;
                 command.execute().await
             }
         }
