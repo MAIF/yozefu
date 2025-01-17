@@ -19,12 +19,6 @@ pub struct State {
     pub filters_dir: PathBuf,
 }
 
-impl Default for State {
-    fn default() -> Self {
-        Self::new("localhost", Theme::light(), &Config::default())
-    }
-}
-
 impl State {
     pub fn new(cluster: &str, theme: Theme, config: &Config) -> Self {
         Self {

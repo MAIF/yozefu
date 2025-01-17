@@ -9,7 +9,7 @@ use clap::Args;
 use lib::Error;
 use log::info;
 
-use crate::{command::Command, config_path};
+use crate::command::Command;
 
 use super::configure::ConfigureSubCommand;
 
@@ -25,7 +25,7 @@ impl Command for ConfigCommand {
             return subcommand.execute().await;
         }
 
-        let path = config_path();
+        let path = Config::path()?;
         info!("The configuration file is located at '{}'", path.display());
 
         let config = Config::read(&path)?;

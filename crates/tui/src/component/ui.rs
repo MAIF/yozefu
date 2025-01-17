@@ -97,6 +97,10 @@ impl Ui {
         self.records.lock().unwrap().reset();
         if self.topics.is_empty() {
             tx.send(Action::StopConsuming())?;
+            tx.send(Action::Notification(Notification::new(
+                log::Level::Info,
+                "No topics selected".to_string(),
+            )))?;
             return Ok(());
         }
         self.worker = CancellationToken::new();
@@ -245,12 +249,15 @@ impl Ui {
                     action_tx.send(Action::Topics(topics)).unwrap();
                 }
                 Err(e) => {
-                    action_tx
+                    if action_tx
                         .send(Action::Notification(Notification::new(
                             log::Level::Error,
                             e.to_string(),
                         )))
-                        .unwrap();
+                        .is_err()
+                    {
+                        error!("Cannot notify the TUI: {:?}", e);
+                    }
                     error!("Something went wrong when trying to list topics: {}", e)
                 }
             }
@@ -359,6 +366,16 @@ impl Ui {
                     }
                     Action::Search(ref search) => {
                         self.app.search_query = search.clone();
+                        if !self.topics.is_empty() {
+                            action_tx.send(Action::Notification(Notification::new(
+                                log::Level::Info,
+                                match self.app.search_query.is_empty() {
+                                    true => "Waiting for new events".to_string(),
+                                    false => "Searching".to_string(),
+                                },
+                            )))?;
+                        }
+
                         self.consume_topics(action_tx.clone()).await?;
                     }
                     _ => {}

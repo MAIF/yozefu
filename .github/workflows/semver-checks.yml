@@ -70,30 +70,35 @@ jobs:
           exit 1
         env:
           GH_TOKEN: ${{ github.token }}
-
       - name: Show release type
         id: semver
         run: |
-          wget -O semver "https://raw.githubusercontent.com/fsaintjacques/semver-tool/master/src/semver"
-          chmod u+x ./semver
-          echo "release=$(./semver diff ${{ steps.current.outputs.version }} ${{ steps.next.outputs.version }})" >> "$GITHUB_OUTPUT"
+          chmod u+x ./.github/workflows/semver.sh
+          echo "release=$(./.github/workflows/semver.sh diff ${{ steps.current.outputs.version }} ${{ steps.next.outputs.version }})" >> "$GITHUB_OUTPUT"
       - name: Prepare report.md
         if: ${{ steps.next.outputs.version == '' }}
         run: |
           {
-          echo "> [!WARNING]"
-          echo "> According to \`cargo-semver-checks\`, the next release version doesn\'t respect semantic versioning."
-          echo '```bash'
+          printf "> [!WARNING]"
+          printf "> According to \`cargo-semver-checks\`, the next release version doesn\'t respect semantic versioning."
+          printf '```bash'
           } > ./report.md
       - name: Run cargo semver-checks
         if: ${{ steps.next.outputs.version != '' && steps.semver.outputs.release  != '' }}
         id: check
-        run: cargo semver-checks --color never --package yozefu-lib --package yozefu-app --package yozefu-wasm-types --package yozefu-command --baseline-rev "${{ steps.current.outputs.version }}" --release-type "${{ steps.semver.outputs.release }}" >> "$GITHUB_OUTPUT"
-      - name: Publish semver-checks report
-        if: ${{ steps.check.outcome != 'success' && steps.check.outcome != 'skipped' }}
         run: |
-          echo "${{ steps.check.outputs.version }}" >> report.md
-          printf '\n```' >> ./report.md
+          printf "\`cargo-semver-checks\` has detected some issues: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\n" > report.md
+          printf '```bash' >> report.md
+          cargo semver-checks --color never --package yozefu-lib --package yozefu-app --package yozefu-wasm-types --package yozefu-command --baseline-rev "${{ steps.current.outputs.version }}" --release-type "${{ steps.semver.outputs.release }}" 2>&1 | tee -a report.md
+          if [[ "${PIPESTATUS[0]}" != "0" ]]; then
+            printf '```' >> report.md
+            exit 1
+          fi
+        continue-on-error: true
+      - name: Publish semver-checks report
+        if: ${{ steps.check.outcome != 'success' }}
+        run: |
           gh pr comment ${{ github.event.number }} --body-file ./report.md
+          exit 1
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

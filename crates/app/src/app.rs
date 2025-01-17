@@ -11,13 +11,7 @@ use rdkafka::{
 };
 use thousands::Separable;
 
-use std::{
-    collections::HashSet,
-    fs,
-    path::PathBuf,
-    sync::{LazyLock, Mutex},
-    time::Duration,
-};
+use std::{collections::HashSet, fs, path::PathBuf, time::Duration};
 
 use itertools::Itertools;
 
@@ -25,8 +19,6 @@ use crate::{
     search::{Search, ValidSearchQuery},
     Config,
 };
-// TODO this is bad
-pub static CONFIG: LazyLock<Mutex<Config>> = LazyLock::new(|| Config::default().into());
 
 /// Struct exposing different functions for consuming kafka records.
 #[derive(Debug, Clone)]
@@ -53,13 +45,6 @@ impl App {
             search_query,
             output_file,
         }
-    }
-
-    /// Loads the config file. It's a global variable
-    /// TODO This is not good
-    pub fn load_config(config: &Config) {
-        let mut d = CONFIG.lock().unwrap();
-        *d = config.clone();
     }
 
     pub fn schema_registry(&self) -> Option<SchemaRegistryClient> {

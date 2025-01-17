@@ -6,7 +6,7 @@ mod command;
 mod headless;
 mod log;
 pub use clap::Parser;
-pub use cli::{config_path, Cli};
+pub use cli::Cli;
 pub use tui::TuiError;
 
 pub use app::APPLICATION_NAME;

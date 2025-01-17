@@ -1,7 +1,7 @@
 //! Command to fetch a property of the configuration file.
 use std::{collections::HashMap, fs};
 
-use crate::{cli::config_path, command::Command as CliCommand};
+use crate::command::Command as CliCommand;
 use app::Config;
 use clap::Args;
 use lib::Error;
@@ -16,7 +16,7 @@ pub struct ConfigureGetCommand {
 
 impl CliCommand for ConfigureGetCommand {
     async fn execute(&self) -> Result<(), Error> {
-        let file = config_path();
+        let file = Config::path()?;
         let content = fs::read_to_string(&file)?;
         let config = serde_json::from_str::<Value>(&content)?;
         let mut property_name = self.property.clone();
@@ -25,15 +25,7 @@ impl CliCommand for ConfigureGetCommand {
         }
         match config.pointer(&property_name) {
             Some(p) => {
-                match p {
-                    Value::Null => println!("null"),
-                    Value::Bool(v) => println!("{}", v),
-                    Value::Number(v) => println!("{}", v),
-                    Value::String(v) => println!("{}", v),
-                    Value::Array(v) => println!("{}", serde_json::to_string_pretty(&v)?),
-                    Value::Object(v) => println!("{}", serde_json::to_string_pretty(&v)?),
-                }
-
+                println!("{}", serde_json::to_string_pretty(&p)?);
                 Ok(())
             }
             None => {
@@ -65,7 +57,9 @@ impl CliCommand for ConfigureGetCommand {
                     }
                     "directory" | "dir" => println!("{:?}", file.parent().unwrap()),
                     "themes" => println!("{}", serde_json::to_string_pretty(&config.themes())?),
-                    "themes_file" | "theme_file" => println!("{:?}", config.themes_file()),
+                    "theme-file" | "themes-file" | "themes_file" | "theme_file" => {
+                        println!("{:?}", config.themes_file())
+                    }
                     _ => {
                         return Err(Error::Error(format!(
                             "There is no '{}' property in the config file",

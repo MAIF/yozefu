@@ -62,7 +62,6 @@ impl SearchComponent {
                 _ = token.cancelled() => {  },
                 _ = tokio::time::sleep(Duration::from_millis(700)) => {
                     if input.len() > 5 {
-                        tt.as_ref().unwrap().send(Action::ResetNotification()).unwrap();
                         if let Err(e) = ValidSearchQuery::from_str(&input) {
                             tt.as_ref().unwrap().send(Action::Notification(Notification::new(log::Level::Error, e.to_string()))).unwrap();
                         }
@@ -124,17 +123,6 @@ impl SearchComponent {
             Ok(search_query) => {
                 self.update_history(&o)?;
                 self.action_tx
-                    .as_ref()
-                    .unwrap()
-                    .send(Action::Notification(Notification::new(
-                        log::Level::Info,
-                        match search_query.is_empty() {
-                            true => "Waiting for new events".to_string(),
-                            false => "Searching".to_string(),
-                        },
-                    )))?;
-
-                self.action_tx
                     .clone()
                     .unwrap()
                     .send(Action::Search(search_query))?;
@@ -170,7 +158,7 @@ impl SearchComponent {
 impl Component for SearchComponent {
     fn register_action_handler(&mut self, tx: UnboundedSender<Action>) -> Result<(), TuiError> {
         self.action_tx = Some(tx);
-        self.search()?;
+        //self.search()?;
         Ok(())
     }
 
@@ -217,10 +205,6 @@ impl Component for SearchComponent {
                 self.input.handle_event(&Event::Key(key));
                 self.parse_input();
                 self.autocomplete(KeyCode::Backspace);
-                self.action_tx
-                    .as_ref()
-                    .unwrap()
-                    .send(Action::ResetNotification())?;
             }
             _ => {
                 self.input.handle_event(&Event::Key(key));

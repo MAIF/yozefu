@@ -25,7 +25,6 @@ use tui::error::TuiError;
 use tui::Theme;
 use tui::{State, Ui};
 
-use crate::cli::config_path;
 use crate::headless::formatter::{
     JsonFormatter, KafkaFormatter, PlainFormatter, SimpleFormatter, TransposeFormatter,
 };
@@ -92,6 +91,8 @@ where
     #[clap(long)]
     /// Use a specific config file
     pub config: Option<PathBuf>,
+    #[clap(skip)]
+    pub logs_file: Option<PathBuf>,
 }
 
 #[derive(Debug, Clone, EnumString, Display)]
@@ -121,9 +122,15 @@ where
         Ok(MainCommandWithClient::new(self, client_config))
     }
 
+    /// Changes the default logs file path
+    pub(crate) fn logs_file(&mut self, logs: &Option<PathBuf>) -> &mut Self {
+        self.logs_file = logs.clone();
+        self
+    }
+
     /// Returns the search query to use.
     pub(crate) fn query(&self, config: &Config) -> Result<String, Error> {
-        App::load_config(config);
+        //App::load_config(config);
         let q = self.query.join(" ").trim().to_string();
         if q.is_empty() {
             return Ok(config.initial_query.clone());
@@ -152,8 +159,10 @@ where
     }
 
     pub(crate) fn config(&self) -> Result<Config, Error> {
-        let path = self.config.clone().unwrap_or(config_path());
-        Config::read(&path)
+        let path = self.config.clone().unwrap_or(Config::path()?);
+        let mut config = Config::read(&path)?;
+        config.logs = self.logs_file.clone();
+        Ok(config)
     }
 
     pub fn cluster(&self) -> T {

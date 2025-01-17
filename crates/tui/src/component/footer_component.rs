@@ -85,7 +85,10 @@ impl Component for FooterComponent {
                 self.ticks = 0;
                 self.notification = Some(notification)
             }
-            Action::ResetNotification() => self.notification = None,
+            Action::ResetNotification() => {
+                self.notification = None;
+                self.ticks = 0;
+            }
             Action::Tick => {
                 self.ticks += 1;
                 if self.ticks > 30 {

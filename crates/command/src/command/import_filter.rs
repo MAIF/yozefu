@@ -10,7 +10,7 @@ use extism::{Manifest, Plugin, Wasm};
 use lib::Error;
 use log::info;
 
-use crate::{command::Command, config_path};
+use crate::command::Command;
 
 /// Import a search filter.
 /// It also checks that it complies with the tool requirements.
@@ -51,7 +51,7 @@ impl ImportFilterCommand {
     /// Returns the path to the wasm file.
     pub fn destination(&self) -> Result<PathBuf, Error> {
         let name = self.name();
-        let config = Config::read(&config_path())?;
+        let config = Config::read(&Config::path()?)?;
         let dir = config.filters_dir();
         fs::create_dir_all(&dir)?;
         Ok(dir.join(format!("{}.wasm", name)))

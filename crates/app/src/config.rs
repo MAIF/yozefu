@@ -1,5 +1,6 @@
 //! module defining the configuration structure of the application
 
+use directories::ProjectDirs;
 use indexmap::IndexMap;
 use itertools::Itertools;
 use lib::Error;
@@ -34,9 +35,15 @@ const EXAMPLE_PROMPTS: &[&str] = &[
 /// Configuration of the application
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone)]
 pub struct Config {
-    /// Path of the config file
+    /// Path of this config
     #[serde(skip)]
     pub path: PathBuf,
+    /// Path to the Yozefu directory containing themes, config, filters...
+    #[serde(skip)]
+    pub yozefu_directory: PathBuf,
+    /// The file to write logs to
+    #[serde(skip)]
+    pub logs: Option<PathBuf>,
     /// A placeholder url that will be used when you want to open a kafka record in the browser
     #[serde(default = "default_url_template")]
     pub default_url_template: String,
@@ -105,12 +112,12 @@ fn default_show_shortcuts() -> bool {
     true
 }
 
-impl Default for Config {
-    fn default() -> Self {
-        let mut kafka_config = IndexMap::new();
-        kafka_config.insert("fetch.max.bytes".to_string(), "3000000".to_string());
+impl Config {
+    pub fn new(path: &Path) -> Self {
         Self {
-            path: PathBuf::default(),
+            path: path.to_path_buf(),
+            yozefu_directory: PathBuf::default(),
+            logs: None,
             default_url_template: default_url_template(),
             history: EXAMPLE_PROMPTS.iter().map(|e| e.to_string()).collect_vec(),
             initial_query: "from end - 10".to_string(),
@@ -121,32 +128,46 @@ impl Default for Config {
             export_directory: default_export_directory(),
         }
     }
-}
 
-impl Config {
-    pub fn new(path: &Path) -> Self {
-        Self {
-            path: path.to_path_buf(),
-            ..Default::default()
-        }
+    /// The default config file path
+    pub fn path() -> Result<PathBuf, Error> {
+        Self::yozefu_directory().map(|d| d.join("config.json"))
+    }
+
+    /// The default yozefu directory containing themes, filters, config...
+    pub fn yozefu_directory() -> Result<PathBuf, Error> {
+        ProjectDirs::from("io", "maif", APPLICATION_NAME)
+            .ok_or(Error::Error(
+                "Failed to find the yozefu configuration directory".to_string(),
+            ))
+            .map(|e| e.config_dir().to_path_buf())
     }
 
     /// Reads a configuration file.
     pub fn read(file: &Path) -> Result<Config, Error> {
         let content = fs::read_to_string(file)?;
-        let mut config: Config = serde_json::from_str(&content)?;
+        let mut config: Config = serde_json::from_str(&content).map_err(|e| {
+            Error::Error(format!(
+                "Failed to parse the configuration file {:?}: {}",
+                file.display(),
+                e
+            ))
+        })?;
+        config.yozefu_directory = Self::yozefu_directory()?;
         config.path = file.to_path_buf();
         Ok(config)
     }
 
     /// Returns the name of the logs file
     pub fn logs_file(&self) -> PathBuf {
-        self.path.parent().unwrap().join("application.log")
+        self.logs
+            .clone()
+            .unwrap_or(self.path.parent().unwrap().join("application.log"))
     }
 
     /// Returns the name of the logs file
     pub fn themes_file(&self) -> PathBuf {
-        self.path.parent().unwrap().join("themes.json")
+        self.yozefu_directory.join("themes.json")
     }
 
     /// Returns the list of available theme names.
@@ -159,7 +180,7 @@ impl Config {
 
     /// Returns the name of the directory containing wasm filters
     pub fn filters_dir(&self) -> PathBuf {
-        let dir = self.path.parent().unwrap().join("filters");
+        let dir = self.yozefu_directory.join("filters");
         let _ = fs::create_dir_all(&dir);
         dir
     }

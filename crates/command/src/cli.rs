@@ -4,7 +4,6 @@ use app::search::filter::FILTERS_DIR;
 use app::{ClusterConfig, APPLICATION_NAME};
 use app::{Config, SchemaRegistryConfig};
 use clap::command;
-use directories::ProjectDirs;
 use lib::Error;
 use log::warn;
 use rdkafka::ClientConfig;
@@ -18,15 +17,6 @@ use tui::Theme;
 pub use clap::Parser;
 use indexmap::IndexMap;
 
-/// Returns the configuration file path.
-pub fn config_path() -> PathBuf {
-    ProjectDirs::from("io", "maif", APPLICATION_NAME)
-        .unwrap()
-        .config_dir()
-        .to_path_buf()
-        .join("config.json")
-}
-
 /// CLI parser
 #[derive(Parser)]
 #[command(author, version, about = "A terminal user interface to navigate Kafka topics and search for Kafka records.", name = APPLICATION_NAME, bin_name = APPLICATION_NAME, display_name = APPLICATION_NAME, long_about = None, propagate_version = true, args_conflicts_with_subcommands = true)]
@@ -39,6 +29,8 @@ where
     pub subcommands: Option<UtilityCommands>,
     #[command(flatten)]
     pub default_command: MainCommand<T>,
+    #[clap(skip)]
+    logs_file: Option<PathBuf>,
 }
 
 impl<T> Cli<T>
@@ -52,14 +44,30 @@ where
         self.run(None).await
     }
 
+    /// Changes the default logs file path
+    pub fn logs_file(&mut self, logs: PathBuf) -> &mut Self {
+        self.logs_file = Some(logs);
+        self
+    }
+
     /// Executes the CLI with a specified kafka config client
     pub async fn execute_with(&self, config_client: ClientConfig) -> Result<(), TuiError> {
         self.run(Some(config_client)).await
     }
 
+    fn read_config(&self) -> Result<Config, Error> {
+        match Config::read(&Config::path()?) {
+            Ok(mut config) => {
+                config.logs = self.logs_file.clone();
+                Ok(config)
+            }
+            Err(e) => Err(e),
+        }
+    }
+
     async fn run(&self, config_client: Option<ClientConfig>) -> Result<(), TuiError> {
         init_files().await?;
-        let filters_dir = Config::read(&config_path())?.filters_dir();
+        let filters_dir = self.read_config()?.filters_dir();
         // TODO this sucks
         *FILTERS_DIR.lock().unwrap() = filters_dir;
         match &self.subcommands {
@@ -69,8 +77,9 @@ where
                     None => self.kafka_client_config()?,
                     Some(c) => c,
                 };
-                let command = self.default_command.clone().with_client(config_client)?;
-                command.execute().await
+                let mut command = self.default_command.clone();
+                command.logs_file(&self.logs_file);
+                command.with_client(config_client)?.execute().await
             }
         }
     }
@@ -92,7 +101,7 @@ async fn init_files() -> Result<(), Error> {
 /// Initializes a default configuration file if it does not exist.
 /// The default cluster is `localhost`.
 fn init_config_file() -> Result<PathBuf, Error> {
-    let path = config_path();
+    let path = Config::path()?;
     if fs::metadata(&path).is_ok() {
         return Ok(path);
     }
@@ -136,8 +145,8 @@ fn init_config_file() -> Result<PathBuf, Error> {
 /// Initializes a default configuration file if it does not exist.
 /// The default cluster is `localhost`.
 async fn init_themes_file() -> Result<PathBuf, Error> {
-    let path = config_path();
-    let config = Config::new(&path);
+    let path = Config::path()?;
+    let config = Config::read(&path)?;
     let path = config.themes_file();
     if fs::metadata(&path).is_ok() {
         return Ok(path);

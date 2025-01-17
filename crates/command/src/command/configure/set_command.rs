@@ -2,7 +2,7 @@
 
 use std::fs;
 
-use crate::{cli::config_path, command::Command as CliCommand};
+use crate::command::Command as CliCommand;
 use app::Config;
 use clap::Args;
 use lib::Error;
@@ -19,7 +19,7 @@ pub struct ConfigureSetCommand {
 
 impl CliCommand for ConfigureSetCommand {
     async fn execute(&self) -> Result<(), Error> {
-        let file = config_path();
+        let file = Config::path()?;
 
         let content = fs::read_to_string(&file)?;
         let mut config = serde_json::from_str::<Value>(&content)?;

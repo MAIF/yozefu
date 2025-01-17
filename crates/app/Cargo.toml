@@ -24,6 +24,7 @@ async-trait = "0.1.85"
 extism = "1.9.1"
 url = { version = "2.5.4", features = ["serde"] }
 resolve-path = "0.1.0"
+directories = "6.0.0"
 
 
 [features]

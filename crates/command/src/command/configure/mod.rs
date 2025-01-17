@@ -17,8 +17,6 @@ mod set_command;
 pub use get_command::ConfigureGetCommand;
 pub use set_command::ConfigureSetCommand;
 
-use crate::cli::config_path;
-
 use super::default_editor;
 
 /// Command to edit the configuration file.
@@ -54,7 +52,7 @@ impl crate::command::Command for ConfigureCommand {
             return subcommand.execute().await;
         }
 
-        let file = config_path();
+        let file = Config::path()?;
         let temp_file =
             tempdir()?.path().join(file.file_name().expect(
                 "the configuration path should be a file, not a directory or something else",
@@ -75,7 +73,7 @@ impl crate::command::Command for ConfigureCommand {
                 fs::write(&file, serde_json::to_string_pretty(&o)?)?;
                 info!(
                     "Configuration file '{}' has been updated successfully.",
-                    config_path().display()
+                    file.display()
                 );
             }
             Err(e) => {
