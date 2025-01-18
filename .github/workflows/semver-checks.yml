@@ -13,7 +13,7 @@ permissions:
 
 on:
   pull_request:
-    types: [review_requested, ready_for_review]
+    types: [opened, reopened, synchronize, ready_for_review]
     branches:
       - main
     paths-ignore:
@@ -48,6 +48,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Delete old cargo-semver-checks comments
+        continue-on-error: true
+        run: |
+          gh pr view "${{ github.event.number }}" --json comments --jq '.comments[] | select(.author.login == "github-actions") | .url' | grep -E 'issuecomment-(.+)' | cut -d '-' -f2 > comments.txt
+          xargs -I {} gh api -X DELETE "/repos/MAIF/yozefu/issues/comments/{}" < comments.txt
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable

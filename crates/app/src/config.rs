@@ -112,11 +112,13 @@ fn default_show_shortcuts() -> bool {
     true
 }
 
-impl Config {
-    pub fn new(path: &Path) -> Self {
-        Self {
+impl TryFrom<&PathBuf> for Config {
+    type Error = Error;
+
+    fn try_from(path: &PathBuf) -> Result<Self, Self::Error> {
+        Ok(Self {
             path: path.to_path_buf(),
-            yozefu_directory: PathBuf::default(),
+            yozefu_directory: Self::yozefu_directory()?,
             logs: None,
             default_url_template: default_url_template(),
             history: EXAMPLE_PROMPTS.iter().map(|e| e.to_string()).collect_vec(),
@@ -126,9 +128,11 @@ impl Config {
             theme: default_theme(),
             show_shortcuts: true,
             export_directory: default_export_directory(),
-        }
+        })
     }
+}
 
+impl Config {
     /// The default config file path
     pub fn path() -> Result<PathBuf, Error> {
         Self::yozefu_directory().map(|d| d.join("config.json"))
@@ -145,7 +149,16 @@ impl Config {
 
     /// Reads a configuration file.
     pub fn read(file: &Path) -> Result<Config, Error> {
-        let content = fs::read_to_string(file)?;
+        let content = fs::read_to_string(file);
+        if let Err(e) = &content {
+            return Err(Error::Error(format!(
+                "Failed to read the configuration file {:?}: {}",
+                file.display(),
+                e
+            )));
+        }
+
+        let content = content.unwrap();
         let mut config: Config = serde_json::from_str(&content).map_err(|e| {
             Error::Error(format!(
                 "Failed to parse the configuration file {:?}: {}",

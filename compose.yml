@@ -41,6 +41,13 @@ services:
       timeout: 1s
       retries: 10
 
+  yozefu:
+    container_name: yozefu
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+
   akhq:
     container_name: yozefu-akhq
     image: tchiotludo/akhq

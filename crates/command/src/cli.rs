@@ -105,7 +105,7 @@ fn init_config_file() -> Result<PathBuf, Error> {
     if fs::metadata(&path).is_ok() {
         return Ok(path);
     }
-    let mut config = Config::new(&path);
+    let mut config = Config::try_from(&path)?;
     let mut localhost_config = IndexMap::new();
     localhost_config.insert(
         "bootstrap.servers".to_string(),

@@ -1,4 +1,4 @@
-/target
+target
 .vscode
 **/*DS_Store
 akhq
@@ -8,6 +8,7 @@ lol/rust/Cargo.lock
 semver-checks/
 demo.sh
 ee.json
+.github/
 
 crates/**/*.cdx.xml
 crates/**/*.cdx.json
