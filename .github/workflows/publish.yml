@@ -88,9 +88,11 @@ jobs:
           git push origin "changelog/v${{ needs.version.outputs.version }}" --force
       - name: Create pull request for changelog
         run: |
+          git pull
           alreadyExists=$(gh pr list --json headRefName | jq '.[] | select(.headRefName == "changelog/v${{ needs.version.outputs.version }}") | any')
           if [[ "$alreadyExists" == "" ]]; then
-            gh pr create --title "Changelog for ${{ needs.version.outputs.version }}" --body "This PR updates the changelog for version ${{ needs.version.outputs.version }}."
+            branch=$(git branch --show-current)
+            gh pr create --head "$branch" --title "Changelog for ${{ needs.version.outputs.version }}" --body "This PR updates the changelog for version ${{ needs.version.outputs.version }}."
           fi
         env: 
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

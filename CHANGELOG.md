@@ -1,3 +1,15 @@
+## What's Changed in v0.0.4
+* Fix/user provided kafka properties by @Mcdostone in [#23](https://github.com/MAIF/yozefu/pull/23)
+* ci: add cargo-deny by @Mcdostone
+* feat: add a function `logs_file` that specifies a file to write logs to by @Mcdostone
+* chore: Release version v0.0.4 by @Mcdostone
+* build: update dependencies by @Mcdostone
+* fix: user-provided kafka properties were not taken into account when creating the kafka client config by @Mcdostone
+* ci: fix github action that creates changelog PR by @Mcdostone
+* chore: Update changelog by @github-actions[bot] in [#20](https://github.com/MAIF/yozefu/pull/20)
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.3...v0.0.4
+
 ## What's Changed in v0.0.3
 * fix `KeyEvent` on windows by @Mcdostone in [#19](https://github.com/MAIF/yozefu/pull/19)
 * test: snapshots tests for `KafkaRecord::parse` by @Mcdostone
