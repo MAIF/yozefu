@@ -14,5 +14,5 @@ repository.workspace = true
 
 [dependencies]
 serde = { version = "1.0.217", features = ["derive"] }
-serde_json = { version = "1.0.135", features = ["preserve_order"] }
+serde_json = { version = "1.0.137", features = ["preserve_order"] }
 lib = { workspace = true }
