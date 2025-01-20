@@ -18,7 +18,7 @@ log = "0.4.25"
 lib = { workspace = true, features = ["native"] }
 itertools = "0.14.0"
 thousands = "0.2.0"
-indexmap = "2.7.0"
+indexmap = "2.7.1"
 rdkafka = { version = "0.37.0", features = ["cmake-build"] }
 async-trait = "0.1.85"
 extism = "1.9.1"
