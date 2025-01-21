@@ -21,7 +21,7 @@ use super::{
     footer_component::FooterComponent, help_component::HelpComponent,
     progress_bar_component::ProgressBarComponent, record_details_component::RecordDetailsComponent,
     records_component::RecordsComponent, schemas_component::SchemasComponent,
-    search_component::SearchComponent, topic_details_component::ScrollableTopicDetailsComponent,
+    search_component::SearchComponent, topic_details_component::TopicDetailsComponent,
     topics_and_records_component::TopicsAndRecordsComponent, topics_component::TopicsComponent,
     Component, ComponentName, ConcurrentRecordsBuffer, State,
 };
@@ -53,7 +53,7 @@ impl RootComponent {
         let mut components: [Arc<Mutex<dyn Component>>; 9] = [
             Arc::new(Mutex::new(TopicsComponent::new(selected_topics))),
             Arc::new(Mutex::new(RecordsComponent::new(records))),
-            Arc::new(Mutex::new(ScrollableTopicDetailsComponent::default())),
+            Arc::new(Mutex::new(TopicDetailsComponent::default())),
             Arc::new(Mutex::new(RecordDetailsComponent::new(&state))),
             Arc::new(Mutex::new(SearchComponent::new(
                 &query,

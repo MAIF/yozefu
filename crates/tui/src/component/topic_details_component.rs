@@ -1,5 +1,5 @@
 //! Component showing information regarding a given topic: partitions, consumer groups, replicas ...
-use crossterm::event::KeyEvent;
+use crossterm::event::{KeyCode, KeyEvent};
 
 use itertools::Itertools;
 use lib::{ConsumerGroupState, TopicDetail};
@@ -16,17 +16,14 @@ use tokio::sync::mpsc::UnboundedSender;
 
 use crate::{error::TuiError, Action};
 
-use super::{
-    vertical_scrollable_block::VerticalScrollableBlock, Component, ComponentName, State, WithHeight,
-};
-
-pub type ScrollableTopicDetailsComponent = VerticalScrollableBlock<TopicDetailsComponent>;
+use super::{scroll_state::ScrollState, Component, ComponentName, State, WithHeight};
 
 #[derive(Default)]
 pub struct TopicDetailsComponent {
     pub details: Vec<TopicDetail>,
     pub action_tx: Option<UnboundedSender<Action>>,
     pub state: TableState,
+    pub scroll: ScrollState,
     throbber_state: throbber_widgets_tui::ThrobberState,
 }
 
@@ -36,7 +33,6 @@ impl WithHeight for TopicDetailsComponent {
             .iter()
             .map(|e| e.consumer_groups.len())
             .sum::<usize>()
-            + 5
     }
 }
 
@@ -50,7 +46,22 @@ impl Component for TopicDetailsComponent {
         ComponentName::TopicDetails
     }
 
-    fn handle_key_events(&mut self, _key: KeyEvent) -> Result<Option<Action>, TuiError> {
+    fn handle_key_events(&mut self, key: KeyEvent) -> Result<Option<Action>, TuiError> {
+        match key.code {
+            KeyCode::Char('k') | KeyCode::Down => {
+                self.scroll.scroll_to_next_line();
+            }
+            KeyCode::Char('j') | KeyCode::Up => {
+                self.scroll.scroll_to_previous_line();
+            }
+            KeyCode::Char('[') => {
+                self.scroll.scroll_to_top();
+            }
+            KeyCode::Char(']') => {
+                self.scroll.scroll_to_bottom();
+            }
+            _ => (),
+        }
         Ok(None)
     }
 
@@ -200,20 +211,23 @@ impl Component for TopicDetailsComponent {
                 Line::from(""),
             ];
 
-            //let main_paragraph = Paragraph::new(text.clone())
-            //    .style(Style::default());
-
             f.render_stateful_widget(
                 table,
                 table_area.offset(Offset { x: 0, y: 5 }),
-                &mut self.state,
+                &mut self
+                    .state
+                    .clone()
+                    .with_offset((self.scroll.value() + table_area.y + 10).into()),
             );
+
             f.render_widget(
                 Paragraph::new(text)
                     .style(Style::default())
                     .block(block.clone()),
                 rect,
             );
+
+            self.scroll.draw(f, rect, self.content_height());
 
             //
             //            let mut text: Vec<Line<'_>> = vec![];

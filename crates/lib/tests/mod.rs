@@ -7,13 +7,12 @@ use yozefu_lib::{parse_search_query, ExportedKafkaRecord, KafkaRecord};
 
 #[test]
 fn test_inputs() {
+    unsafe {
+        use std::env;
+        // Set the timezone to Paris to have a fixed timezone for the tests
+        env::set_var("TZ", "Europe/Paris");
+    }
     glob!("inputs/search-queries/*.sql", |path| {
-        unsafe {
-            use std::env;
-            // Set the timezone to Paris to have a fixed timezone for the tests
-            env::set_var("TZ", "Europe/Paris");
-        }
-
         let input = fs::read_to_string(path).unwrap();
         let input = input.trim();
         insta::with_settings!({

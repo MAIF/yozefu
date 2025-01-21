@@ -13,12 +13,12 @@ repository.workspace = true
 
 [dependencies]
 serde = { version = "1.0.217", features = ["derive"] }
-serde_json = { version = "1.0.135", features = ["preserve_order"] }
+serde_json = { version = "1.0.137", features = ["preserve_order"] }
 log = "0.4.25"
 lib = { workspace = true, features = ["native"] }
 itertools = "0.14.0"
 thousands = "0.2.0"
-indexmap = "2.7.0"
+indexmap = "2.7.1"
 rdkafka = { version = "0.37.0", features = ["cmake-build"] }
 async-trait = "0.1.85"
 extism = "1.9.1"
