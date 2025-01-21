@@ -11,6 +11,8 @@
 # bash docs/try-it.sh "Niort" "avro" "public-french-addresses-avro"
 # bash docs/try-it.sh "Nancy" "text" "public-french-addresses-text"
 # bash docs/try-it.sh "Nimes" "malformed" "public-french-addresses-malformed"
+# 
+# jbang run ./docs/schemas/MyConsumer.java public-french-addresses
 
 
 set -eo pipefail
@@ -84,7 +86,7 @@ fi
 
 
 echo " 🐋 Starting kafka"
-docker compose -f "${repo}/compose.yml" up kafka schema-registry -d --wait
+docker compose -f "${repo}/compose.yml" up kafka schema-registry -d --wait --no-recreate
 docker compose -f "${repo}/compose.yml" exec -T kafka \
   /usr/bin/kafka-topics \
   --create --if-not-exists          \
