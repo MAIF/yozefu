@@ -4,6 +4,8 @@
 //DEPS org.slf4j:slf4j-nop:2.0.16
 //DEPS info.picocli:picocli:4.7.6
 
+// jbang run ./MyConsumer.java public-french-addresses
+
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
@@ -32,7 +34,7 @@ class MyConsumer implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         Properties props = this.kafkaProperties();
-        System.err.println(" 📣 About to consume records from topic '%s'");
+        System.err.printf(" 📣 About to consume records from topic '%s'\n", this.topic);
         this.consume(new KafkaConsumer<byte[], byte[]>(props), this.topic);
         return 0;
     }
@@ -64,7 +66,7 @@ class MyConsumer implements Callable<Integer> {
         return props;
     }
 
-    public static <K, V> void consume(final KafkaConsumer<K, V> consumer, final String topic) throws Exception {
+    public static <K, V> void consume(final KafkaConsumer<K, V> consumer, final String topic) {
         consumer.subscribe(Collections.singletonList(topic));
         while (true) {
             var records = consumer.poll(Duration.ofMillis(100));

@@ -4,7 +4,7 @@
 //! yozf config | jq '.clusters | keys'
 //! ```
 
-use app::Config;
+use app::configuration::GlobalConfig;
 use clap::Args;
 use lib::Error;
 use log::info;
@@ -25,10 +25,10 @@ impl Command for ConfigCommand {
             return subcommand.execute().await;
         }
 
-        let path = Config::path()?;
+        let path = GlobalConfig::path()?;
         info!("The configuration file is located at '{}'", path.display());
 
-        let config = Config::read(&path)?;
+        let config = GlobalConfig::read(&path)?;
         println!("{}", serde_json::to_string_pretty(&config)?);
 
         Ok(())

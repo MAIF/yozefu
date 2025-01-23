@@ -13,6 +13,7 @@ pub struct TopicDetail {
     pub partitions: usize,
     pub replicas: usize,
     pub consumer_groups: Vec<ConsumerGroupDetail>,
+    pub count: i64,
 }
 
 /// Information regarding a given consumer

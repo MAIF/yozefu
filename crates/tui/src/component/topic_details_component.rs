@@ -1,5 +1,7 @@
 //! Component showing information regarding a given topic: partitions, consumer groups, replicas ...
-use crossterm::event::{KeyCode, KeyEvent};
+use std::collections::HashSet;
+
+use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
 use itertools::Itertools;
 use lib::{ConsumerGroupState, TopicDetail};
@@ -12,6 +14,7 @@ use ratatui::{
     },
     Frame,
 };
+use thousands::Separable;
 use tokio::sync::mpsc::UnboundedSender;
 
 use crate::{error::TuiError, Action};
@@ -59,6 +62,15 @@ impl Component for TopicDetailsComponent {
             }
             KeyCode::Char(']') => {
                 self.scroll.scroll_to_bottom();
+            }
+            KeyCode::Char('p') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+                let mut h = HashSet::default();
+                h.extend(self.details.iter().map(|d| d.name.clone()));
+                self.action_tx
+                    .as_ref()
+                    .unwrap()
+                    .send(Action::RequestTopicDetails(h))
+                    .unwrap();
             }
             _ => (),
         }
@@ -205,15 +217,18 @@ impl Component for TopicDetailsComponent {
                     detail.partitions, detail.replicas
                 ))
                 .style(Style::default()),
-                Line::from(format!("{} consumer groups", detail.consumer_groups.len()))
-                    .style(Style::default()),
+                Line::from(format!(
+                    "{} records, {} consumer groups",
+                    detail.count.separate_with_underscores(),
+                    detail.consumer_groups.len()
+                )),
                 Line::from(""),
                 Line::from(""),
             ];
 
             f.render_stateful_widget(
                 table,
-                table_area.offset(Offset { x: 0, y: 5 }),
+                table_area.offset(Offset { x: 0, y: 6 }),
                 &mut self
                     .state
                     .clone()

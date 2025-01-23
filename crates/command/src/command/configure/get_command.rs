@@ -2,7 +2,7 @@
 use std::{collections::HashMap, fs};
 
 use crate::command::Command as CliCommand;
-use app::Config;
+use app::configuration::GlobalConfig;
 use clap::Args;
 use lib::Error;
 use serde_json::Value;
@@ -16,7 +16,7 @@ pub struct ConfigureGetCommand {
 
 impl CliCommand for ConfigureGetCommand {
     async fn execute(&self) -> Result<(), Error> {
-        let file = Config::path()?;
+        let file = GlobalConfig::path()?;
         let content = fs::read_to_string(&file)?;
         let config = serde_json::from_str::<Value>(&content)?;
         let mut property_name = self.property.clone();
@@ -29,7 +29,7 @@ impl CliCommand for ConfigureGetCommand {
                 Ok(())
             }
             None => {
-                let config = Config::read(&file)?;
+                let config = GlobalConfig::read(&file)?;
                 match self.property.as_str() {
                     "filters" | "filter" | "fn" | "func" | "functions" => {
                         let paths = fs::read_dir(config.filters_dir())?;
@@ -47,6 +47,7 @@ impl CliCommand for ConfigureGetCommand {
                         }
                         println!("{:}", serde_json::to_string_pretty(&filters)?);
                     }
+                    "path" | "file" => println!("{:?}", config.path),
                     "filter_dir" | "filters_dir" | "filters-dir" | "functions-dir"
                     | "functions_dir" | "function_dir" => {
                         println!("{:?}", config.filters_dir().display())

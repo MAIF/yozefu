@@ -5,7 +5,7 @@
 
 use std::{fs, process::Command};
 
-use app::Config;
+use app::configuration::GlobalConfig;
 use clap::{Args, Subcommand};
 use lib::Error;
 use log::info;
@@ -52,7 +52,7 @@ impl crate::command::Command for ConfigureCommand {
             return subcommand.execute().await;
         }
 
-        let file = Config::path()?;
+        let file = GlobalConfig::path()?;
         let temp_file =
             tempdir()?.path().join(file.file_name().expect(
                 "the configuration path should be a file, not a directory or something else",
@@ -68,7 +68,7 @@ impl crate::command::Command for ConfigureCommand {
 
         let new_config = fs::read_to_string(&temp_file)?;
         fs::remove_file(temp_file)?;
-        match serde_json::from_str::<Config>(&new_config) {
+        match serde_json::from_str::<GlobalConfig>(&new_config) {
             Ok(o) => {
                 fs::write(&file, serde_json::to_string_pretty(&o)?)?;
                 info!(

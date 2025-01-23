@@ -1,4 +1,6 @@
+use app::configuration::{ClusterConfig, YozefuConfig};
 use clap::Parser;
+use indexmap::IndexMap;
 use rdkafka::ClientConfig;
 use strum::{Display, EnumIter, EnumString};
 use tui::TuiError;
@@ -20,7 +22,7 @@ struct MyCli {
 }
 
 impl MyCli {
-    pub fn kafka_client_config(&self) -> ClientConfig {
+    pub fn kafka_client_config(&self) -> ClusterConfig {
         let mut config = ClientConfig::new();
         config.set_log_level(rdkafka::config::RDKafkaLogLevel::Emerg);
         match self.command.default_command.cluster() {
@@ -38,11 +40,16 @@ impl MyCli {
             ),
         };
 
-        config
+        ClusterConfig {
+            url_template: None,
+            schema_registry: None,
+            kafka: IndexMap::from_iter(config.config_map().clone()),
+        }
     }
 
     pub async fn execute(&self) -> Result<(), TuiError> {
-        self.command.execute_with(self.kafka_client_config()).await
+        let yozefu_config = YozefuConfig::new(self.kafka_client_config());
+        self.command.execute_with(yozefu_config).await
     }
 }
 

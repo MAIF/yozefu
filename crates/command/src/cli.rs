@@ -1,12 +1,11 @@
 //! The command line argument Parser struct
 use crate::command::{Command, MainCommand, UtilityCommands};
+use app::configuration::{ClusterConfig, GlobalConfig, SchemaRegistryConfig, YozefuConfig};
 use app::search::filter::FILTERS_DIR;
-use app::{ClusterConfig, APPLICATION_NAME};
-use app::{Config, SchemaRegistryConfig};
+use app::APPLICATION_NAME;
 use clap::command;
 use lib::Error;
 use log::warn;
-use rdkafka::ClientConfig;
 use reqwest::Url;
 use std::fmt::Debug;
 use std::fs;
@@ -39,9 +38,22 @@ where
     <T as FromStr>::Err: Display,
 {
     /// Executes the CLI.
-    /// The kafka config client will be loaded from the default config file.
+    /// The config will be loaded from the default config file.
     pub async fn execute(&self) -> Result<(), TuiError> {
         self.run(None).await
+    }
+
+    /// Executes the CLI with a specified kafka config client
+    pub async fn execute_with(&self, yozefu_config: YozefuConfig) -> Result<(), TuiError> {
+        self.run(Some(yozefu_config)).await
+    }
+
+    /// The targeted cluster
+    pub fn cluster(&self) -> Option<T> {
+        match self.subcommands.is_some() {
+            true => None,
+            false => Some(self.default_command.cluster()),
+        }
     }
 
     /// Changes the default logs file path
@@ -50,13 +62,8 @@ where
         self
     }
 
-    /// Executes the CLI with a specified kafka config client
-    pub async fn execute_with(&self, config_client: ClientConfig) -> Result<(), TuiError> {
-        self.run(Some(config_client)).await
-    }
-
-    fn read_config(&self) -> Result<Config, Error> {
-        match Config::read(&Config::path()?) {
+    fn read_config(&self) -> Result<GlobalConfig, Error> {
+        match GlobalConfig::read(&GlobalConfig::path()?) {
             Ok(mut config) => {
                 config.logs = self.logs_file.clone();
                 Ok(config)
@@ -65,7 +72,7 @@ where
         }
     }
 
-    async fn run(&self, config_client: Option<ClientConfig>) -> Result<(), TuiError> {
+    async fn run(&self, yozefu_config: Option<YozefuConfig>) -> Result<(), TuiError> {
         init_files().await?;
         let filters_dir = self.read_config()?.filters_dir();
         // TODO this sucks
@@ -73,20 +80,24 @@ where
         match &self.subcommands {
             Some(c) => c.execute().await.map_err(|e| e.into()),
             None => {
-                let config_client = match config_client {
-                    None => self.kafka_client_config()?,
+                // Load the config from the yozefu config file
+                let yozefu_config = match yozefu_config {
+                    None => self.yozefu_config_of(self.default_command.cluster())?,
                     Some(c) => c,
                 };
-                let mut command = self.default_command.clone();
-                command.logs_file(&self.logs_file);
-                command.with_client(config_client)?.execute().await
+                let command = self.default_command.clone();
+                command.execute(yozefu_config).await
             }
         }
     }
 
     /// Returns the kafka client config
-    fn kafka_client_config(&self) -> Result<ClientConfig, Error> {
-        self.default_command.kafka_client_config()
+    fn yozefu_config_of(&self, cluster: T) -> Result<YozefuConfig, Error> {
+        let config = self.read_config()?;
+        match config.clusters.get(&cluster.to_string()) {
+            Some(c) => Ok(YozefuConfig::new(c.clone())),
+            None => Err(Error::Error(format!("Unknown cluster '{}'. Make sure you have defined a configuration for this cluster name.", cluster))),
+        }
     }
 }
 
@@ -101,11 +112,11 @@ async fn init_files() -> Result<(), Error> {
 /// Initializes a default configuration file if it does not exist.
 /// The default cluster is `localhost`.
 fn init_config_file() -> Result<PathBuf, Error> {
-    let path = Config::path()?;
+    let path = GlobalConfig::path()?;
     if fs::metadata(&path).is_ok() {
         return Ok(path);
     }
-    let mut config = Config::try_from(&path)?;
+    let mut config = GlobalConfig::try_from(&path)?;
     let mut localhost_config = IndexMap::new();
     localhost_config.insert(
         "bootstrap.servers".to_string(),
@@ -145,8 +156,8 @@ fn init_config_file() -> Result<PathBuf, Error> {
 /// Initializes a default configuration file if it does not exist.
 /// The default cluster is `localhost`.
 async fn init_themes_file() -> Result<PathBuf, Error> {
-    let path = Config::path()?;
-    let config = Config::read(&path)?;
+    let path = GlobalConfig::path()?;
+    let config = GlobalConfig::read(&path)?;
     let path = config.themes_file();
     if fs::metadata(&path).is_ok() {
         return Ok(path);

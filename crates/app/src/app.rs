@@ -5,45 +5,41 @@ use lib::{
 };
 use log::{info, warn};
 use rdkafka::{
-    consumer::BaseConsumer,
-    consumer::{Consumer, StreamConsumer},
-    ClientConfig, Offset, TopicPartitionList,
+    consumer::{BaseConsumer, Consumer, StreamConsumer},
+    Offset, TopicPartitionList,
 };
 use thousands::Separable;
 
-use std::{collections::HashSet, fs, path::PathBuf, time::Duration};
+use std::{collections::HashSet, fs, time::Duration};
 
 use itertools::Itertools;
 
 use crate::{
+    configuration::{Configuration, InternalConfig, YozefuConfig},
     search::{Search, ValidSearchQuery},
-    Config,
 };
 
 /// Struct exposing different functions for consuming kafka records.
 #[derive(Debug, Clone)]
 pub struct App {
-    pub config: Config,
     pub cluster: String,
-    pub kafka_config: ClientConfig,
+    pub config: InternalConfig,
     pub search_query: ValidSearchQuery,
-    pub output_file: PathBuf,
+    //pub output_file: PathBuf,
 }
 
 impl App {
     pub fn new(
-        config: Config,
         cluster: String,
-        kafka_config: ClientConfig,
+        config: InternalConfig,
         search_query: ValidSearchQuery,
-        output_file: PathBuf,
+        //     output_file: PathBuf,
     ) -> Self {
         Self {
-            config,
             cluster,
-            kafka_config,
+            config,
             search_query,
-            output_file,
+            //    output_file,
         }
     }
 
@@ -63,7 +59,7 @@ impl App {
             FromOffset::Offset(o) => self.assign_partitions(topics, Offset::Offset(o)),
             FromOffset::OffsetTail(o) => self.assign_partitions(topics, Offset::OffsetTail(o)),
             FromOffset::Timestamp(timestamp) => {
-                let consumer: StreamConsumer = self.kafka_config.create()?;
+                let consumer: StreamConsumer = self.config.create_kafka_consumer()?;
                 let mut tp = TopicPartitionList::new();
                 for t in topics {
                     let metadata = consumer.fetch_metadata(Some(t), Duration::from_secs(10))?;
@@ -84,8 +80,9 @@ impl App {
     /// Exports a given kafka record to a file.
     /// The Name of the file is automatically generated at the runtime
     pub fn export_record(&self, record: &KafkaRecord) -> Result<(), Error> {
-        fs::create_dir_all(self.output_file.parent().unwrap())?;
-        let content = fs::read_to_string(&self.output_file).unwrap_or("[]".to_string());
+        let output_file = self.config.output_file();
+        fs::create_dir_all(output_file.parent().unwrap())?;
+        let content = fs::read_to_string(output_file).unwrap_or("[]".to_string());
         let mut exported_records: Vec<ExportedKafkaRecord> = serde_json::from_str(&content)?;
 
         let mut exported_record_kafka: ExportedKafkaRecord = record.into();
@@ -106,12 +103,12 @@ impl App {
         }
 
         fs::write(
-            &self.output_file,
+            output_file,
             serde_json::to_string_pretty(&exported_records)?,
         )?;
         info!(
             "A record has been exported into file '{}'",
-            self.output_file.display()
+            output_file.display()
         );
         Ok(())
     }
@@ -150,7 +147,7 @@ impl App {
         }
 
         info!(
-            "{} are about to be consumed on the following topic partitions: [{}]",
+            "{} records are about to be consumed on the following topic partitions: [{}]",
             count.separate_with_underscores(),
             topic_partition_list
                 .elements()
@@ -162,7 +159,7 @@ impl App {
     }
 
     fn create_assigned_consumer(&self) -> Result<StreamConsumer, Error> {
-        self.kafka_config.create().map_err(|e| e.into())
+        self.config.create_kafka_consumer()
     }
 
     /// Assigns topics to a consumer
@@ -191,7 +188,7 @@ impl App {
     pub fn topic_details(&self, topics: HashSet<String>) -> Result<Vec<TopicDetail>, Error> {
         let mut results = vec![];
         for topic in topics {
-            let consumer: BaseConsumer = self.kafka_config.create()?;
+            let consumer: BaseConsumer = self.config.create_kafka_consumer()?;
             let metadata = consumer.fetch_metadata(Some(&topic), Duration::from_secs(10))?;
             let metadata = metadata.topics().first().unwrap();
             let mut detail = TopicDetail {
@@ -199,6 +196,7 @@ impl App {
                 replicas: metadata.partitions().first().unwrap().replicas().len(),
                 partitions: metadata.partitions().len(),
                 consumer_groups: vec![],
+                count: self.count_records_in_topic(&topic)?,
             };
             let mut consumer_groups = vec![];
             let metadata = consumer.fetch_group_list(None, Duration::from_secs(10))?;
@@ -215,6 +213,25 @@ impl App {
         }
 
         Ok(results)
+    }
+
+    pub fn count_records_in_topic(&self, topic: &str) -> Result<i64, Error> {
+        let mut count = 0;
+        let consumer: BaseConsumer = self.config.create_kafka_consumer()?;
+        let metadata = consumer.fetch_metadata(Some(topic), Duration::from_secs(10))?;
+        let metadata_topic = metadata.topics().first();
+        if metadata_topic.is_none() {
+            return Ok(0);
+        }
+
+        let metadata_topic = metadata_topic.unwrap();
+        for partition in metadata_topic.partitions() {
+            let watermarks =
+                consumer.fetch_watermarks(topic, partition.id(), Duration::from_secs(10))?;
+            count += watermarks.1 - watermarks.0;
+        }
+
+        Ok(count)
     }
 
     /// Lists available kafka topics on the cluster.
@@ -279,8 +296,8 @@ impl App {
     //    }
 
     /// Lists available topics on the cluster with a custom kafka client.
-    pub fn list_topics_from_client(kafka_config: &ClientConfig) -> Result<Vec<String>, Error> {
-        let consumer: StreamConsumer = kafka_config.create()?;
+    pub fn list_topics_from_client(yozefu_config: &YozefuConfig) -> Result<Vec<String>, Error> {
+        let consumer: StreamConsumer = yozefu_config.create_kafka_consumer()?;
         let metadata = consumer.fetch_metadata(None, Duration::from_secs(3))?;
         let topics = metadata
             .topics()

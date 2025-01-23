@@ -1,6 +1,6 @@
 //! This component is handles the main layout of the TUI
 //! and renders components based on the current context.
-use app::Config;
+use app::configuration::GlobalConfig;
 use copypasta::{ClipboardContext, ClipboardProvider};
 use std::{
     collections::HashMap,
@@ -42,7 +42,7 @@ impl RootComponent {
     pub fn new(
         query: String,
         selected_topics: Vec<String>,
-        config: &Config,
+        config: &GlobalConfig,
         records: &'static ConcurrentRecordsBuffer,
         state: State,
     ) -> Self {

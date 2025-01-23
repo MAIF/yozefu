@@ -1,4 +1,4 @@
-use app::{search::ValidSearchQuery, Config};
+use app::{configuration::GlobalConfig, search::ValidSearchQuery};
 use std::collections::HashSet;
 
 use lib::{kafka::SchemaId, search::OrderBy, KafkaRecord, TopicDetail};
@@ -54,7 +54,7 @@ pub enum Action {
     /// List of topics to consume
     SelectedTopics(Vec<String>),
     /// Dispatch the new configuration to the UI
-    NewConfig(Config),
+    NewConfig(GlobalConfig),
     /// Copy the given record to the clipboard
     CopyToClipboard(String),
     /// Notify the UI that a new component has been be displayed

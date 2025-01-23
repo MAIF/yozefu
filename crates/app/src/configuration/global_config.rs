@@ -4,7 +4,6 @@ use directories::ProjectDirs;
 use indexmap::IndexMap;
 use itertools::Itertools;
 use lib::Error;
-use resolve_path::PathResolveExt;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::{
@@ -12,19 +11,10 @@ use std::{
     fs,
     path::{Path, PathBuf},
 };
-use url::Url;
 
 use crate::APPLICATION_NAME;
 
-/// List of kafka properties that are a file location.
-const KAFKA_PROPERTIES_WITH_LOCATIONS: [&str; 6] = [
-    "ssl.ca.location",
-    "ssl.certificate.location",
-    "ssl.key.location",
-    "ssl.keystore.location",
-    "ssl.crl.location",
-    "ssl.engine.location",
-];
+use super::cluster_config::{ClusterConfig, SchemaRegistryConfig};
 
 const EXAMPLE_PROMPTS: &[&str] = &[
     r#"timestamp between "2 hours ago" and "1 hour ago" limit 100 from beginning"#,
@@ -34,7 +24,7 @@ const EXAMPLE_PROMPTS: &[&str] = &[
 
 /// Configuration of the application
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone)]
-pub struct Config {
+pub struct GlobalConfig {
     /// Path of this config
     #[serde(skip)]
     pub path: PathBuf,
@@ -64,38 +54,6 @@ pub struct Config {
     pub export_directory: PathBuf,
 }
 
-impl Default for ClusterConfig {
-    fn default() -> Self {
-        Self {
-            url_template: Some(default_url_template()),
-            schema_registry: None,
-            kafka: Default::default(),
-        }
-    }
-}
-
-/// Specific configuration for a cluster
-#[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone)]
-pub struct ClusterConfig {
-    /// A placeholder url that will be used when you want to open a kafka record in the browser
-    pub url_template: Option<String>,
-    /// Schema registry configuration
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub schema_registry: Option<SchemaRegistryConfig>,
-    // Kafka consumer properties for this cluster, see <https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md> for more details
-    pub kafka: IndexMap<String, String>,
-}
-
-/// Schema registry configuration of a given cluster
-#[derive(Debug, Deserialize, PartialEq, Eq, Serialize, Clone)]
-pub struct SchemaRegistryConfig {
-    /// Url of the schema registry
-    pub url: Url,
-    /// HTTP headers to be used when communicating with the schema registry
-    #[serde(default = "HashMap::default")]
-    pub headers: HashMap<String, String>,
-}
-
 fn default_url_template() -> String {
     "http://localhost/cluster/{topic}/{partition}/{offset}".to_string()
 }
@@ -112,7 +70,7 @@ fn default_show_shortcuts() -> bool {
     true
 }
 
-impl TryFrom<&PathBuf> for Config {
+impl TryFrom<&PathBuf> for GlobalConfig {
     type Error = Error;
 
     fn try_from(path: &PathBuf) -> Result<Self, Self::Error> {
@@ -132,7 +90,7 @@ impl TryFrom<&PathBuf> for Config {
     }
 }
 
-impl Config {
+impl GlobalConfig {
     /// The default config file path
     pub fn path() -> Result<PathBuf, Error> {
         Self::yozefu_directory().map(|d| d.join("config.json"))
@@ -148,7 +106,7 @@ impl Config {
     }
 
     /// Reads a configuration file.
-    pub fn read(file: &Path) -> Result<Config, Error> {
+    pub fn read(file: &Path) -> Result<Self, Error> {
         let content = fs::read_to_string(file);
         if let Err(e) = &content {
             return Err(Error::Error(format!(
@@ -159,7 +117,7 @@ impl Config {
         }
 
         let content = content.unwrap();
-        let mut config: Config = serde_json::from_str(&content).map_err(|e| {
+        let mut config: Self = serde_json::from_str(&content).map_err(|e| {
             Error::Error(format!(
                 "Failed to parse the configuration file {:?}: {}",
                 file.display(),
@@ -204,41 +162,6 @@ impl Config {
             .get(cluster)
             .and_then(|e| e.url_template.clone())
             .unwrap_or(self.default_url_template.clone())
-    }
-
-    /// Returns the kafka properties for the given cluster.
-    pub fn kafka_config_of(&self, cluster: &str) -> Result<HashMap<String, String>, Error> {
-        let mut config = HashMap::new();
-        config.extend(self.default_kafka_config.clone());
-
-        if !self.clusters.contains_key(cluster) {
-            return Err(Error::Error(format!(
-                "I was not able to find the '{}' cluster. Available clusters are: [{}]",
-                cluster,
-                self.clusters.keys().join(", ")
-            )));
-        }
-
-        let env_config = self.clusters.get(cluster.trim()).unwrap();
-        config.extend(env_config.kafka.clone());
-        config = Self::normalize_path_locations(config);
-
-        Ok(config)
-    }
-
-    /// Returns the kafka properties for the given cluster.
-    fn normalize_path_locations(mut config: HashMap<String, String>) -> HashMap<String, String> {
-        for key in KAFKA_PROPERTIES_WITH_LOCATIONS {
-            if let Some(path) = config.get(key) {
-                let normalized_path = PathBuf::from(path)
-                    .resolve()
-                    .canonicalize()
-                    .map(|d| d.display().to_string())
-                    .unwrap_or(path.to_string());
-                config.insert(key.to_string(), normalized_path);
-            }
-        }
-        config
     }
 
     /// Returns the schema registry configuration for the given cluster.

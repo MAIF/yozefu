@@ -10,16 +10,16 @@ use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use std::{fs, io};
 
+use app::configuration::{Configuration, GlobalConfig, InternalConfig, YozefuConfig};
 use app::search::ValidSearchQuery;
-use chrono::Local;
 
-use app::{App, Config};
+use app::App;
 use clap::Parser;
 use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
 use itertools::Itertools;
 use lib::Error;
 use log::{debug, info, warn};
-use rdkafka::ClientConfig;
+use rdkafka::consumer::BaseConsumer;
 use strum::{Display, EnumString};
 use tui::error::TuiError;
 use tui::Theme;
@@ -29,10 +29,8 @@ use crate::headless::formatter::{
     JsonFormatter, KafkaFormatter, PlainFormatter, SimpleFormatter, TransposeFormatter,
 };
 use crate::headless::Headless;
-use crate::log::init_logging_file;
+use crate::log::{init_logging_file, init_logging_stderr};
 use crate::APPLICATION_NAME;
-
-use super::main_command_with_client::MainCommandWithClient;
 
 fn parse_cluster<T>(s: &str) -> Result<T, Error>
 where
@@ -60,6 +58,7 @@ where
     #[clap(
         short,
         long,
+        alias = "topic",
         group = "topic",
         use_value_delimiter = true,
         value_delimiter = ','
@@ -91,8 +90,6 @@ where
     #[clap(long)]
     /// Use a specific config file
     pub config: Option<PathBuf>,
-    #[clap(skip)]
-    pub logs_file: Option<PathBuf>,
 }
 
 #[derive(Debug, Clone, EnumString, Display)]
@@ -111,26 +108,32 @@ where
     T: Display + Clone + Sync + Send + 'static + FromStr,
     <T as FromStr>::Err: Display,
 {
-    /// Create a new `MainCommandWithClient` with a `ClientConfig`.
-    pub fn with_client(
-        self,
-        client_config: ClientConfig,
-    ) -> Result<MainCommandWithClient<T>, Error> {
-        let kafka_properties = client_config.config_map().clone();
-        let kafka_properties = self.override_kafka_config_properties(kafka_properties)?;
-        let client_config = Self::kafka_client_config_from_properties(kafka_properties)?;
-        Ok(MainCommandWithClient::new(self, client_config))
-    }
+    pub async fn execute(self, mut yozefu_config: YozefuConfig) -> Result<(), TuiError> {
+        for property in &self.properties {
+            match property.split_once('=') {
+                Some((key, value)) => {
+                    yozefu_config.set_kafka_property(key, value);
+                }
+                None => {
+                    return Err(TuiError::from(Error::Error(format!("Invalid kafka property '{}', expected a '=' symbol to separate the property and its value.", property))));
+                }
+            }
+        }
 
-    /// Changes the default logs file path
-    pub(crate) fn logs_file(&mut self, logs: &Option<PathBuf>) -> &mut Self {
-        self.logs_file = logs.clone();
-        self
+        match self.headless {
+            true => {
+                let _ = init_logging_stderr(self.debug);
+                self.headless(&yozefu_config).await.map_err(|e| e.into())
+            }
+            false => {
+                // Ignore the result, we just want to make sure the logger is initialized
+                self.tui(&yozefu_config).await
+            }
+        }
     }
 
     /// Returns the search query to use.
-    pub(crate) fn query(&self, config: &Config) -> Result<String, Error> {
-        //App::load_config(config);
+    fn query(&self, config: &GlobalConfig) -> Result<String, Error> {
         let q = self.query.join(" ").trim().to_string();
         if q.is_empty() {
             return Ok(config.initial_query.clone());
@@ -158,10 +161,10 @@ where
         }
     }
 
-    pub(crate) fn config(&self) -> Result<Config, Error> {
-        let path = self.config.clone().unwrap_or(Config::path()?);
-        let mut config = Config::read(&path)?;
-        config.logs = self.logs_file.clone();
+    fn config(&self, yozefu_config: &YozefuConfig) -> Result<GlobalConfig, Error> {
+        let path = self.config.clone().unwrap_or(GlobalConfig::path()?);
+        let mut config = GlobalConfig::read(&path)?;
+        config.logs = yozefu_config.logs_file.clone();
         Ok(config)
     }
 
@@ -169,7 +172,7 @@ where
         self.cluster.as_ref().unwrap().clone()
     }
 
-    pub fn themes(file: &Path) -> Result<HashMap<String, Theme>, Error> {
+    fn themes(file: &Path) -> Result<HashMap<String, Theme>, Error> {
         let content = fs::read_to_string(file)?;
         let themes: HashMap<String, Theme> = serde_json::from_str(&content).map_err(|e| {
             Error::Error(format!(
@@ -181,7 +184,7 @@ where
         Ok(themes)
     }
 
-    pub fn load_theme(file: &Path, name: &str) -> Result<Theme, Error> {
+    fn load_theme(file: &Path, name: &str) -> Result<Theme, Error> {
         let themes = Self::themes(file)?;
         let theme = match themes.get(name) {
             Some(theme) => theme,
@@ -200,61 +203,52 @@ where
     }
 
     /// Starts the app in TUI mode
-    pub(crate) async fn tui(&self, kafka_client_config: ClientConfig) -> Result<(), TuiError> {
+    async fn tui(&self, yozefu_config: &YozefuConfig) -> Result<(), TuiError> {
         let cluster = self.cluster();
-        let config = self.config()?;
+        let config = self.config(yozefu_config)?;
         let query = self.query(&config)?;
 
         let theme_name = self.theme.clone().unwrap_or(config.theme.clone());
         let color_palette = Self::load_theme(&config.themes_file(), &theme_name)?;
 
         let state = State::new(&cluster.to_string(), color_palette, &config);
-        let mut app = Ui::new(
-            self.app(&query, kafka_client_config)?,
+
+        let _ = init_logging_file(self.debug, &config.logs_file());
+        let mut ui = Ui::new(
+            self.app(&query, yozefu_config)?,
             query,
             self.topics.clone(),
             state.clone(),
         )
         .await?;
 
-        let _ = init_logging_file(self.debug, &config.logs_file());
-        app.run(self.topics.clone(), state).await
+        self.check_connection(yozefu_config)?;
+        ui.run(self.topics.clone(), state).await
+    }
+
+    fn check_connection(&self, yozefu_config: &YozefuConfig) -> Result<(), Error> {
+        let _ = yozefu_config.create_kafka_consumer::<BaseConsumer>()?;
+        Ok(())
     }
 
     /// Creates the App
-    fn app(&self, query: &str, kafka_client_config: ClientConfig) -> Result<App, Error> {
-        let config = self.config()?;
+    fn app(&self, query: &str, yozefu_config: &YozefuConfig) -> Result<App, Error> {
+        debug!("{:?}", yozefu_config);
         let search_query = ValidSearchQuery::from_str(query)?;
+        let config = self.config(yozefu_config)?;
+
+        let internal_config = InternalConfig::new(yozefu_config.clone(), config);
+        //let output_file = internal_config.output_file();
         Ok(App::new(
-            config,
             self.cluster().to_string(),
-            kafka_client_config,
+            internal_config,
             search_query,
-            self.output_file()?,
         ))
     }
 
-    /// Returns the output file to use to store exported kafka records.
-    pub(crate) fn output_file(&self) -> Result<PathBuf, Error> {
-        let output = match &self.output {
-            Some(o) => o.clone(),
-            None => {
-                let config = self.config()?;
-                config.export_directory.join(format!(
-                    "export-{}.json",
-                    // Windows does not support ':' in filenames
-                    Local::now()
-                        .to_rfc3339_opts(chrono::SecondsFormat::Secs, false)
-                        .replace(':', "-"),
-                ))
-            }
-        };
-        Ok(output)
-    }
-
     /// Starts the app in headless mode
-    pub(crate) async fn headless(&self, kafka_client_config: ClientConfig) -> Result<(), Error> {
-        let config = self.config()?;
+    async fn headless(&self, yozefu_config: &YozefuConfig) -> Result<(), Error> {
+        let config = self.config(yozefu_config)?;
         let query = self.query(&config)?;
 
         let progress = ProgressBar::new(0);
@@ -267,13 +261,12 @@ where
             .map_err(|e| Error::Error(e.to_string()))?,
         );
         progress.set_message("INFO");
-
-        let topics = self.topics(&kafka_client_config)?;
+        let topics = self.topics(yozefu_config)?;
         if !self.disable_progress {
             progress.set_draw_target(ProgressDrawTarget::stderr());
         }
         let app = Headless::new(
-            self.app(&query, kafka_client_config)?,
+            self.app(&query, yozefu_config)?,
             &topics,
             self.formatter(),
             self.export,
@@ -303,11 +296,11 @@ where
     }
 
     /// Lists available topics when the user didn't provide any
-    fn topics(&self, kafka_config: &ClientConfig) -> Result<Vec<String>, Error> {
+    fn topics(&self, yozefu_config: &YozefuConfig) -> Result<Vec<String>, Error> {
         if !self.topics.is_empty() {
             return Ok(self.topics.clone());
         }
-        let items = App::list_topics_from_client(kafka_config)?;
+        let items = App::list_topics_from_client(yozefu_config)?;
         println!(
             "Select topics to consume:\n {}",
             items.iter().take(20).join("\n ")
@@ -331,62 +324,5 @@ where
             },
             None => Box::new(TransposeFormatter::new()),
         }
-    }
-
-    /// Overrides the kafka properties with the properties provided by the user
-    fn override_kafka_config_properties(
-        &self,
-        mut config: HashMap<String, String>,
-    ) -> Result<HashMap<String, String>, Error> {
-        for property in &self.properties {
-            match property.split_once('=') {
-                Some((key, value)) => {
-                    config.insert(key.trim().into(), value.into());
-                }
-                None => {
-                    return Err(Error::Error(format!("Invalid kafka property '{}', expected a '=' symbol to separate the property and its value.", property)));
-                }
-            }
-        }
-        Ok(config)
-    }
-
-    /// Returns the kafka client config from the configuration file
-    pub(crate) fn kafka_client_config(&self) -> Result<ClientConfig, Error> {
-        let config = self.config()?;
-        let mut kafka_properties = config.kafka_config_of(&self.cluster().to_string())?;
-        kafka_properties = self.override_kafka_config_properties(kafka_properties)?;
-
-        // Default properties
-        for (key, value) in [
-            ("group.id", APPLICATION_NAME),
-            ("enable.auto.commit", "false"),
-        ] {
-            if !kafka_properties.contains_key(key) {
-                kafka_properties.insert(key.into(), value.into());
-            }
-        }
-
-        Self::kafka_client_config_from_properties(kafka_properties)
-    }
-
-    /// Returns the kafka client config from kafka properties
-    pub fn kafka_client_config_from_properties(
-        kafka_properties: HashMap<String, String>,
-    ) -> Result<ClientConfig, Error> {
-        let mut config = ClientConfig::new();
-        config.set_log_level(rdkafka::config::RDKafkaLogLevel::Emerg);
-        debug!(
-            "Kafka properties: {:?}",
-            kafka_properties
-                .iter()
-                .map(|(k, v)| format!("{}={}", k, v))
-                .join(", ")
-        );
-        for (key, value) in kafka_properties {
-            config.set(key, value);
-        }
-
-        Ok(config)
     }
 }

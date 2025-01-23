@@ -2,8 +2,8 @@
 use std::{fs, path::PathBuf};
 
 use app::{
+    configuration::GlobalConfig,
     search::filter::{MATCHES_FUNCTION_NAME, PARSE_PARAMETERS_FUNCTION_NAME},
-    Config,
 };
 use clap::Args;
 use extism::{Manifest, Plugin, Wasm};
@@ -51,7 +51,7 @@ impl ImportFilterCommand {
     /// Returns the path to the wasm file.
     pub fn destination(&self) -> Result<PathBuf, Error> {
         let name = self.name();
-        let config = Config::read(&Config::path()?)?;
+        let config = GlobalConfig::read(&GlobalConfig::path()?)?;
         let dir = config.filters_dir();
         fs::create_dir_all(&dir)?;
         Ok(dir.join(format!("{}.wasm", name)))

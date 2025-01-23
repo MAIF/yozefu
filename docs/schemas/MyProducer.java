@@ -20,6 +20,7 @@
 //FILES protobuf/key-schema.proto=protobuf/key-schema.proto
 //FILES protobuf/value-schema.proto=protobuf/value-schema.proto
 
+// jbang run ./MyProducer.java --type avro --topic public-french-addresses Nimes
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

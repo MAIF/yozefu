@@ -55,7 +55,7 @@ impl Ui {
             app,
             records: &BUFFER,
             topics: vec![],
-            root: RootComponent::new(query, selected_topics, &config, &BUFFER, state),
+            root: RootComponent::new(query, selected_topics, &config.global, &BUFFER, state),
             records_sender: None,
             last_tick_key_events: Vec::new(),
             last_time_consuming: Instant::now(),
@@ -64,12 +64,12 @@ impl Ui {
 
     pub fn save_config(&self) -> Result<(), TuiError> {
         let mut config = self.app.config.clone();
-        if config.history.len() > 1000 {
-            config.history = config.history.into_iter().skip(500).collect();
+        if config.global.history.len() > 1000 {
+            config.global.history = config.global.history.into_iter().skip(500).collect();
         }
         fs::write(
-            &self.app.config.path,
-            serde_json::to_string_pretty(&self.app.config)?,
+            &self.app.config.global.path,
+            serde_json::to_string_pretty(&self.app.config.global)?,
         )?;
         Ok(())
     }
@@ -97,12 +97,18 @@ impl Ui {
         self.records.lock().unwrap().reset();
         if self.topics.is_empty() {
             tx.send(Action::StopConsuming())?;
-            tx.send(Action::Notification(Notification::new(
-                log::Level::Info,
-                "No topics selected".to_string(),
-            )))?;
             return Ok(());
         }
+
+        let message = match self.app.search_query.is_empty() {
+            true => "Waiting for new events".to_string(),
+            false => "Searching".to_string(),
+        };
+
+        tx.send(Action::Notification(Notification::new(
+            log::Level::Info,
+            message,
+        )))?;
         self.worker = CancellationToken::new();
 
         let query = self.app.search_query.query().clone();
@@ -182,7 +188,7 @@ impl Ui {
                     let message = message.detach();
                     let timestamp = message.timestamp().to_millis().unwrap_or_default();
                     tx_dd.send(message).unwrap();
-                    if current_time.elapsed() > Duration::from_secs(20) {
+                    if current_time.elapsed() > Duration::from_secs(10) {
                         current_time = Instant::now();
 
                         tx.send(Action::Notification(Notification::new(
@@ -278,7 +284,9 @@ impl Ui {
             .register_action_handler(action_tx.clone());
         self.root.register_action_handler(action_tx.clone())?;
         self.root.init()?;
-        action_tx.send(Action::SelectedTopics(topics))?;
+        if !topics.is_empty() {
+            action_tx.send(Action::SelectedTopics(topics))?;
+        }
 
         let mut schema_registry = self.app.schema_registry();
         loop {
@@ -298,12 +306,12 @@ impl Ui {
             while let Ok(action) = action_rx.try_recv() {
                 match action {
                     Action::NewConfig(ref config) => {
-                        self.app.config = config.clone();
+                        self.app.config.global = config.clone();
                         self.save_config()?;
                     }
                     Action::NewSearchPrompt(ref prompt) => {
-                        self.app.config.history.push(prompt.to_string());
-                        self.app.config.history.dedup();
+                        self.app.config.global.history.push(prompt.to_string());
+                        self.app.config.global.history.dedup();
                         self.save_config()?;
                     }
                     Action::RequestTopicDetails(ref topics) => {
@@ -365,17 +373,13 @@ impl Ui {
                         self.consume_topics(action_tx.clone()).await?;
                     }
                     Action::Search(ref search) => {
-                        self.app.search_query = search.clone();
-                        if !self.topics.is_empty() {
+                        if self.topics.is_empty() {
                             action_tx.send(Action::Notification(Notification::new(
                                 log::Level::Info,
-                                match self.app.search_query.is_empty() {
-                                    true => "Waiting for new events".to_string(),
-                                    false => "Searching".to_string(),
-                                },
+                                "No topics selected".to_string(),
                             )))?;
                         }
-
+                        self.app.search_query = search.clone();
                         self.consume_topics(action_tx.clone()).await?;
                     }
                     _ => {}

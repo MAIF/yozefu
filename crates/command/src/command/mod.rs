@@ -8,7 +8,6 @@ pub mod configure;
 mod create_filter;
 mod import_filter;
 mod main_command;
-mod main_command_with_client;
 mod utility_commands;
 
 pub use create_filter::CreateFilterCommand;

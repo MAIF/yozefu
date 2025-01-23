@@ -1,6 +1,6 @@
 //! The state is a struct containing various information.
 //! It is passed to all components.
-use app::Config;
+use app::configuration::GlobalConfig;
 use std::path::PathBuf;
 
 use crate::theme::Theme;
@@ -20,7 +20,7 @@ pub struct State {
 }
 
 impl State {
-    pub fn new(cluster: &str, theme: Theme, config: &Config) -> Self {
+    pub fn new(cluster: &str, theme: Theme, config: &GlobalConfig) -> Self {
         Self {
             focused: ComponentName::default(),
             cluster: cluster.to_string(),

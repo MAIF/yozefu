@@ -3,7 +3,7 @@
 use std::fs;
 
 use crate::command::Command as CliCommand;
-use app::Config;
+use app::configuration::GlobalConfig;
 use clap::Args;
 use lib::Error;
 use log::info;
@@ -19,7 +19,7 @@ pub struct ConfigureSetCommand {
 
 impl CliCommand for ConfigureSetCommand {
     async fn execute(&self) -> Result<(), Error> {
-        let file = Config::path()?;
+        let file = GlobalConfig::path()?;
 
         let content = fs::read_to_string(&file)?;
         let mut config = serde_json::from_str::<Value>(&content)?;
@@ -41,7 +41,7 @@ impl CliCommand for ConfigureSetCommand {
             true => {
                 let _  = std::mem::replace(old_value, new_value);
                 info!("'{}' is now equal to '{}'", property_name, old_value);
-                let c: Config = serde_json::from_value(config)?;
+                let c: GlobalConfig = serde_json::from_value(config)?;
                 fs::write(file, serde_json::to_string_pretty(&c)?)?;
                 Ok(())
             },
