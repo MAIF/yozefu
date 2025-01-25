@@ -11,15 +11,6 @@ use std::collections::BTreeMap;
 #[derive(Clone, Debug, Deserialize, Serialize, Hash, PartialEq, Eq, Default)]
 #[serde(rename_all = "lowercase")]
 pub struct KafkaRecord {
-    /// A human readable representation of the value
-    pub value: DataType,
-    #[serde(skip_serializing, default)]
-    /// The value as a string. needed to be displayed in the TUI
-    pub value_as_string: String,
-    /// A human readable representation of the value
-    pub key: DataType,
-    #[serde(skip_serializing, default)]
-    pub key_as_string: String,
     pub topic: String,
     pub timestamp: Option<i64>,
     pub partition: i32,
@@ -32,6 +23,15 @@ pub struct KafkaRecord {
     /// Number of bytes in the key + the value
     #[serde(default)]
     pub size: usize,
+    /// A human readable representation of the key
+    pub key: DataType,
+    #[serde(skip_serializing, default)]
+    pub key_as_string: String,
+    /// A human readable representation of the value
+    pub value: DataType,
+    #[serde(skip_serializing, default)]
+    /// The value as a string. needed to be displayed in the TUI
+    pub value_as_string: String,
 }
 
 #[cfg(feature = "native")]

@@ -110,7 +110,7 @@ impl Component for TopicDetailsComponent {
             .borders(Borders::ALL)
             .border_style(Style::default())
             .title(" Topic details ")
-            .padding(Padding::proportional(3))
+            .padding(Padding::proportional(2))
             .border_type(BorderType::Rounded);
         let block = self.make_block_focused_with_state(state, block);
 
@@ -125,7 +125,7 @@ impl Component for TopicDetailsComponent {
             f.render_widget(block, rect);
             f.render_stateful_widget(
                 full,
-                rect.inner(Margin::new(7, 3)),
+                rect.inner(Margin::new(5, 2)),
                 &mut self.throbber_state,
             );
             return Ok(());
@@ -141,7 +141,7 @@ impl Component for TopicDetailsComponent {
             f.render_widget(&block, rect);
             f.render_stateful_widget(
                 full,
-                rect.inner(Margin::new(7, 3)),
+                rect.inner(Margin::new(5, 2)),
                 &mut self.throbber_state,
             );
         }
@@ -279,11 +279,11 @@ impl Component for TopicDetailsComponent {
                 .block(block_experimental),
                 Rect {
                     x: 0,
-                    y: 9,
+                    y: 8,
                     width: rect.width + 3,
                     height: 3,
                 }
-                .inner(Margin::new(8, 0)),
+                .inner(Margin::new(7, 0)),
             );
 
             f.render_stateful_widget(
@@ -292,7 +292,7 @@ impl Component for TopicDetailsComponent {
                     x: table_area.x,
                     y: table_area.y + 7,
                     width: table_area.width,
-                    height: table_area.height.saturating_sub(4),
+                    height: table_area.height.saturating_sub(5),
                 },
                 &mut self.state.clone(), //.with_offset((self.scroll.value() + table_area.y + 10).into()),
             );

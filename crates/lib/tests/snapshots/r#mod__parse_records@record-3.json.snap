@@ -4,14 +4,6 @@ expression: "KafkaRecord::parse(owned_message, &mut None).await"
 input_file: crates/lib/tests/inputs/raw-records/record-3.json
 ---
 KafkaRecord {
-    value: Json(
-        Object {},
-    ),
-    value_as_string: "{}",
-    key: Json(
-        Object {},
-    ),
-    key_as_string: "{}",
     topic: "my-topic",
     timestamp: Some(
         0,
@@ -36,4 +28,12 @@ KafkaRecord {
         },
     ),
     size: 14,
+    key: Json(
+        Object {},
+    ),
+    key_as_string: "{}",
+    value: Json(
+        Object {},
+    ),
+    value_as_string: "{}",
 }

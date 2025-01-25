@@ -1,10 +1,38 @@
 ---
 source: crates/lib/tests/mod.rs
 expression: "ExportedKafkaRecord::from(&record)"
-input_file: crates/lib/tests/inputs/record-1.json
+input_file: crates/lib/tests/inputs/parsed-records/record-1.json
 ---
 ExportedKafkaRecord {
     record: KafkaRecord {
+        topic: "public-french-addresses",
+        timestamp: Some(
+            1732481153241,
+        ),
+        partition: 0,
+        offset: 4,
+        headers: {},
+        key_schema: Some(
+            Schema {
+                id: SchemaId(
+                    1,
+                ),
+                schema_type: None,
+            },
+        ),
+        value_schema: Some(
+            Schema {
+                id: SchemaId(
+                    2,
+                ),
+                schema_type: None,
+            },
+        ),
+        size: 381,
+        key: Json(
+            String("381"),
+        ),
+        key_as_string: "",
         value: Json(
             Object {
                 "type": String("Feature"),
@@ -33,34 +61,6 @@ ExportedKafkaRecord {
             },
         ),
         value_as_string: "",
-        key: Json(
-            String("381"),
-        ),
-        key_as_string: "",
-        topic: "public-french-addresses",
-        timestamp: Some(
-            1732481153241,
-        ),
-        partition: 0,
-        offset: 4,
-        headers: {},
-        key_schema: Some(
-            Schema {
-                id: SchemaId(
-                    1,
-                ),
-                schema_type: None,
-            },
-        ),
-        value_schema: Some(
-            Schema {
-                id: SchemaId(
-                    2,
-                ),
-                schema_type: None,
-            },
-        ),
-        size: 381,
     },
     date_time: Some(
         2024-11-24T21:45:53.241+01:00,
