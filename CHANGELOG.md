@@ -1,3 +1,18 @@
+## What's Changed in v0.0.5
+* Develop by @Mcdostone in [#28](https://github.com/MAIF/yozefu/pull/28)
+* fix: fix the table state in `topicDetailsComponent`, adjust delay for checkpoint while consuming records by @Mcdostone
+* docs: remove powerline-fonts by @Mcdostone
+* fix: fix panics when resizing the height of the terminal window to 0 by @Mcdostone
+* refactor: change the order of attribute for struct `KafkaRecord` for better user experience by @Mcdostone
+* refactor: make component attributes private by @Mcdostone
+* feat: Feedback to user when refreshing topic details component, make consumer members table scrollable by @Mcdostone
+* feat: introducing `YozefuConfig` that gathers configuration of the tool by @Mcdostone
+* test: create a kafka consumer that commits offset by @Mcdostone
+* feat: make TopicDetailComponent scrollable by @Mcdostone
+* chore: Update changelog by @github-actions[bot] in [#25](https://github.com/MAIF/yozefu/pull/25)
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.4...v0.0.5
+
 ## What's Changed in v0.0.4
 * Fix/user provided kafka properties by @Mcdostone in [#23](https://github.com/MAIF/yozefu/pull/23)
 * ci: add cargo-deny by @Mcdostone
