@@ -41,8 +41,10 @@ By default, [the kafka consumer is configured](https://github.com/MAIF/yozefu/bl
 
 ## Getting started
 
+<!--
 > [!NOTE]
 > For a better visual experience, I invite you to install [Powerline fonts](https://github.com/powerline/fonts).
+> -->
 
 ```bash
 cargo install yozefu
