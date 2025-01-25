@@ -118,7 +118,7 @@ impl Component for FooterComponent {
                 false => (state.theme.bg_disabled, state.theme.fg_disabled),
             };
             if v.0 > 0 {
-                help.push("".to_string().bg(colors.0).fg(state.theme.bg));
+                help.push("—".fg(colors.0));
             }
             let prefix = match v.0 {
                 0 if self.main_component == ComponentName::TopicsAndRecords => "◧ ",
@@ -132,7 +132,6 @@ impl Component for FooterComponent {
                     .fg(colors.1)
                     .bold(),
             );
-            help.push("".fg(colors.0));
         }
 
         help.push(Span::from("  "));

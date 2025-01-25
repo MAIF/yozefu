@@ -279,9 +279,9 @@ impl Component for TopicDetailsComponent {
                 .block(block_experimental),
                 Rect {
                     x: 0,
-                    y: 8,
+                    y: 8.min(rect.height), // to avoid panicking with 'index outside of buffer'
                     width: rect.width + 3,
-                    height: 3,
+                    height: 3.min(rect.height),
                 }
                 .inner(Margin::new(7, 0)),
             );

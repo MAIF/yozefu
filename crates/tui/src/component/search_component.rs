@@ -13,7 +13,7 @@ use ratatui::{
     layout::{Position, Rect},
     style::{Style, Stylize},
     text::{Line, Span},
-    widgets::{Block, BorderType, Borders, Clear, Padding, Paragraph, Wrap},
+    widgets::{Block, BorderType, Borders, Padding, Paragraph, Wrap},
     Frame,
 };
 use tokio::{select, sync::mpsc::UnboundedSender, time::Instant};
@@ -272,7 +272,7 @@ impl Component for SearchComponent {
         if state.is_focused(self.id()) {
             f.set_cursor_position(position_cursor);
         }
-        f.render_widget(Clear, rect);
+        //f.render_widget(Clear, rect);
         f.render_widget(paragraph, rect);
         Ok(())
     }
