@@ -1,5 +1,3 @@
-//! A notification component
-
 use ratatui::{
     layout::{Constraint, Flex, Layout, Rect},
     style::{Style, Stylize},

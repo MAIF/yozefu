@@ -18,13 +18,13 @@ use super::{Component, ComponentName, Shortcut, State};
 
 #[derive(Default)]
 pub struct TopicsComponent {
-    pub topics: Vec<String>,
-    pub visible_topics: Vec<String>,
-    pub selected: HashSet<String>,
-    pub state: ListState,
-    pub action_tx: Option<UnboundedSender<Action>>,
-    pub input: Input,
-    pub loading: bool,
+    topics: Vec<String>,
+    visible_topics: Vec<String>,
+    selected: HashSet<String>,
+    state: ListState,
+    action_tx: Option<UnboundedSender<Action>>,
+    input: Input,
+    loading: bool,
 }
 
 impl TopicsComponent {

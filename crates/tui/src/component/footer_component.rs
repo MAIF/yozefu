@@ -18,13 +18,13 @@ use super::{Component, ComponentName, Shortcut, State};
 
 #[derive(Default)]
 pub struct FooterComponent {
-    pub shortcuts: Vec<Shortcut>,
-    pub main_component: ComponentName,
-    pub state: Vec<ComponentName>,
-    pub notification: Option<Notification>,
-    pub action_tx: Option<UnboundedSender<Action>>,
-    pub ticks: u64,
-    pub show_shortcuts: bool,
+    shortcuts: Vec<Shortcut>,
+    main_component: ComponentName,
+    state: Vec<ComponentName>,
+    notification: Option<Notification>,
+    action_tx: Option<UnboundedSender<Action>>,
+    ticks: u64,
+    show_shortcuts: bool,
 }
 
 impl FooterComponent {

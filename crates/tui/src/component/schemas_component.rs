@@ -26,8 +26,8 @@ pub struct SchemasComponent<'a> {
     key: Option<SchemaDetail>,
     value: Option<SchemaDetail>,
     lines: Vec<Line<'a>>,
-    pub action_tx: Option<UnboundedSender<Action>>,
-    pub scroll: ScrollState,
+    action_tx: Option<UnboundedSender<Action>>,
+    scroll: ScrollState,
 }
 
 impl SchemasComponent<'_> {

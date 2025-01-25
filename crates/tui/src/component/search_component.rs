@@ -29,15 +29,15 @@ use super::{Component, ComponentName, Shortcut, State};
 
 #[derive(Default)]
 pub struct SearchComponent {
-    pub input: Input,
-    pub index_history: usize,
-    pub history: Vec<String>,
-    pub compiler_worker: CancellationToken,
-    pub remaining_input: Option<String>,
-    pub action_tx: Option<UnboundedSender<Action>>,
-    pub autocomplete: Option<String>,
+    input: Input,
+    index_history: usize,
+    history: Vec<String>,
+    compiler_worker: CancellationToken,
+    remaining_input: Option<String>,
+    action_tx: Option<UnboundedSender<Action>>,
+    autocomplete: Option<String>,
     // A hack to detect copy-paste events and replace \n with a space
-    pub entered: Option<Instant>,
+    entered: Option<Instant>,
 }
 
 impl SearchComponent {

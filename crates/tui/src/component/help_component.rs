@@ -26,8 +26,8 @@ const REPOSITORY_URL: &str = concat!(
 
 #[derive(Default)]
 pub struct HelpComponent {
-    pub scroll: ScrollState,
-    pub rendered: usize,
+    scroll: ScrollState,
+    rendered: usize,
 }
 
 impl Component for HelpComponent {

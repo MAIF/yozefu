@@ -23,10 +23,10 @@ use super::{Component, ComponentName, State, WithHeight};
 
 #[derive(Default)]
 pub struct TopicDetailsComponent {
-    pub details: Vec<TopicDetail>,
-    pub action_tx: Option<UnboundedSender<Action>>,
-    pub state: TableState,
-    pub refreshing_data: bool,
+    details: Vec<TopicDetail>,
+    action_tx: Option<UnboundedSender<Action>>,
+    state: TableState,
+    refreshing_data: bool,
     throbber_state: throbber_widgets_tui::ThrobberState,
 }
 
@@ -125,7 +125,7 @@ impl Component for TopicDetailsComponent {
             f.render_widget(block, rect);
             f.render_stateful_widget(
                 full,
-                rect.inner(Margin::new(6, 4)),
+                rect.inner(Margin::new(7, 3)),
                 &mut self.throbber_state,
             );
             return Ok(());

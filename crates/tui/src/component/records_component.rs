@@ -21,17 +21,17 @@ use crate::{action::Notification, error::TuiError, records_buffer::BufferAction,
 use super::{Component, ComponentName, ConcurrentRecordsBuffer, Shortcut, State};
 
 pub struct RecordsComponent<'a> {
-    pub records: &'a ConcurrentRecordsBuffer,
-    pub state: TableState,
+    records: &'a ConcurrentRecordsBuffer,
+    state: TableState,
     status: ThrobberState,
-    pub search_query: ValidSearchQuery,
-    pub consuming: bool,
-    pub count: (usize, usize, usize),
-    pub follow: bool,
-    pub action_tx: Option<UnboundedSender<Action>>,
-    pub buffer_tx: Receiver<BufferAction>,
-    pub selected_topics: usize,
-    pub key_events_buffer: Vec<KeyEvent>,
+    search_query: ValidSearchQuery,
+    consuming: bool,
+    count: (usize, usize, usize),
+    follow: bool,
+    action_tx: Option<UnboundedSender<Action>>,
+    buffer_tx: Receiver<BufferAction>,
+    selected_topics: usize,
+    key_events_buffer: Vec<KeyEvent>,
 }
 
 impl<'a> RecordsComponent<'a> {

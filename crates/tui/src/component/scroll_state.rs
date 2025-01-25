@@ -7,7 +7,7 @@ use ratatui::{
 };
 
 #[derive(Default)]
-pub struct ScrollState {
+pub(crate) struct ScrollState {
     rect: Rect,
     scroll: usize,
     scroll_height: usize,

@@ -19,11 +19,11 @@ use super::{scroll_state::ScrollState, Component, ComponentName, Shortcut, State
 
 #[derive(Default)]
 pub struct RecordDetailsComponent<'a> {
-    pub record: Option<KafkaRecord>,
-    pub lines: Vec<Line<'a>>,
-    pub search_query: String,
-    pub scroll: ScrollState,
-    pub action_tx: Option<UnboundedSender<Action>>,
+    record: Option<KafkaRecord>,
+    lines: Vec<Line<'a>>,
+    search_query: String,
+    scroll: ScrollState,
+    action_tx: Option<UnboundedSender<Action>>,
 }
 
 impl RecordDetailsComponent<'_> {
