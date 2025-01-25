@@ -1,0 +1,78 @@
+name: Changelog
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+  RUSTFLAGS: "-D warnings"
+  RUSTDOCFLAGS: '--deny warnings'
+
+permissions:
+  id-token: write
+  packages: write
+  contents: write
+  pull-requests: write
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  version:
+    name: Determine version to publish
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - id: release
+        run: echo "version=$(cargo pkgid --manifest-path crates/bin/Cargo.toml | cut -d '@' -f2)" >> "$GITHUB_OUTPUT"
+
+  changelog:
+    needs: [version]
+    name: Create changelog
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - run: git fetch
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Install git-cliff
+        run: cargo install git-cliff
+      - name: Generate a changelog
+        run: |
+          if [ -f CHANGELOG.md ]; then
+            git-cliff --config github --prepend CHANGELOG.md --latest
+          else
+            git-cliff --config github --output CHANGELOG.md
+          fi
+        env:
+          OUTPUT: CHANGELOG.md
+          GITHUB_REPO: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Commit changelog
+        run: |
+          git checkout -b "changelog/v${{ needs.version.outputs.version }}"
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          set +e
+          git add CHANGELOG.md
+          git commit -m "chore: Update changelog"
+          git push origin "changelog/v${{ needs.version.outputs.version }}" --force
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: "changelog/v${{ needs.version.outputs.version }}"
+      - name: Create pull request for changelog
+        run: |
+          alreadyExists=$(gh pr list --json headRefName | jq '.[] | select(.headRefName == "changelog/v${{ needs.version.outputs.version }}") | any')
+          if [[ "$alreadyExists" == "" ]]; then
+            branch=$(git branch --show-current)
+            gh pr create --head "$branch" --title "Changelog for ${{ needs.version.outputs.version }}" --body "This PR updates the changelog for version ${{ needs.version.outputs.version }}."
+          fi
+        env: 
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
