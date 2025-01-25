@@ -4,9 +4,9 @@ use std::collections::HashSet;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
 use itertools::Itertools;
-use lib::{ConsumerGroupState, TopicDetail};
+use lib::{ConsumerGroupDetail, ConsumerGroupState, TopicDetail};
 use ratatui::{
-    layout::{Alignment, Constraint, Margin, Offset, Rect},
+    layout::{Alignment, Constraint, Margin, Rect},
     style::{Modifier, Style, Stylize},
     text::{Line, Span, Text},
     widgets::{
@@ -17,16 +17,16 @@ use ratatui::{
 use thousands::Separable;
 use tokio::sync::mpsc::UnboundedSender;
 
-use crate::{error::TuiError, Action};
+use crate::{error::TuiError, Action, Notification};
 
-use super::{scroll_state::ScrollState, Component, ComponentName, State, WithHeight};
+use super::{Component, ComponentName, State, WithHeight};
 
 #[derive(Default)]
 pub struct TopicDetailsComponent {
     pub details: Vec<TopicDetail>,
     pub action_tx: Option<UnboundedSender<Action>>,
     pub state: TableState,
-    pub scroll: ScrollState,
+    pub refreshing_data: bool,
     throbber_state: throbber_widgets_tui::ThrobberState,
 }
 
@@ -52,20 +52,31 @@ impl Component for TopicDetailsComponent {
     fn handle_key_events(&mut self, key: KeyEvent) -> Result<Option<Action>, TuiError> {
         match key.code {
             KeyCode::Char('k') | KeyCode::Down => {
-                self.scroll.scroll_to_next_line();
+                self.next();
+                //self.scroll.scroll_to_next_line();
             }
             KeyCode::Char('j') | KeyCode::Up => {
-                self.scroll.scroll_to_previous_line();
+                self.previous();
+                //self.scroll.scroll_to_previous_line();
             }
             KeyCode::Char('[') => {
-                self.scroll.scroll_to_top();
+                self.first();
             }
             KeyCode::Char(']') => {
-                self.scroll.scroll_to_bottom();
+                self.last();
             }
             KeyCode::Char('p') if key.modifiers.contains(KeyModifiers::CONTROL) => {
                 let mut h = HashSet::default();
                 h.extend(self.details.iter().map(|d| d.name.clone()));
+                self.refreshing_data = true;
+                self.action_tx
+                    .as_ref()
+                    .unwrap()
+                    .send(Action::Notification(Notification::new(
+                        log::Level::Info,
+                        "Refreshing data".to_string(),
+                    )))
+                    .unwrap();
                 self.action_tx
                     .as_ref()
                     .unwrap()
@@ -81,7 +92,13 @@ impl Component for TopicDetailsComponent {
         match action {
             Action::Tick => self.throbber_state.calc_next(),
             Action::TopicDetails(details) => {
+                self.refreshing_data = false;
                 self.details = details;
+            }
+            Action::RequestTopicDetails(_details) => {
+                if !self.details.is_empty() {
+                    self.refreshing_data = true;
+                }
             }
             _ => (),
         };
@@ -100,7 +117,7 @@ impl Component for TopicDetailsComponent {
         if self.details.is_empty() {
             f.render_widget(Clear, rect);
             let full = throbber_widgets_tui::Throbber::default()
-                .label("This feature is not ready yet. Fetching data, please wait...")
+                .label("Fetching data...")
                 .style(Style::default())
                 .throbber_style(Style::default().add_modifier(Modifier::BOLD))
                 .throbber_set(throbber_widgets_tui::BRAILLE_DOUBLE)
@@ -114,8 +131,22 @@ impl Component for TopicDetailsComponent {
             return Ok(());
         }
 
+        if self.refreshing_data {
+            let full = throbber_widgets_tui::Throbber::default()
+                .label("Refreshing data...")
+                .style(Style::default())
+                .throbber_style(Style::default().add_modifier(Modifier::BOLD))
+                .throbber_set(throbber_widgets_tui::BRAILLE_DOUBLE)
+                .use_type(throbber_widgets_tui::WhichUse::Spin);
+            f.render_widget(&block, rect);
+            f.render_stateful_widget(
+                full,
+                rect.inner(Margin::new(7, 3)),
+                &mut self.throbber_state,
+            );
+        }
+
         if !self.details.is_empty() {
-            f.render_widget(Clear, rect);
             let header_cells = vec![
                 Cell::new(Text::from("")),
                 Cell::new(Text::from("Name")),
@@ -192,6 +223,7 @@ impl Component for TopicDetailsComponent {
                 );
             }
 
+            let focused = state.is_focused(self.id());
             let table = Table::new(
                 rows,
                 [
@@ -204,7 +236,16 @@ impl Component for TopicDetailsComponent {
                 ],
             )
             .column_spacing(2)
-            .header(header.clone());
+            .header(header.clone())
+            .row_highlight_style(match focused {
+                true => Style::default()
+                    .bg(state.theme.bg_focused_selected)
+                    .fg(state.theme.fg_focused_selected)
+                    .bold(),
+                false => Style::default()
+                    .bg(state.theme.bg_unfocused_selected)
+                    .fg(state.theme.fg_unfocused_selected),
+            });
 
             let table_area = block.inner(rect);
 
@@ -223,16 +264,37 @@ impl Component for TopicDetailsComponent {
                     detail.consumer_groups.len()
                 )),
                 Line::from(""),
-                Line::from(""),
             ];
+
+            let block_experimental = Block::default()
+                .borders(Borders::ALL)
+                .border_style(Style::default())
+                .padding(Padding::horizontal(1))
+                .border_type(BorderType::Rounded);
+
+            f.render_widget(
+                Paragraph::new(
+                    "🔬 The following list of consumer members is experimental, use it with caution.",
+                )
+                .block(block_experimental),
+                Rect {
+                    x: 0,
+                    y: 9,
+                    width: rect.width + 3,
+                    height: 3,
+                }
+                .inner(Margin::new(8, 0)),
+            );
 
             f.render_stateful_widget(
                 table,
-                table_area.offset(Offset { x: 0, y: 6 }),
-                &mut self
-                    .state
-                    .clone()
-                    .with_offset((self.scroll.value() + table_area.y + 10).into()),
+                Rect {
+                    x: table_area.x,
+                    y: table_area.y + 7,
+                    width: table_area.width,
+                    height: table_area.height.saturating_sub(4),
+                },
+                &mut self.state.clone(), //.with_offset((self.scroll.value() + table_area.y + 10).into()),
             );
 
             f.render_widget(
@@ -242,7 +304,8 @@ impl Component for TopicDetailsComponent {
                 rect,
             );
 
-            self.scroll.draw(f, rect, self.content_height());
+            //f.render_widget(widget, area);
+            //self.scroll.draw(f, rect, self.content_height());
 
             //
             //            let mut text: Vec<Line<'_>> = vec![];
@@ -264,5 +327,69 @@ impl Component for TopicDetailsComponent {
         }
 
         Ok(())
+    }
+}
+
+impl TopicDetailsComponent {
+    fn all_consumer_members(&self) -> Vec<&ConsumerGroupDetail> {
+        self.details
+            .iter()
+            .flat_map(|e| &e.consumer_groups)
+            .collect()
+    }
+
+    fn next(&mut self) {
+        let consumer_members = self.all_consumer_members();
+        if consumer_members.is_empty() {
+            self.state.select(None);
+            return;
+        }
+
+        let consumer_members = self.all_consumer_members();
+        let i = match self.state.selected() {
+            Some(i) => {
+                if i >= consumer_members.len() - 1 {
+                    i
+                } else {
+                    i + 1
+                }
+            }
+            None => 0,
+        };
+        self.state.select(Some(i));
+    }
+
+    fn previous(&mut self) {
+        let consumer_members = self.all_consumer_members();
+        if consumer_members.is_empty() {
+            self.state.select(None);
+            return;
+        }
+        let i = match self.state.selected() {
+            Some(i) => {
+                if i == 0 {
+                    0
+                } else {
+                    i - 1
+                }
+            }
+            None => 0,
+        };
+        self.state.select(Some(i));
+    }
+
+    fn first(&mut self) {
+        match self.all_consumer_members().is_empty() {
+            true => self.state.select(None),
+            false => self.state.select(Some(0)),
+        }
+    }
+
+    fn last(&mut self) {
+        let consumer_members = self.all_consumer_members();
+        match consumer_members.is_empty() {
+            true => self.state.select(None),
+            false => self.state.select(Some(consumer_members.len() - 1)),
+        }
     }
 }

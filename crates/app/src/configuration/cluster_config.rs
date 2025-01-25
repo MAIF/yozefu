@@ -41,7 +41,8 @@ pub struct ClusterConfig {
 }
 
 impl ClusterConfig {
-    /// Returns the kafka properties for the given cluster.
+    /// Normalize all properties that are file locations.
+    /// For instance, `~/certificates/ca.pem` will be resolved to `/home/user/certificates/ca.pem`.
     pub fn normalize_paths(self) -> Self {
         let mut cloned = self.clone();
         for key in KAFKA_PROPERTIES_WITH_LOCATIONS {
