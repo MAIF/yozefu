@@ -1,3 +1,8 @@
+## What's Changed in v0.0.5
+* Develop by @Mcdostone in [#28](https://github.com/MAIF/yozefu/pull/28)
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.4...v0.0.5
+
 ## What's Changed in v0.0.4
 * Fix/user provided kafka properties by @Mcdostone in [#23](https://github.com/MAIF/yozefu/pull/23)
 * ci: add cargo-deny by @Mcdostone
