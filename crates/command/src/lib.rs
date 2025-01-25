@@ -5,6 +5,7 @@ mod cli;
 mod command;
 mod headless;
 mod log;
+mod theme;
 use app::configuration::GlobalConfig;
 pub use clap::Parser;
 pub use cli::Cli;

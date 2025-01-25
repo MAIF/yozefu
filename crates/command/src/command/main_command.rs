@@ -30,6 +30,7 @@ use crate::headless::formatter::{
 };
 use crate::headless::Headless;
 use crate::log::{init_logging_file, init_logging_stderr};
+use crate::theme::update_themes;
 use crate::APPLICATION_NAME;
 
 fn parse_cluster<T>(s: &str) -> Result<T, Error>
@@ -184,16 +185,24 @@ where
         Ok(themes)
     }
 
-    fn load_theme(file: &Path, name: &str) -> Result<Theme, Error> {
-        let themes = Self::themes(file)?;
+    async fn load_theme(file: &Path, name: &str) -> Result<Theme, Error> {
+        let mut themes = Self::themes(file)?;
+
+        if !themes.contains_key(name) {
+            info!("Theme '{}' not found. About to update theme file.", name);
+            let _ = update_themes().await;
+            themes = Self::themes(file)?;
+        }
+
         let theme = match themes.get(name) {
             Some(theme) => theme,
             None => {
+                update_themes().await?;
                 warn!("Theme '{}' not found. Available themes are [{}]. Make sure it is defined in '{}'",
-
                 name,
                 themes.keys().join(", "),
                 file.display());
+
                 let theme = themes.iter().next().unwrap().1;
                 info!("Since the theme was not found, I'm going to use the first available theme '{}'", theme.name);
                 theme
@@ -208,12 +217,10 @@ where
         let config = self.config(yozefu_config)?;
         let query = self.query(&config)?;
 
-        let theme_name = self.theme.clone().unwrap_or(config.theme.clone());
-        let color_palette = Self::load_theme(&config.themes_file(), &theme_name)?;
-
-        let state = State::new(&cluster.to_string(), color_palette, &config);
-
         let _ = init_logging_file(self.debug, &config.logs_file());
+        let theme_name = self.theme.clone().unwrap_or(config.theme.clone());
+        let color_palette = Self::load_theme(&config.themes_file(), &theme_name).await?;
+        let state = State::new(&cluster.to_string(), color_palette, &config);
         let mut ui = Ui::new(
             self.app(&query, yozefu_config)?,
             query,

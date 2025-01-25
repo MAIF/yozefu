@@ -1,7 +1,6 @@
 //! Component showing the help
 
 use crossterm::event::{KeyCode, KeyEvent};
-use itertools::Itertools;
 use ratatui::{
     layout::Rect,
     style::Stylize,
@@ -113,9 +112,8 @@ impl Component for HelpComponent {
             Line::from(vec![
                 Span::from("                                                         Theme").bold(),
                 Span::from(format!(
-                                        "      Theme is '{}'. You can switch between [{}] in the config file or with the '--theme' flag",
-                                        state.theme.name,
-                                        state.themes.iter().filter(|f| *f != &state.theme.name).join(", ")
+                                        "      Theme is '{}'. run `yozf config get themes` to list available themes.",
+                                        state.theme.name
                                     ))
             ]),
             Line::from(vec![

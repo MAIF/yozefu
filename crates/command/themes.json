@@ -73,5 +73,30 @@
     "fg_active": "DarkGray",
     "dialog_border": "Yellow",
     "autocomplete": "#646464"
+  },
+  "solarized-dark-higher-contrast": {
+    "name": "solarized-dark-higher-contrast",
+    "fg": "Black",
+    "bg": "Black",
+    "black": "Black",
+    "red": "Red",
+    "green": "Green",
+    "yellow": "Yellow",
+    "blue": "Blue",
+    "magenta": "Magenta",
+    "cyan": "Cyan",
+    "white": "White",
+    "orange": "LightRed",
+    "focused_border": "Blue",
+    "bg_focused_selected": "White",
+    "fg_focused_selected": "DarkGray",
+    "bg_unfocused_selected": "0",
+    "fg_unfocused_selected": "White",
+    "bg_disabled": "Green",
+    "fg_disabled": "Black",
+    "bg_active": "LightGreen",
+    "fg_active": "Black",
+    "dialog_border": "Yellow",
+    "autocomplete": "#646464"
   }
 }

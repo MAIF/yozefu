@@ -1,7 +1,7 @@
 //! Command to fetch a property of the configuration file.
 use std::{collections::HashMap, fs};
 
-use crate::command::Command as CliCommand;
+use crate::{command::Command as CliCommand, theme::update_themes};
 use app::configuration::GlobalConfig;
 use clap::Args;
 use lib::Error;
@@ -57,7 +57,10 @@ impl CliCommand for ConfigureGetCommand {
                         println!("{:?}", file)
                     }
                     "directory" | "dir" => println!("{:?}", file.parent().unwrap()),
-                    "themes" => println!("{}", serde_json::to_string_pretty(&config.themes())?),
+                    "themes" => {
+                        let _ = update_themes().await;
+                        println!("{}", serde_json::to_string_pretty(&config.themes())?)
+                    }
                     "theme-file" | "themes-file" | "themes_file" | "theme_file" => {
                         println!("{:?}", config.themes_file())
                     }

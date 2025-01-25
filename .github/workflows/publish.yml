@@ -58,8 +58,6 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - run: git fetch --tags origin
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -86,6 +84,8 @@ jobs:
           git add CHANGELOG.md
           git commit -m "chore: Update changelog"
           git push origin "changelog/v${{ needs.version.outputs.version }}" --force
+      - name: Check out repository
+        uses: actions/checkout@v4
       - name: Create pull request for changelog
         run: |
           git pull

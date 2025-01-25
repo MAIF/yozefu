@@ -1,17 +1,16 @@
 //! The command line argument Parser struct
 use crate::command::{Command, MainCommand, UtilityCommands};
+use crate::theme::init_themes_file;
 use app::configuration::{ClusterConfig, GlobalConfig, SchemaRegistryConfig, YozefuConfig};
 use app::search::filter::FILTERS_DIR;
 use app::APPLICATION_NAME;
 use clap::command;
 use lib::Error;
-use log::warn;
 use reqwest::Url;
 use std::fmt::Debug;
 use std::fs;
 use std::{fmt::Display, path::PathBuf, str::FromStr};
 use tui::error::TuiError;
-use tui::Theme;
 
 pub use clap::Parser;
 use indexmap::IndexMap;
@@ -150,47 +149,6 @@ fn init_config_file() -> Result<PathBuf, Error> {
         fs::set_permissions(&path, perms)?;
     }
 
-    Ok(path)
-}
-
-/// Initializes a default configuration file if it does not exist.
-/// The default cluster is `localhost`.
-async fn init_themes_file() -> Result<PathBuf, Error> {
-    let path = GlobalConfig::path()?;
-    let config = GlobalConfig::read(&path)?;
-    let path = config.themes_file();
-    if fs::metadata(&path).is_ok() {
-        return Ok(path);
-    }
-
-    let default_theme = Theme::light();
-    let mut default_themes = IndexMap::new();
-    default_themes.insert(default_theme.name.clone(), default_theme);
-
-    let content = match reqwest::get(
-        "https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/crates/command/themes.json",
-    )
-    .await
-    {
-        Ok(response) => match response.status().is_success() {
-            true => response.text().await.unwrap(),
-            false => {
-                warn!("HTTP {} when downloading theme file", response.status());
-                serde_json::to_string_pretty(&default_themes).unwrap()
-            }
-        },
-        Err(e) => {
-            warn!("Error while downloading theme file: {}", e);
-            serde_json::to_string_pretty(&default_themes).unwrap()
-        }
-    };
-
-    let e: IndexMap<String, Theme> = match serde_json::from_str(&content) {
-        Ok(themes) => themes,
-        Err(_) => default_themes,
-    };
-
-    fs::write(&path, &serde_json::to_string_pretty(&e)?)?;
     Ok(path)
 }
 
