@@ -1,3 +1,6 @@
+## What's Changed
+* ci: another attempt ro fix CI for changelog by @Mcdostone
+
 ## What's Changed in v0.0.4
 * Fix/user provided kafka properties by @Mcdostone in [#23](https://github.com/MAIF/yozefu/pull/23)
 * ci: add cargo-deny by @Mcdostone
