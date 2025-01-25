@@ -188,7 +188,7 @@ impl Ui {
                     let message = message.detach();
                     let timestamp = message.timestamp().to_millis().unwrap_or_default();
                     tx_dd.send(message).unwrap();
-                    if current_time.elapsed() > Duration::from_secs(10) {
+                    if current_time.elapsed() > Duration::from_secs(13) {
                         current_time = Instant::now();
 
                         tx.send(Action::Notification(Notification::new(

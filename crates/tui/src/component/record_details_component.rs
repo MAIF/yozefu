@@ -263,7 +263,7 @@ impl Component for RecordDetailsComponent<'_> {
     fn shortcuts(&self) -> Vec<Shortcut> {
         let mut shortcuts = vec![
             Shortcut::new("J/K", "Scroll"),
-            Shortcut::new("↑↓", "Previous/next record"),
+            Shortcut::new("↑↓", "Prev/next record"),
         ];
 
         if self

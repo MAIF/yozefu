@@ -100,7 +100,7 @@ impl Headless {
                     let timestamp = message.timestamp().to_millis().unwrap_or_default();
                     tx_dd.send(message).unwrap();
 
-                    if current_time.elapsed() > Duration::from_secs(10) {
+                    if current_time.elapsed() > Duration::from_secs(15) {
                         current_time = Instant::now();
                         info!("Checkpoint: {}", timestamp);
                     }

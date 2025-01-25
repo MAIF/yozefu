@@ -294,7 +294,7 @@ impl Component for TopicDetailsComponent {
                     width: table_area.width,
                     height: table_area.height.saturating_sub(5),
                 },
-                &mut self.state.clone(), //.with_offset((self.scroll.value() + table_area.y + 10).into()),
+                &mut self.state,
             );
 
             f.render_widget(
