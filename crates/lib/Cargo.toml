@@ -18,7 +18,7 @@ chrono = { version = "0.4.39", features = ["serde"], optional = true }
 itertools = "0.14.0"
 strum = { version = "0.26.3", features = ["derive", "strum_macros"], optional = true }
 fuzzydate = {version = "0.2.2", optional = true }
-nom = "8.0.0-beta.1"
+nom = "8.0.0"
 rdkafka = { version = "0.37.0", features = [], optional = true}
 url = "2.5.4"
 apache-avro = "0.17.0"
