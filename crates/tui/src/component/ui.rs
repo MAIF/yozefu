@@ -278,10 +278,6 @@ impl Ui {
         self.load_topics(action_tx.clone())?;
         let mut tui = tui::Tui::new()?;
         tui.enter()?;
-        self.records
-            .lock()
-            .unwrap()
-            .register_action_handler(action_tx.clone());
         self.root.register_action_handler(action_tx.clone())?;
         self.root.init()?;
         if !topics.is_empty() {

@@ -10,12 +10,7 @@ use lib::{
     KafkaRecord,
 };
 use rayon::prelude::*;
-use tokio::sync::{
-    mpsc::UnboundedSender,
-    watch::{self, Receiver, Sender},
-};
-
-use crate::action::Action;
+use tokio::sync::watch::{self, Receiver, Sender};
 
 /// Size of the ring buffer
 #[cfg(not(target_family = "windows"))]
@@ -28,7 +23,6 @@ const BUFFER_SIZE: usize = 120;
 /// Wrapper around [CircularBuffer]
 pub struct RecordsBuffer {
     buffer: CircularBuffer<BUFFER_SIZE, KafkaRecord>,
-    tx_action: Option<UnboundedSender<Action>>,
     read: usize,
     pub channels: (Sender<BufferAction>, Receiver<BufferAction>),
     last_time_sorted: usize,
@@ -60,13 +54,8 @@ impl RecordsBuffer {
             read: 0,
             channels: watch::channel(BufferAction::Count((0, 0, 0))),
             matched: 0,
-            last_time_sorted: 0,
-            tx_action: None,
+            last_time_sorted: 0
         }
-    }
-
-    pub fn register_action_handler(&mut self, tx: UnboundedSender<Action>) {
-        self.tx_action = Some(tx);
     }
 
     pub fn is_empty(&self) -> bool {

@@ -116,9 +116,9 @@ then
         echo -e "    It looks like you haven't installed \033[1myozefu\033[0m yet:"
         echo "       1. Go to https://github.com/MAIF/yozefu/releases/latest"
         echo "       2. Download the binary that matches your operating system"
-        echo "       3. curl -L 'https://github.com/MAIF/yozefu/releases/download/<version>/yozefu-<target>-<version>.tar.gz' | tar xvz"
-        echo "       4. mv yozefu-* yozf"
-        echo "       5. Run './yozf -c localhost'"
+        echo "          curl -L 'https://github.com/MAIF/yozefu/releases/download/<version>/yozefu-<target>-<version>.tar.gz' | tar xvz"
+        echo "       3. mv yozf-* yozf"
+        echo "       4. Run './yozf -c localhost'"
     fi
 else
     echo " 🎉 Finally, start the tool"
