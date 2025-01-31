@@ -54,7 +54,7 @@ impl RecordsBuffer {
             read: 0,
             channels: watch::channel(BufferAction::Count((0, 0, 0))),
             matched: 0,
-            last_time_sorted: 0
+            last_time_sorted: 0,
         }
     }
 
