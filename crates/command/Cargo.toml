@@ -29,7 +29,7 @@ log = "0.4.25"
 env_logger = "0.11.6"
 chrono = "0.4.39"
 strum = { version = "0.26.3", features = ["derive", "strum_macros"] }
-indicatif = { version = "0.17.9", features = ["tokio"] }
+indicatif = { version = "0.17.11", features = ["tokio"] }
 tempfile = "3.15.0"
 tokio-util = "0.7.13"
 futures = "0.3.31"
