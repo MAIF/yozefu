@@ -2,6 +2,7 @@
 //! and renders components based on the current context.
 use app::configuration::GlobalConfig;
 use copypasta::{ClipboardContext, ClipboardProvider};
+use log::warn;
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
@@ -9,8 +10,8 @@ use std::{
 
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use ratatui::{
-    layout::{Constraint, Direction, Layout, Margin, Rect},
-    widgets::Clear,
+    layout::{Constraint, Direction, Flex, Layout, Margin, Rect},
+    widgets::{Clear, Paragraph},
     Frame,
 };
 use tokio::sync::{mpsc::UnboundedSender, watch::Receiver};
@@ -243,7 +244,7 @@ impl Component for RootComponent {
                 match self.views.first().unwrap() {
                     ComponentName::Records => self.views[0] = ComponentName::TopicsAndRecords,
                     ComponentName::TopicsAndRecords => self.views[0] = ComponentName::Records,
-                    _ => unreachable!("nope nope"),
+                    _ => warn!("View '{}' does not support toggling. This instruction should not be unreachable", self.views.first().unwrap()),
                 }
                 self.notify_footer()?;
                 if self.views.len() == 1 {
@@ -342,6 +343,15 @@ impl Component for RootComponent {
     }
 
     fn draw(&mut self, f: &mut Frame<'_>, rect: Rect, _: &State) -> Result<(), TuiError> {
+        if rect.width < 20 && rect.height < 4 {
+            let [area] = Layout::horizontal([Constraint::Length(8)])
+            .flex(Flex::Center)
+            .areas(rect);
+            let [area] = Layout::vertical([Constraint::Length(1)]).flex(Flex::Center).areas(area);
+            
+            f.render_widget(Paragraph::new(String::from_utf8(vec![70, 111, 114, 32, 74, 32, 226, 157, 164, 239, 184, 143]).unwrap()), area);
+            return Ok(());
+        }
         let mut a = self.buffer_rx.clone();
         let BufferAction::Count(count) = *a.borrow_and_update();
         self.progress_bar.set_progress(count.1);
