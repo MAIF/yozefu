@@ -20,7 +20,7 @@ itertools = "0.14.0"
 thousands = "0.2.0"
 indexmap = "2.7.1"
 rdkafka = { version = "0.37.0", features = ["cmake-build"] }
-async-trait = "0.1.85"
+async-trait = "0.1.86"
 extism = "1.9.1"
 url = { version = "2.5.4", features = ["serde"] }
 resolve-path = "0.1.0"
