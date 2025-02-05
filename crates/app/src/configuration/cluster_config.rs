@@ -9,7 +9,7 @@ use url::Url;
 use super::Configuration;
 
 /// List of kafka properties that are a file location.
-const KAFKA_PROPERTIES_WITH_LOCATIONS: [&str; 6] = [
+pub const KAFKA_PROPERTIES_WITH_LOCATIONS: [&str; 6] = [
     "ssl.ca.location",
     "ssl.certificate.location",
     "ssl.key.location",

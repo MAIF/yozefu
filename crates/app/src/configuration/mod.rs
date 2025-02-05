@@ -10,6 +10,7 @@ mod yozefu_config;
 
 pub use cluster_config::ClusterConfig;
 pub use cluster_config::SchemaRegistryConfig;
+pub use cluster_config::KAFKA_PROPERTIES_WITH_LOCATIONS;
 pub use global_config::GlobalConfig;
 pub use internal_config::InternalConfig;
 pub use yozefu_config::YozefuConfig;

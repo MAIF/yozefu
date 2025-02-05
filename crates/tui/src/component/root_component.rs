@@ -344,12 +344,19 @@ impl Component for RootComponent {
 
     fn draw(&mut self, f: &mut Frame<'_>, rect: Rect, _: &State) -> Result<(), TuiError> {
         if rect.width < 20 && rect.height < 4 {
-            let [area] = Layout::horizontal([Constraint::Length(8)])
-            .flex(Flex::Center)
-            .areas(rect);
-            let [area] = Layout::vertical([Constraint::Length(1)]).flex(Flex::Center).areas(area);
-            
-            f.render_widget(Paragraph::new(String::from_utf8(vec![70, 111, 114, 32, 74, 32, 226, 157, 164, 239, 184, 143]).unwrap()), area);
+            let [area] = Layout::horizontal([Constraint::Length(4)])
+                .flex(Flex::Center)
+                .areas(rect);
+            let [area] = Layout::vertical([Constraint::Length(1)])
+                .flex(Flex::Center)
+                .areas(area);
+
+            f.render_widget(
+                Paragraph::new(
+                    String::from_utf8(vec![74, 32, 226, 157, 164, 239, 184, 143]).unwrap(),
+                ),
+                area,
+            );
             return Ok(());
         }
         let mut a = self.buffer_rx.clone();
