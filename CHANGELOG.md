@@ -1,3 +1,16 @@
+## What's Changed in v0.0.6
+* Develop by @Mcdostone in [#37](https://github.com/MAIF/yozefu/pull/37)
+* build: update dependencies by @Mcdostone
+* feat: make `KAFKA_PROPERTIES_WITH_LOCATIONS` public by @Mcdostone
+* docs: fix links by @Mcdostone
+* build: update deps by @Mcdostone
+* refactor: remove unused `Sender` by @Mcdostone
+* build: update nom by @Mcdostone
+* Changelog for v0.0.5 by @github-actions[bot] in [#34](https://github.com/MAIF/yozefu/pull/34)
+* ci: another attempt ro fix CI for changelog by @Mcdostone
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.5...v0.0.6
+
 ## What's Changed in v0.0.5
 * Develop by @Mcdostone in [#28](https://github.com/MAIF/yozefu/pull/28)
 * fix: fix the table state in `topicDetailsComponent`, adjust delay for checkpoint while consuming records by @Mcdostone
