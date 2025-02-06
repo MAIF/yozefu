@@ -104,3 +104,26 @@ yozf -c localhost
  - [Keybindings.](https://github.com/MAIF/yozefu/tree/main/docs/keybindings/README.md)
  - [Releasing a new version.](https://github.com/MAIF/yozefu/tree/main/docs/release/README.md)
  
+
+
+## Screenshots
+
+<table>
+  <tr>
+    <td>
+      <img alt="A table listing topics and kafka records" src="./docs/screenshots/topics.png">
+    </td>
+    <td>
+      <img alt="A table listing kafka records" src="./docs/screenshots/records.png">
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img alt="View of a selected kafka records" src="./docs/screenshots/record.png">
+    </td>
+    <td>
+      <img alt="View of the help page" src="./docs/screenshots/help.png">
+    </td>
+  </tr>
+</table>
+

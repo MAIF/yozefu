@@ -25,20 +25,24 @@ impl MyCli {
     pub fn kafka_client_config(&self) -> ClusterConfig {
         let mut config = ClientConfig::new();
         config.set_log_level(rdkafka::config::RDKafkaLogLevel::Emerg);
-        match self.command.default_command.cluster() {
-            Cluster::Localhost => {
-                config.set("bootstrap.servers", "kafka-localhost.acme:9092".to_string())
-            }
-            Cluster::Test => config.set("bootstrap.servers", "kafka-test.acme:9092".to_string()),
-            Cluster::Development => config.set(
-                "bootstrap.servers",
-                "kafka-development.acme:9092".to_string(),
-            ),
-            Cluster::Production => config.set(
-                "bootstrap.servers",
-                "kafka-production.acme:9092".to_string(),
-            ),
-        };
+        if let Some(cluster) = self.command.cluster() {
+            match cluster {
+                Cluster::Localhost => {
+                    config.set("bootstrap.servers", "kafka-localhost.acme:9092".to_string())
+                }
+                Cluster::Test => {
+                    config.set("bootstrap.servers", "kafka-test.acme:9092".to_string())
+                }
+                Cluster::Development => config.set(
+                    "bootstrap.servers",
+                    "kafka-development.acme:9092".to_string(),
+                ),
+                Cluster::Production => config.set(
+                    "bootstrap.servers",
+                    "kafka-production.acme:9092".to_string(),
+                ),
+            };
+        }
 
         ClusterConfig {
             url_template: None,
