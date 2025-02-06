@@ -18,6 +18,34 @@
 set -eo pipefail
 
 
+# Return the rust target name
+function target_name {
+    ARCH="$(uname -m)"
+    case "$ARCH" in
+        "x86_64") ARCH="x86_64" ;;
+        "arm64"|"aarch64") ARCH="aarch64" ;;
+        *) echo "Unsupported architecture: $ARCH" >&2; exit 1 ;;
+    esac
+
+    # Detect OS
+    OS="$(uname -s)"
+    case "$OS" in
+        "Darwin") OS="apple-darwin" ;;
+        "Linux") OS="unknown-linux-gnu" ;;
+        "MINGW"*|"MSYS"*|"CYGWIN"*) 
+            if [[ "$ARCH" == "x86_64" ]]; then
+                OS="pc-windows-msvc"
+            else
+                echo "Unsupported Windows architecture: $ARCH" >&2
+                exit 1
+            fi
+            ;;
+        *) echo "Unsupported OS: $OS" >&2; exit 1 ;;
+    esac
+    echo "${ARCH}-${OS}"
+}
+
+
 # When jbang is not installed,
 # it uses the kafka-console-producer to produce records
 function fallback_produce {
@@ -40,17 +68,47 @@ function fallback_produce {
 
 # Make sure these commands are installed
 function check_commands_are_installed {
-    for cmd in docker git bash sed jq; do
+    for cmd in docker git bash sed jq curl; do
         if ! command -v $cmd &> /dev/null; then
             echo " ❌ This script requires programs to be installed on your machine. Unfortunately, I was not able to find '$cmd'. Install '$cmd' and try again."
             exit 1
         fi
-    done    
+    done
 }
 
+# The latest version of the tool
+function latest_version {
+    curl -sL https://api.github.com/repos/MAIF/yozefu/releases | jq -r '.[0].tag_name'
+}
+
+# The latest version of the tool
+function instructions_for_windows {
+    target=$(target_name)
+    version=$(latest_version)
+    echo "          curl -L 'https://github.com/MAIF/yozefu/releases/download/$version/yozefu-$target.zip' --output yozefu.zip"
+    echo "          powershell -command 'Expand-Archive -Path yozefu.zip -DestinationPath .'"
+    echo "          ren yozf-* yozf mv yozf-* yozf"
+    echo "          .\yozf -c localhost"
+}
+
+function instructions_for_unix {
+    target=$(target_name)
+    version=$(latest_version)
+    echo "          curl -L 'https://github.com/MAIF/yozefu/releases/download/$version/yozefu-$target.tar.gz' | tar xvz"
+    echo "          mv yozf-* yozf"
+    echo "          ./yozf -c localhost"
+}
+
+function instructions {
+    target=$(target_name)
+    if printf "%s" "$target" | grep -i "windows"; then
+        instructions_for_windows
+    else
+        instructions_for_unix
+    fi
+}
 
 check_commands_are_installed
-
 
 if [ "$BASH_SOURCE" = "" ]; then
     if [ ! -d /tmp/yozefu ]; then
@@ -95,8 +153,8 @@ docker compose -f "${repo}/compose.yml" exec -T kafka \
   --topic "${topic}"
 
 if jbang --version &> /dev/null; then
-    echo " 🤖 jbang run ${repo}/docs/schemas/MyProducer.java --type "$type" --topic "$topic" "$query""
-    jbang run ${repo}/docs/schemas/MyProducer.java --type "$type" --topic "$topic" "$query"
+    echo " 🤖 jbang run ${repo}/docs/schemas/MyProducer.java --type $type --topic $topic $query"
+    jbang run "${repo}/docs/schemas/MyProducer.java" --type "$type" --topic "$topic" "$query"
 else
     echo " ℹ️ About to use the default producer 'kafka-console-producer.sh'. Install jbang to create a kafka producer using the schema registry."
     echo " 🏡 Searching french addresses matching the query '${query}'"
@@ -116,9 +174,7 @@ then
         echo -e "    It looks like you haven't installed \033[1myozefu\033[0m yet:"
         echo "       1. Go to https://github.com/MAIF/yozefu/releases/latest"
         echo "       2. Download the binary that matches your operating system"
-        echo "          curl -L 'https://github.com/MAIF/yozefu/releases/download/<version>/yozefu-<target>-<version>.tar.gz' | tar xvz"
-        echo "       3. mv yozf-* yozf"
-        echo "       4. Run './yozf -c localhost'"
+        instructions
     fi
 else
     echo " 🎉 Finally, start the tool"
