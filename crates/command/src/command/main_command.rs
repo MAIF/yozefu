@@ -52,9 +52,9 @@ where
     #[clap(short, long)]
     /// Log level set to 'debug'
     pub debug: bool,
-    #[clap(short = 'c', short_alias='e', alias="environment", long, value_parser = parse_cluster::<T>, required_unless_present_any=&["version", "help"])]
+    #[clap(short = 'c', short_alias='e', alias="environment", long, value_parser = parse_cluster::<T>)]
     /// The cluster to use
-    cluster: Option<T>,
+    cluster: T,
     /// Topics to consume
     #[clap(
         short,
@@ -169,8 +169,8 @@ where
         Ok(config)
     }
 
-    pub fn cluster(&self) -> T {
-        self.cluster.as_ref().unwrap().clone()
+    pub(crate) fn cluster(&self) -> T {
+        self.cluster.clone()
     }
 
     fn themes(file: &Path) -> Result<HashMap<String, Theme>, Error> {
