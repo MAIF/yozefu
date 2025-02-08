@@ -13,6 +13,6 @@ repository.workspace = true
 
 
 [dependencies]
-serde = { version = "1.0.217", features = ["derive"] }
-serde_json = { version = "1.0.138", features = ["preserve_order"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
 lib = { workspace = true }

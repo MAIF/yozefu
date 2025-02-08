@@ -38,6 +38,9 @@ command = { package = "yozefu-command", path = "crates/command/", version = "0.0
 yozefu = { package = "yozefu", path = "crates/bin/", version = "0.0.6" }
 tui = { package = "yozefu-tui", path = "crates/tui/", version = "0.0.6" }
 wasm-types = { package = "wasm-types", path = "crates/wasm-types/", version = "0.0.6" }
+serde_json = { version = "1.0.138", features = ["preserve_order"] }
+serde = { version = "1.0.217", features = ["derive"] }
+log = {version = "0.4.25" }
 
 [profile.release]
 opt-level = 3

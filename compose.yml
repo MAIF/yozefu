@@ -1,7 +1,7 @@
 services:
 
   kafka:
-    image: confluentinc/cp-kafka:7.7.1
+    image: confluentinc/cp-kafka:latest
     container_name: yozefu-kafka
     ports:
         - "9092:9092"
@@ -24,7 +24,7 @@ services:
       CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
 
   schema-registry:
-    image: confluentinc/cp-schema-registry:7.7.1
+    image: confluentinc/cp-schema-registry:latest
     hostname: schema-registry
     container_name: yozefu-schema-registry
     depends_on:
@@ -50,7 +50,7 @@ services:
 
   akhq:
     container_name: yozefu-akhq
-    image: tchiotludo/akhq
+    image: tchiotludo/akhq:latest
     restart: unless-stopped
     environment:
       AKHQ_CONFIGURATION: |
@@ -94,7 +94,7 @@ services:
   kafdrop:
     profiles: ["disabled"]
     container_name: yozefu-kafdrop
-    image: obsidiandynamics/kafdrop
+    image: obsidiandynamics/kafdrop:latest
     ports:
       - "9003:9000"
     environment:
@@ -120,7 +120,7 @@ services:
   provectus-kafka-ui:
     profiles: ["disabled"]
     container_name: yozefu-provectus
-    image: provectuslabs/kafka-ui
+    image: provectuslabs/kafka-ui:latest
     ports:
       - "9006:8080"
     environment:
