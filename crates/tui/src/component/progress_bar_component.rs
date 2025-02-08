@@ -7,7 +7,7 @@ use ratatui::{
 };
 
 #[derive(Clone, Default)]
-pub struct ProgressBarComponent {
+pub(crate) struct ProgressBarComponent {
     length: u64,
     progress: u64,
 }

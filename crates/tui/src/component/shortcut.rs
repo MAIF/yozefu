@@ -7,7 +7,7 @@ use serde::Deserialize;
 /// will be visible as `[CTRL + P]: Show details` in the footer.
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
-pub struct Shortcut {
+pub(crate) struct Shortcut {
     pub key: &'static str,
     pub description: &'static str,
 }

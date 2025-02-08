@@ -31,10 +31,6 @@ impl SchemaDetail {
 
         Some(Self { response, url, id })
     }
-
-    pub fn schema_to_string_pretty(&self) -> Option<String> {
-        self.response.as_ref().map(|r| r.schema_to_string_pretty())
-    }
 }
 
 #[derive(Clone, Debug, Serialize, Hash, PartialEq, Eq, Default)]

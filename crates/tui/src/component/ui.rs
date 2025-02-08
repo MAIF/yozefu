@@ -29,16 +29,14 @@ use crate::tui;
 use super::{ConcurrentRecordsBuffer, State, BUFFER};
 
 pub struct Ui {
-    pub app: App,
-    pub should_quit: bool,
-
-    pub root: RootComponent,
-    pub worker: CancellationToken,
-    pub topics: Vec<String>,
-    pub last_tick_key_events: Vec<KeyEvent>,
-    pub last_time_consuming: Instant,
-    pub records_sender: Option<UnboundedSender<KafkaRecord>>,
-    pub records: &'static ConcurrentRecordsBuffer,
+    app: App,
+    should_quit: bool,
+    root: RootComponent,
+    worker: CancellationToken,
+    topics: Vec<String>,
+    last_tick_key_events: Vec<KeyEvent>,
+    records_sender: Option<UnboundedSender<KafkaRecord>>,
+    records: &'static ConcurrentRecordsBuffer,
 }
 
 impl Ui {
@@ -58,7 +56,6 @@ impl Ui {
             root: RootComponent::new(query, selected_topics, &config.global, &BUFFER, state),
             records_sender: None,
             last_tick_key_events: Vec::new(),
-            last_time_consuming: Instant::now(),
         })
     }
 
@@ -74,7 +71,7 @@ impl Ui {
         Ok(())
     }
 
-    pub async fn create_consumer(
+    pub(crate) async fn create_consumer(
         app: &App,
         topics: Vec<String>,
         tx: UnboundedSender<Action>,
@@ -92,7 +89,10 @@ impl Ui {
         }
     }
 
-    pub async fn consume_topics(&mut self, tx: UnboundedSender<Action>) -> Result<(), TuiError> {
+    pub(crate) async fn consume_topics(
+        &mut self,
+        tx: UnboundedSender<Action>,
+    ) -> Result<(), TuiError> {
         self.worker.cancel();
         self.records.lock().unwrap().reset();
         if self.topics.is_empty() {
@@ -213,7 +213,7 @@ impl Ui {
         Ok(())
     }
 
-    pub fn topics_details(
+    pub(crate) fn topics_details(
         &mut self,
         topics: HashSet<String>,
         action_tx: UnboundedSender<Action>,
@@ -233,7 +233,7 @@ impl Ui {
         Ok(())
     }
 
-    pub fn export_record(
+    pub(crate) fn export_record(
         &mut self,
         record: &KafkaRecord,
         action_tx: UnboundedSender<Action>,
@@ -246,7 +246,10 @@ impl Ui {
         Ok(())
     }
 
-    pub fn load_topics(&mut self, action_tx: UnboundedSender<Action>) -> Result<(), TuiError> {
+    pub(crate) fn load_topics(
+        &mut self,
+        action_tx: UnboundedSender<Action>,
+    ) -> Result<(), TuiError> {
         let app = self.app.clone();
         tokio::spawn(async move {
             info!("Loading topics");
@@ -301,10 +304,6 @@ impl Ui {
             }
             while let Ok(action) = action_rx.try_recv() {
                 match action {
-                    Action::NewConfig(ref config) => {
-                        self.app.config.global = config.clone();
-                        self.save_config()?;
-                    }
                     Action::NewSearchPrompt(ref prompt) => {
                         self.app.config.global.history.push(prompt.to_string());
                         self.app.config.global.history.dedup();

@@ -12,7 +12,7 @@ use crate::{action::Action, error::TuiError, tui::Event};
 use super::{ComponentName, State};
 
 #[derive(Default)]
-pub struct VerticalScrollableBlock<C> {
+pub(crate) struct VerticalScrollableBlock<C> {
     scroll: u16,
     scroll_length: u16,
     scrollbar_state: ScrollbarState,

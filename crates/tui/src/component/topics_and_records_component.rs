@@ -10,7 +10,7 @@ use crate::error::TuiError;
 
 use super::{Component, ComponentName, State};
 
-pub struct TopicsAndRecordsComponent {
+pub(crate) struct TopicsAndRecordsComponent {
     records: Arc<Mutex<dyn Component>>,
     topics: Arc<Mutex<dyn Component>>,
 }

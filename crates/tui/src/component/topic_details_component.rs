@@ -22,7 +22,7 @@ use crate::{error::TuiError, Action, Notification};
 use super::{Component, ComponentName, State, WithHeight};
 
 #[derive(Default)]
-pub struct TopicDetailsComponent {
+pub(crate) struct TopicDetailsComponent {
     details: Vec<TopicDetail>,
     action_tx: Option<UnboundedSender<Action>>,
     state: TableState,

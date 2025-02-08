@@ -11,7 +11,7 @@ use crate::error::TuiError;
 use super::{Component, ComponentName, State};
 
 #[derive(Default)]
-pub struct IssueComponent {}
+pub(crate) struct IssueComponent {}
 
 impl Component for IssueComponent {
     fn id(&self) -> ComponentName {

@@ -1,4 +1,4 @@
-use app::{configuration::GlobalConfig, search::ValidSearchQuery};
+use app::search::ValidSearchQuery;
 use std::collections::HashSet;
 
 use lib::{kafka::SchemaId, search::OrderBy, KafkaRecord, TopicDetail};
@@ -10,7 +10,7 @@ use super::component::{ComponentName, Shortcut};
 /// Actions that can be dispatched to the UI
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Clone, PartialEq)]
-pub enum Action {
+pub(crate) enum Action {
     Tick,
     Render,
     /// Notify the UI that the terminal has been resized
@@ -19,12 +19,8 @@ pub enum Action {
     Quit,
     /// Request the app to export the given record into the file
     Export(KafkaRecord),
-    /// Dispatch statistics about the number of processed records
-    Count((usize, usize, usize)),
     /// Dispatch the new shortcuts to the UI
     Shortcuts(Vec<Shortcut>, bool),
-    /// Request the app to clear the current notification
-    ResetNotification(),
     /// Request the UI to show a new notification
     Notification(Notification),
     /// Request the UI to start searching for kafka records
@@ -47,14 +43,10 @@ pub enum Action {
     Schemas(Option<SchemaDetail>, Option<SchemaDetail>),
     /// Notify the UI the list of topics
     Topics(Vec<String>),
-    /// Notify the UI that a new record has been polled
-    NewRecord(KafkaRecord),
     /// Request the list of kafka records to be sorted in a specific way
     OrderBy(OrderBy),
     /// List of topics to consume
     SelectedTopics(Vec<String>),
-    /// Dispatch the new configuration to the UI
-    NewConfig(GlobalConfig),
     /// Copy the given record to the clipboard
     CopyToClipboard(String),
     /// Notify the UI that a new component has been be displayed
@@ -63,8 +55,6 @@ pub enum Action {
     ViewStack((ComponentName, Vec<ComponentName>)),
     /// Request to open the web browser with the URL template (AKHQ, redpanda-console, etc.) pointing to the given record
     Open(KafkaRecord),
-    /// Request the UI to close the specified component
-    Close(ComponentName),
     /// Notify the UI some details (consumer groups, members...) of a given topic
     TopicDetails(Vec<TopicDetail>),
     /// Notify the UI that the user typed a new search query

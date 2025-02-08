@@ -27,7 +27,7 @@ use super::{
     Component, ComponentName, ConcurrentRecordsBuffer, State,
 };
 
-pub struct RootComponent {
+pub(crate) struct RootComponent {
     components: HashMap<ComponentName, Arc<Mutex<dyn Component>>>,
     views: Vec<ComponentName>,
     state: State,
@@ -322,7 +322,6 @@ impl Component for RootComponent {
             Action::RecordsToRead(length) => {
                 self.progress_bar.set_length(length);
             }
-            Action::Close(_) => self.close(),
             Action::CopyToClipboard(ref content) => {
                 let mut ctx = ClipboardContext::new().unwrap();
                 self.action_tx

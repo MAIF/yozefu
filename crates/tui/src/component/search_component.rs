@@ -28,7 +28,7 @@ use crate::{
 use super::{Component, ComponentName, Shortcut, State};
 
 #[derive(Default)]
-pub struct SearchComponent {
+pub(crate) struct SearchComponent {
     input: Input,
     index_history: usize,
     history: Vec<String>,

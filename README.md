@@ -75,7 +75,7 @@ yozf import-filter path/to/key-ends-with.wasm
 
 You can also download pre-build binaries from the [releases section](https://github.com/MAIF/yozefu/releases). [Attestions](https://github.com/MAIF/yozefu/attestations) are available:
 ```bash
-gh attestation verify --repo MAIF/yozefu <file-path of downloaded artifact> 
+gh attestation verify --repo MAIF/yozefu $(which yozf)
 ```
 
 

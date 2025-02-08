@@ -8,7 +8,7 @@ mod schema_detail;
 pub mod theme;
 mod tui;
 
-pub use action::Action;
+pub(crate) use action::Action;
 pub use action::Notification;
 
 pub use component::State;

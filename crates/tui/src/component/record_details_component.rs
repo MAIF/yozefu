@@ -18,7 +18,7 @@ use crate::{error::TuiError, Action};
 use super::{scroll_state::ScrollState, Component, ComponentName, Shortcut, State};
 
 #[derive(Default)]
-pub struct RecordDetailsComponent<'a> {
+pub(crate) struct RecordDetailsComponent<'a> {
     record: Option<KafkaRecord>,
     lines: Vec<Line<'a>>,
     search_query: String,

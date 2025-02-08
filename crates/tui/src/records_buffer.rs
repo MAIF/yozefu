@@ -21,7 +21,7 @@ const BUFFER_SIZE: usize = 500;
 const BUFFER_SIZE: usize = 120;
 
 /// Wrapper around [CircularBuffer]
-pub struct RecordsBuffer {
+pub(crate) struct RecordsBuffer {
     buffer: CircularBuffer<BUFFER_SIZE, KafkaRecord>,
     read: usize,
     pub channels: (Sender<BufferAction>, Receiver<BufferAction>),
@@ -58,10 +58,6 @@ impl RecordsBuffer {
         }
     }
 
-    pub fn is_empty(&self) -> bool {
-        self.buffer.is_empty()
-    }
-
     /// Empty the buffer and reset metrics
     pub fn reset(&mut self) {
         self.buffer.clear();
@@ -78,10 +74,6 @@ impl RecordsBuffer {
     /// Updates the metric regarding the number of kafka records read
     pub fn new_record_read(&mut self) {
         self.read += 1;
-    }
-
-    pub fn len(&self) -> usize {
-        self.buffer.len()
     }
 
     pub fn get(&self, index: usize) -> Option<&KafkaRecord> {

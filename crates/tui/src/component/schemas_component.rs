@@ -22,7 +22,7 @@ use crate::{
 use super::{scroll_state::ScrollState, Component, ComponentName, Shortcut, State};
 
 #[derive(Default)]
-pub struct SchemasComponent<'a> {
+pub(crate) struct SchemasComponent<'a> {
     key: Option<SchemaDetail>,
     value: Option<SchemaDetail>,
     lines: Vec<Line<'a>>,

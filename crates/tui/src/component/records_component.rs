@@ -20,7 +20,7 @@ use crate::{action::Notification, error::TuiError, records_buffer::BufferAction,
 
 use super::{Component, ComponentName, ConcurrentRecordsBuffer, Shortcut, State};
 
-pub struct RecordsComponent<'a> {
+pub(crate) struct RecordsComponent<'a> {
     records: &'a ConcurrentRecordsBuffer,
     state: TableState,
     status: ThrobberState,

@@ -23,21 +23,21 @@ use ratatui::{
     widgets::{Block, BorderType},
     Frame,
 };
-pub use shortcut::Shortcut;
+pub(crate) use root_component::RootComponent;
+pub(crate) use shortcut::Shortcut;
 use strum::Display;
 use tokio::sync::mpsc::UnboundedSender;
 pub use ui::Ui;
 
 use std::sync::{Arc, LazyLock, Mutex};
 
-pub use root_component::RootComponent;
 pub use state::State;
 
 use serde::Deserialize;
 
 use crate::{records_buffer::RecordsBuffer, tui::Event, Action, TuiError};
 
-pub type ConcurrentRecordsBuffer = LazyLock<Arc<Mutex<RecordsBuffer>>>;
+pub(crate) type ConcurrentRecordsBuffer = LazyLock<Arc<Mutex<RecordsBuffer>>>;
 static BUFFER: ConcurrentRecordsBuffer =
     LazyLock::new(|| Arc::new(Mutex::new(RecordsBuffer::new())));
 

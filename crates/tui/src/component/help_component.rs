@@ -24,7 +24,7 @@ const REPOSITORY_URL: &str = concat!(
 );
 
 #[derive(Default)]
-pub struct HelpComponent {
+pub(crate) struct HelpComponent {
     scroll: ScrollState,
     rendered: usize,
 }

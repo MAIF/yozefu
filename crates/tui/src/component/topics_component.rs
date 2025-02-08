@@ -17,7 +17,7 @@ use crate::{error::TuiError, Action};
 use super::{Component, ComponentName, Shortcut, State};
 
 #[derive(Default)]
-pub struct TopicsComponent {
+pub(crate) struct TopicsComponent {
     topics: Vec<String>,
     visible_topics: Vec<String>,
     selected: HashSet<String>,
