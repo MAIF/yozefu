@@ -6,7 +6,6 @@ use std::{
     sync::{LazyLock, Mutex},
 };
 
-use async_trait::async_trait;
 use extism::{Manifest, Plugin, Wasm};
 use filter::{CACHED_FILTERS, FILTERS_DIR, PARSE_PARAMETERS_FUNCTION_NAME};
 use itertools::Itertools;
@@ -24,7 +23,6 @@ pub mod filter;
 pub mod search_query;
 pub mod term;
 
-#[async_trait]
 pub trait Search {
     /// Returns the offset from which the search should start.
     fn offset(&self) -> Option<FromOffset> {

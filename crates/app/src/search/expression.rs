@@ -1,4 +1,3 @@
-use async_trait::async_trait;
 use lib::search::{
     expression::{AndExpression, OrExpression},
     filter::Filter,
@@ -7,7 +6,6 @@ use lib::search::{
 
 use super::{Search, SearchContext};
 
-#[async_trait]
 impl Search for AndExpression {
     fn offset(&self) -> Option<FromOffset> {
         match self {
@@ -47,7 +45,6 @@ impl Search for AndExpression {
     }
 }
 
-#[async_trait]
 impl Search for OrExpression {
     fn offset(&self) -> Option<FromOffset> {
         match self {

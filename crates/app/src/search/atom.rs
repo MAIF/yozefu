@@ -1,9 +1,7 @@
-use async_trait::async_trait;
 use lib::search::{atom::Atom, filter::Filter, offset::FromOffset};
 
 use super::{Search, SearchContext};
 
-#[async_trait]
 impl Search for Atom {
     fn offset(&self) -> Option<FromOffset> {
         match self {

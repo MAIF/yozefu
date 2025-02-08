@@ -1,9 +1,7 @@
-use async_trait::async_trait;
 use lib::search::{filter::Filter, offset::FromOffset, term::Term};
 
 use super::{Search, SearchContext};
 
-#[async_trait]
 impl Search for Term {
     fn offset(&self) -> Option<FromOffset> {
         match self {

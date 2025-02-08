@@ -1,4 +1,3 @@
-use async_trait::async_trait;
 use lib::{
     kafka::Comparable,
     search::{
@@ -12,7 +11,6 @@ use crate::search::Search;
 
 use super::SearchContext;
 
-#[async_trait]
 impl Search for CompareExpression {
     fn offset(&self) -> Option<FromOffset> {
         match self {

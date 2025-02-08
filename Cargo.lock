@@ -4883,7 +4883,6 @@ dependencies = [
 name = "yozefu-app"
 version = "0.0.6"
 dependencies = [
- "async-trait",
  "chrono",
  "directories",
  "extism",
