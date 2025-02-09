@@ -42,7 +42,7 @@ static BUFFER: ConcurrentRecordsBuffer =
     LazyLock::new(|| Arc::new(Mutex::new(RecordsBuffer::new())));
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
-pub enum FocusDirection {
+pub(crate) enum FocusDirection {
     Top,
     Left,
     Right,
@@ -50,7 +50,7 @@ pub enum FocusDirection {
 }
 
 #[derive(Debug, Clone, Display, Hash, PartialEq, Eq, Deserialize, PartialOrd, Ord)]
-pub enum ComponentName {
+pub(crate) enum ComponentName {
     Records,
     Topics,
     Footer,
@@ -81,17 +81,14 @@ impl Default for ComponentName {
     }
 }
 
-pub trait WithHeight: Component {
+pub(crate) trait WithHeight: Component {
     fn content_height(&self) -> usize {
         0
     }
 }
 
-pub trait Component {
-    #[allow(unused_variables)]
-    fn register_action_handler(&mut self, tx: UnboundedSender<Action>) -> Result<(), TuiError> {
-        Ok(())
-    }
+pub(crate) trait Component {
+    fn register_action_handler(&mut self, _tx: UnboundedSender<Action>) {}
 
     fn id(&self) -> ComponentName;
 

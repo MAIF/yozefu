@@ -38,8 +38,7 @@ impl<C> Component for VerticalScrollableBlock<C>
 where
     C: WithHeight,
 {
-    #[allow(unused_variables)]
-    fn register_action_handler(&mut self, tx: UnboundedSender<Action>) -> Result<(), TuiError> {
+    fn register_action_handler(&mut self, tx: UnboundedSender<Action>) {
         self.component.register_action_handler(tx)
     }
 

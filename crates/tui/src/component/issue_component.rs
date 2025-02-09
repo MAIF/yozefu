@@ -26,7 +26,7 @@ impl Component for IssueComponent {
             .border_type(BorderType::Rounded);
 
         let block = self.make_block_focused(state, block);
-        let pp = Paragraph::new(vec![
+        let paragraph = Paragraph::new(vec![
             Line::from(""),
             Line::from("ʕノ•ᴥ•ʔノ ︵ ┻━┻"),
             Line::from("Alt: Your mate flipping the desk").italic(),
@@ -50,7 +50,7 @@ impl Component for IssueComponent {
             .areas(area);
 
         f.render_widget(Clear, area);
-        f.render_widget(pp.block(block), area);
+        f.render_widget(paragraph.block(block), area);
 
         Ok(())
     }

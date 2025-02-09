@@ -187,14 +187,21 @@ impl RootComponent {
 }
 
 impl Component for RootComponent {
-    fn register_action_handler(&mut self, tx: UnboundedSender<Action>) -> Result<(), TuiError> {
+    fn register_action_handler(&mut self, tx: UnboundedSender<Action>) {
         self.action_tx = Some(tx.clone());
         for component in self.components.values_mut() {
             component
                 .lock()
                 .unwrap()
-                .register_action_handler(tx.clone())?;
+                .register_action_handler(tx.clone());
         }
+    }
+
+    fn id(&self) -> ComponentName {
+        ComponentName::Main
+    }
+
+    fn init(&mut self) -> Result<(), TuiError> {
         self.notify_footer()?;
         self.action_tx.as_ref().unwrap().send(Action::Shortcuts(
             self.components
@@ -206,10 +213,6 @@ impl Component for RootComponent {
             true,
         ))?;
         Ok(())
-    }
-
-    fn id(&self) -> ComponentName {
-        ComponentName::Main
     }
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Result<Option<Action>, TuiError> {

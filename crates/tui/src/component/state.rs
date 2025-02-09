@@ -9,7 +9,7 @@ use super::ComponentName;
 
 #[derive(Clone)]
 pub struct State {
-    pub focused: ComponentName,
+    pub(crate) focused: ComponentName,
     pub cluster: String,
     pub themes: Vec<String>,
     pub theme: Theme,
@@ -33,7 +33,7 @@ impl State {
         }
     }
 
-    pub fn is_focused(&self, component_name: ComponentName) -> bool {
+    pub(crate) fn is_focused(&self, component_name: ComponentName) -> bool {
         self.focused == component_name
     }
 }

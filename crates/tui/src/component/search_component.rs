@@ -156,10 +156,8 @@ impl SearchComponent {
 }
 
 impl Component for SearchComponent {
-    fn register_action_handler(&mut self, tx: UnboundedSender<Action>) -> Result<(), TuiError> {
+    fn register_action_handler(&mut self, tx: UnboundedSender<Action>) {
         self.action_tx = Some(tx);
-        //self.search()?;
-        Ok(())
     }
 
     fn id(&self) -> ComponentName {

@@ -210,9 +210,8 @@ impl<'a> RecordsComponent<'a> {
 }
 
 impl Component for RecordsComponent<'_> {
-    fn register_action_handler(&mut self, tx: UnboundedSender<Action>) -> Result<(), TuiError> {
+    fn register_action_handler(&mut self, tx: UnboundedSender<Action>) {
         self.action_tx = Some(tx.clone());
-        Ok(())
     }
 
     fn id(&self) -> ComponentName {

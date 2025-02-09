@@ -190,9 +190,8 @@ impl RecordDetailsComponent<'_> {
 }
 
 impl Component for RecordDetailsComponent<'_> {
-    fn register_action_handler(&mut self, tx: UnboundedSender<Action>) -> Result<(), TuiError> {
+    fn register_action_handler(&mut self, tx: UnboundedSender<Action>) {
         self.action_tx = Some(tx);
-        Ok(())
     }
 
     fn id(&self) -> ComponentName {

@@ -281,7 +281,7 @@ impl Ui {
         self.load_topics(action_tx.clone())?;
         let mut tui = tui::Tui::new()?;
         tui.enter()?;
-        self.root.register_action_handler(action_tx.clone())?;
+        self.root.register_action_handler(action_tx.clone());
         self.root.init()?;
         if !topics.is_empty() {
             action_tx.send(Action::SelectedTopics(topics))?;
