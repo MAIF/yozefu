@@ -10,8 +10,8 @@ mod import_filter;
 mod main_command;
 mod utility_commands;
 
-pub use create_filter::CreateFilterCommand;
-pub use import_filter::ImportFilterCommand;
+pub(crate) use create_filter::CreateFilterCommand;
+pub(crate) use import_filter::ImportFilterCommand;
 pub use main_command::MainCommand;
 pub use utility_commands::UtilityCommands;
 

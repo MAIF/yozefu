@@ -31,7 +31,7 @@ use crate::headless::formatter::{
 use crate::headless::Headless;
 use crate::log::{init_logging_file, init_logging_stderr};
 use crate::theme::update_themes;
-use crate::APPLICATION_NAME;
+use crate::{Cluster, APPLICATION_NAME};
 
 fn parse_cluster<T>(s: &str) -> Result<T, Error>
 where
@@ -46,8 +46,7 @@ where
 #[command(author, version, about, long_about = None, propagate_version = true)]
 pub struct MainCommand<T>
 where
-    T: Display + Clone + Sync + Send + 'static + FromStr + Default,
-    <T as FromStr>::Err: Display,
+    T: Cluster,
 {
     #[clap(short, long)]
     /// Log level set to 'debug'
@@ -106,8 +105,7 @@ pub enum KafkaFormatterOption {
 
 impl<T> MainCommand<T>
 where
-    T: Display + Clone + Sync + Send + 'static + FromStr + Default,
-    <T as FromStr>::Err: Display,
+    T: Cluster,
 {
     pub async fn execute(self, mut yozefu_config: YozefuConfig) -> Result<(), TuiError> {
         for property in &self.properties {

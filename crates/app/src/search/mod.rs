@@ -1,6 +1,10 @@
 //! Module implementing the search logic
 
-use std::path::{Path, PathBuf};
+use std::{
+    collections::HashMap,
+    path::{Path, PathBuf},
+    sync::{LazyLock, Mutex},
+};
 
 use extism::{Manifest, Plugin, Wasm};
 use filter::{CACHED_FILTERS, PARSE_PARAMETERS_FUNCTION_NAME};
@@ -34,7 +38,11 @@ pub trait Search {
 /// Struct that holds the context of the search.
 /// It contains the record that is being searched and the loaded search filters.
 pub struct SearchContext<'a> {
+    /// The record that is being searched.
     pub record: &'a KafkaRecord,
+    /// The search filters that are already loaded in memory.
+    pub filters: &'a LazyLock<Mutex<HashMap<String, Plugin>>>,
+    /// The directory containing the search filters
     pub filters_directory: PathBuf,
 }
 
@@ -42,6 +50,7 @@ impl SearchContext<'_> {
     pub fn new<'a>(record: &'a KafkaRecord, filters_directory: &'a Path) -> SearchContext<'a> {
         SearchContext {
             record,
+            filters: &CACHED_FILTERS,
             filters_directory: filters_directory.to_path_buf(),
         }
     }

@@ -20,12 +20,12 @@ use indexmap::IndexMap;
 #[command(author, version, about = "A terminal user interface to navigate Kafka topics and search for Kafka records.", name = APPLICATION_NAME, bin_name = APPLICATION_NAME, display_name = APPLICATION_NAME, long_about = None, propagate_version = true, args_conflicts_with_subcommands = true)]
 pub struct Cli<T>
 where
-    T: Cluster
+    T: Cluster,
 {
     #[command(subcommand)]
-    pub subcommands: Option<UtilityCommands>,
+    subcommands: Option<UtilityCommands>,
     #[command(flatten)]
-    pub default_command: MainCommand<T>,
+    default_command: MainCommand<T>,
     #[clap(skip)]
     logs_file: Option<PathBuf>,
 }
@@ -45,12 +45,17 @@ where
         self.run(Some(yozefu_config)).await
     }
 
-    /// The targeted cluster
+    /// This function returns `Some(T)` when the user starts the TUI.
+    /// Otherwise, for subcommands commands that such `config` or `new-filter`, it returns `None`.
     pub fn cluster(&self) -> Option<T> {
         match self.subcommands.is_some() {
             true => None,
             false => Some(self.default_command.cluster()),
         }
+    }
+
+    pub fn is_main_command(&self) -> bool {
+        self.cluster().is_some()
     }
 
     /// Changes the default logs file path

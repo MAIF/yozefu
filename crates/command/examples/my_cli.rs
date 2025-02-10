@@ -1,3 +1,5 @@
+//! This module shows you how to include yozefu to your own CLI.
+
 use app::configuration::{ClusterConfig, YozefuConfig};
 use clap::Parser;
 use indexmap::IndexMap;
@@ -6,6 +8,7 @@ use strum::{Display, EnumIter, EnumString};
 use tui::TuiError;
 use yozefu_command::Cli;
 
+/// I have 4 kafka clusters
 #[derive(Debug, Clone, PartialEq, Eq, Display, EnumString, EnumIter, Default)]
 #[strum(serialize_all = "lowercase")]
 enum Cluster {
@@ -29,18 +32,18 @@ impl MyCli {
         if let Some(cluster) = self.command.cluster() {
             match cluster {
                 Cluster::Localhost => {
-                    config.set("bootstrap.servers", "kafka-localhost.acme:9092".to_string())
+                    config.set("bootstrap.servers", "kafka.localhost.acme:9092".to_string())
                 }
                 Cluster::Test => {
-                    config.set("bootstrap.servers", "kafka-test.acme:9092".to_string())
+                    config.set("bootstrap.servers", "kafka.test.acme:9092".to_string())
                 }
                 Cluster::Development => config.set(
                     "bootstrap.servers",
-                    "kafka-development.acme:9092".to_string(),
+                    "kafka.development.acme:9092".to_string(),
                 ),
                 Cluster::Production => config.set(
                     "bootstrap.servers",
-                    "kafka-production.acme:9092".to_string(),
+                    "kafka.production.acme:9092".to_string(),
                 ),
             };
         }
@@ -53,11 +56,14 @@ impl MyCli {
     }
 
     pub async fn execute(&self) -> Result<(), TuiError> {
+        // To pass your configuration, create a `YozefuConfig`.
         let yozefu_config = YozefuConfig::new(self.kafka_client_config());
+        // And pass it to the `yozefu_command::Cli`
         self.command.execute_with(yozefu_config).await
     }
 }
 
+/// Yozefu uses an async runtime
 #[tokio::main]
 async fn main() -> Result<(), String> {
     let parsed = MyCli::parse();

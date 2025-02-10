@@ -17,7 +17,7 @@ use crate::{
 use std::process::Command as ProcessCommand;
 
 #[derive(Debug, Clone, Args)]
-pub struct CreateFilterCommand {
+pub(crate) struct CreateFilterCommand {
     #[clap(short, long)]
     /// The programming language used to build the WebAssembly module
     language: SupportedLanguages,

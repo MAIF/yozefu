@@ -15,7 +15,7 @@ use crate::command::Command;
 /// Import a search filter.
 /// It also checks that it complies with the tool requirements.
 #[derive(Debug, Clone, Args)]
-pub struct ImportFilterCommand {
+pub(crate) struct ImportFilterCommand {
     /// Search filter to import
     file: PathBuf,
     /// Name of the search filter
