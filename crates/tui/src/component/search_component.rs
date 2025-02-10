@@ -3,7 +3,7 @@
 //!  - all queries are stored into a history.
 //!  - The component suggests queries based on your history.
 
-use std::{str::FromStr, time::Duration};
+use std::{path::PathBuf, time::Duration};
 
 use app::search::ValidSearchQuery;
 use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers};
@@ -33,6 +33,7 @@ pub(crate) struct SearchComponent {
     index_history: usize,
     history: Vec<String>,
     compiler_worker: CancellationToken,
+    filters_directory: PathBuf,
     remaining_input: Option<String>,
     action_tx: Option<UnboundedSender<Action>>,
     autocomplete: Option<String>,
@@ -41,11 +42,12 @@ pub(crate) struct SearchComponent {
 }
 
 impl SearchComponent {
-    pub fn new(input: &str, history: Vec<String>) -> Self {
+    pub fn new(input: &str, history: Vec<String>, filters_directory: PathBuf) -> Self {
         Self {
             input: Input::from(input),
             index_history: history.len() - 1,
             history,
+            filters_directory,
             ..Self::default()
         }
     }
@@ -54,6 +56,7 @@ impl SearchComponent {
         let input = self.input.value().to_string();
         let tt = self.action_tx.clone();
 
+        let filters_dir = self.filters_directory.clone();
         self.compiler_worker.cancel();
         self.compiler_worker = CancellationToken::new();
         let token = self.compiler_worker.clone();
@@ -62,7 +65,7 @@ impl SearchComponent {
                 _ = token.cancelled() => {  },
                 _ = tokio::time::sleep(Duration::from_millis(700)) => {
                     if input.len() > 5 {
-                        if let Err(e) = ValidSearchQuery::from_str(&input) {
+                        if let Err(e) = ValidSearchQuery::from(&input, &filters_dir) {
                             tt.as_ref().unwrap().send(Action::Notification(Notification::new(log::Level::Error, e.to_string()))).unwrap();
                         }
                     }
@@ -119,7 +122,8 @@ impl SearchComponent {
 
     fn search(&mut self) -> Result<(), TuiError> {
         let o = self.input.value().to_string();
-        match ValidSearchQuery::from_str(o.as_str()) {
+
+        match ValidSearchQuery::from(o.as_str(), &self.filters_directory) {
             Ok(search_query) => {
                 self.update_history(&o)?;
                 self.action_tx

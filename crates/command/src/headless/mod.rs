@@ -65,6 +65,8 @@ impl Headless {
         let (tx_dd, mut rx_dd) = mpsc::unbounded_channel::<OwnedMessage>();
         let mut schema_registry = self.app.schema_registry().clone();
         let token_cloned = token.clone();
+
+        let filters_directory = self.app.config.global.filters_dir();
         tokio::spawn(async move {
             loop {
                 let mut limit = 0;
@@ -75,7 +77,7 @@ impl Headless {
                      },
                     Some(message) = rx_dd.recv() => {
                         let record = KafkaRecord::parse(message, &mut schema_registry).await;
-                        let context = SearchContext::new(&record);
+                        let context = SearchContext::new(&record, &filters_directory);
                         if search_query.matches(&context) {
                             records_channel.0.send(record).unwrap();
                             limit += 1;

@@ -59,6 +59,7 @@ impl RootComponent {
             Arc::new(Mutex::new(SearchComponent::new(
                 &query,
                 config.history.clone(),
+                config.filters_dir(),
             ))),
             Arc::new(Mutex::new(footer)),
             Arc::new(Mutex::new(HelpComponent::default())),

@@ -2,7 +2,6 @@
 use crate::command::{Command, MainCommand, UtilityCommands};
 use crate::theme::init_themes_file;
 use app::configuration::{ClusterConfig, GlobalConfig, SchemaRegistryConfig, YozefuConfig};
-use app::search::filter::FILTERS_DIR;
 use app::APPLICATION_NAME;
 use clap::command;
 use lib::Error;
@@ -73,9 +72,6 @@ where
 
     async fn run(&self, yozefu_config: Option<YozefuConfig>) -> Result<(), TuiError> {
         init_files().await?;
-        let filters_dir = self.read_config()?.filters_dir();
-        // TODO this sucks
-        *FILTERS_DIR.lock().unwrap() = filters_dir;
         match &self.subcommands {
             Some(c) => c.execute().await.map_err(|e| e.into()),
             None => {

@@ -135,6 +135,8 @@ impl Ui {
         let (tx_dd, mut rx_dd) = mpsc::unbounded_channel::<OwnedMessage>();
         let mut schema_registry = app.schema_registry().clone();
         let token_cloned = token.clone();
+
+        let filters_directory = self.app.config.global.filters_dir();
         tokio::spawn(async move {
             loop {
                 select! {
@@ -144,7 +146,7 @@ impl Ui {
                      },
                     Some(message) = rx_dd.recv() => {
                         let record = KafkaRecord::parse(message, &mut schema_registry).await;
-                        let context = SearchContext::new(&record);
+                        let context = SearchContext::new(&record, &filters_directory);
                         let mut ll = r.lock().unwrap();
                         ll.new_record_read();
                         if search_query.matches(&context) {

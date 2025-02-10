@@ -1,6 +1,5 @@
 use std::{
     collections::HashMap,
-    path::PathBuf,
     sync::{LazyLock, Mutex},
 };
 
@@ -16,9 +15,6 @@ use super::{Search, SearchContext};
 // This is evil, TODO context
 pub static CACHED_FILTERS: LazyLock<Mutex<HashMap<String, Plugin>>> =
     LazyLock::new(|| HashMap::new().into());
-
-// This is evil, TODO context
-pub static FILTERS_DIR: LazyLock<Mutex<PathBuf>> = LazyLock::new(|| PathBuf::new().into());
 
 pub const MATCHES_FUNCTION_NAME: &str = "matches";
 pub const PARSE_PARAMETERS_FUNCTION_NAME: &str = "parse_parameters";

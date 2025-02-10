@@ -241,8 +241,8 @@ where
     /// Creates the App
     fn app(&self, query: &str, yozefu_config: &YozefuConfig) -> Result<App, Error> {
         debug!("{:?}", yozefu_config);
-        let search_query = ValidSearchQuery::from_str(query)?;
         let config = self.config(yozefu_config)?;
+        let search_query = ValidSearchQuery::from(query, &config.filters_dir())?;
 
         let internal_config = InternalConfig::new(yozefu_config.clone(), config);
         //let output_file = internal_config.output_file();

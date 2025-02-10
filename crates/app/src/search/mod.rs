@@ -1,13 +1,9 @@
 //! Module implementing the search logic
 
-use std::{
-    collections::HashMap,
-    str::FromStr,
-    sync::{LazyLock, Mutex},
-};
+use std::path::{Path, PathBuf};
 
 use extism::{Manifest, Plugin, Wasm};
-use filter::{CACHED_FILTERS, FILTERS_DIR, PARSE_PARAMETERS_FUNCTION_NAME};
+use filter::{CACHED_FILTERS, PARSE_PARAMETERS_FUNCTION_NAME};
 use itertools::Itertools;
 use lib::{
     parse_search_query,
@@ -39,14 +35,14 @@ pub trait Search {
 /// It contains the record that is being searched and the loaded search filters.
 pub struct SearchContext<'a> {
     pub record: &'a KafkaRecord,
-    pub filters: &'a LazyLock<Mutex<HashMap<String, Plugin>>>,
+    pub filters_directory: PathBuf,
 }
 
 impl SearchContext<'_> {
-    pub fn new(record: &KafkaRecord) -> SearchContext<'_> {
+    pub fn new<'a>(record: &'a KafkaRecord, filters_directory: &'a Path) -> SearchContext<'a> {
         SearchContext {
             record,
-            filters: &CACHED_FILTERS,
+            filters_directory: filters_directory.to_path_buf(),
         }
     }
 }
@@ -68,16 +64,13 @@ impl ValidSearchQuery {
     }
 }
 
-impl FromStr for ValidSearchQuery {
-    type Err = lib::Error;
-
-    fn from_str(input: &str) -> Result<Self, Self::Err> {
+impl ValidSearchQuery {
+    pub fn from(input: &str, filters_directory: &Path) -> Result<Self, lib::Error> {
         let query = parse_search_query(input).map_err(lib::Error::Search)?.1;
         let filters = query.filters();
-        let dir = FILTERS_DIR.lock().unwrap().clone();
         for filter in filters {
             let name = filter.name;
-            let path = dir.join(format!("{}.wasm", &name));
+            let path = filters_directory.join(format!("{}.wasm", &name));
             let url = Wasm::file(&path);
             let manifest = Manifest::new([url]);
             let mut filters = CACHED_FILTERS.lock().unwrap();
