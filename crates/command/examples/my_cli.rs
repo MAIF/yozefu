@@ -6,9 +6,10 @@ use strum::{Display, EnumIter, EnumString};
 use tui::TuiError;
 use yozefu_command::Cli;
 
-#[derive(Debug, Clone, PartialEq, Eq, Display, EnumString, EnumIter)]
+#[derive(Debug, Clone, PartialEq, Eq, Display, EnumString, EnumIter, Default)]
 #[strum(serialize_all = "lowercase")]
 enum Cluster {
+    #[default]
     Localhost,
     Test,
     Development,

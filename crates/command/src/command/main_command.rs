@@ -46,13 +46,13 @@ where
 #[command(author, version, about, long_about = None, propagate_version = true)]
 pub struct MainCommand<T>
 where
-    T: Display + Clone + Sync + Send + 'static + FromStr,
+    T: Display + Clone + Sync + Send + 'static + FromStr + Default,
     <T as FromStr>::Err: Display,
 {
     #[clap(short, long)]
     /// Log level set to 'debug'
     pub debug: bool,
-    #[clap(short = 'c', short_alias='e', alias="environment", long, value_parser = parse_cluster::<T>)]
+    #[clap(short = 'c', short_alias='e', alias="environment", long, value_parser = parse_cluster::<T>, default_value_t)]
     /// The cluster to use
     cluster: T,
     /// Topics to consume
@@ -106,7 +106,7 @@ pub enum KafkaFormatterOption {
 
 impl<T> MainCommand<T>
 where
-    T: Display + Clone + Sync + Send + 'static + FromStr,
+    T: Display + Clone + Sync + Send + 'static + FromStr + Default,
     <T as FromStr>::Err: Display,
 {
     pub async fn execute(self, mut yozefu_config: YozefuConfig) -> Result<(), TuiError> {

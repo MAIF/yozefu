@@ -1,4 +1,5 @@
 //! The command line argument Parser struct
+use crate::cluster::Cluster;
 use crate::command::{Command, MainCommand, UtilityCommands};
 use crate::theme::init_themes_file;
 use app::configuration::{ClusterConfig, GlobalConfig, SchemaRegistryConfig, YozefuConfig};
@@ -6,21 +7,20 @@ use app::APPLICATION_NAME;
 use clap::command;
 use lib::Error;
 use reqwest::Url;
-use std::fmt::Debug;
 use std::fs;
-use std::{fmt::Display, path::PathBuf, str::FromStr};
+use std::path::PathBuf;
 use tui::error::TuiError;
 
 pub use clap::Parser;
 use indexmap::IndexMap;
 
+// https://github.com/clap-rs/clap/issues/975
 /// CLI parser
 #[derive(Parser)]
 #[command(author, version, about = "A terminal user interface to navigate Kafka topics and search for Kafka records.", name = APPLICATION_NAME, bin_name = APPLICATION_NAME, display_name = APPLICATION_NAME, long_about = None, propagate_version = true, args_conflicts_with_subcommands = true)]
 pub struct Cli<T>
 where
-    T: Display + Debug + Clone + Sync + Send + 'static + FromStr,
-    <T as FromStr>::Err: Display,
+    T: Cluster
 {
     #[command(subcommand)]
     pub subcommands: Option<UtilityCommands>,
@@ -32,8 +32,7 @@ where
 
 impl<T> Cli<T>
 where
-    T: Display + Debug + Clone + Sync + Send + 'static + FromStr,
-    <T as FromStr>::Err: Display,
+    T: Cluster,
 {
     /// Executes the CLI.
     /// The config will be loaded from the default config file.
