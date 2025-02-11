@@ -5,16 +5,18 @@
 //! 2. To call `execute` on the `MainCommandWithClient`.
 
 use std::collections::HashMap;
-use std::fmt::Display;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use std::{fs, io};
 
-use app::configuration::{Configuration, GlobalConfig, InternalConfig, YozefuConfig};
+use app::configuration::{
+    ClusterConfig, Configuration, GlobalConfig, InternalConfig, YozefuConfig,
+};
 use app::search::ValidSearchQuery;
 
 use app::App;
-use clap::Parser;
+use clap::error::ErrorKind;
+use clap::{CommandFactory, Parser};
 use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
 use itertools::Itertools;
 use lib::Error;
@@ -31,12 +33,11 @@ use crate::headless::formatter::{
 use crate::headless::Headless;
 use crate::log::{init_logging_file, init_logging_stderr};
 use crate::theme::update_themes;
-use crate::{Cluster, APPLICATION_NAME};
+use crate::{Cli, Cluster, APPLICATION_NAME};
 
 fn parse_cluster<T>(s: &str) -> Result<T, Error>
 where
-    T: FromStr,
-    <T as FromStr>::Err: Display,
+    T: Cluster,
 {
     s.parse()
         .map_err(|e: <T as FromStr>::Err| Error::Error(e.to_string()))
@@ -51,9 +52,10 @@ where
     #[clap(short, long)]
     /// Log level set to 'debug'
     pub debug: bool,
-    #[clap(short = 'c', short_alias='e', alias="environment", long, value_parser = parse_cluster::<T>, default_value_t)]
+    #[clap(short = 'c', short_alias='e', alias="environment", long, value_parser = parse_cluster::<T>, default_value_t, hide_default_value=true)]
     /// The cluster to use
     cluster: T,
+    #[clap(long)]
     /// Topics to consume
     #[clap(
         short,
@@ -90,6 +92,8 @@ where
     #[clap(long)]
     /// Use a specific config file
     pub config: Option<PathBuf>,
+    #[clap(skip)]
+    pub(crate) logs_file: Option<PathBuf>,
 }
 
 #[derive(Debug, Clone, EnumString, Display)]
@@ -131,6 +135,16 @@ where
         }
     }
 
+    pub(crate) fn cluster(&self) -> T {
+        self.cluster.clone()
+    }
+
+    /// Returns the kafka client config
+    pub fn yozefu_config(&self) -> Result<YozefuConfig, Error> {
+        let cluster_config = self.cluster_config(&self.cluster)?;
+        Ok(YozefuConfig::new(cluster_config))
+    }
+
     /// Returns the search query to use.
     fn query(&self, config: &GlobalConfig) -> Result<String, Error> {
         let q = self.query.join(" ").trim().to_string();
@@ -167,10 +181,6 @@ where
         Ok(config)
     }
 
-    pub(crate) fn cluster(&self) -> T {
-        self.cluster.clone()
-    }
-
     fn themes(file: &Path) -> Result<HashMap<String, Theme>, Error> {
         let content = fs::read_to_string(file)?;
         let themes: HashMap<String, Theme> = serde_json::from_str(&content).map_err(|e| {
@@ -181,6 +191,47 @@ where
             ))
         })?;
         Ok(themes)
+    }
+
+    // Validate the cluster name provided by the user.
+    // If the cluster name is not provided (`self.cluster` is an empty string), it will return an error.
+    // If the cluster name is not found in the configuration file, it will return an error.
+    fn cluster_config(&self, cluster: &T) -> Result<ClusterConfig, TuiError> {
+        let config = self.read_config()?;
+        let available_clusters = config.clusters.keys().collect_vec().into_iter().join(", ");
+        match self.cluster().to_string().is_empty() {
+            true => {
+                let mut cmd = Cli::<T>::command();
+                cmd.error(
+                    ErrorKind::MissingRequiredArgument,
+                    format!(
+                        "Argument '--cluster' was not provided. Possible clusters: [{}]",
+                        available_clusters
+                    ),
+                )
+                .exit();
+            }
+            false => {
+                if !config.clusters.contains_key(&cluster.to_string()) {
+                    return Err(Error::Error(format!(
+                        "Unknown cluster '{}'. Possible clusters: [{}].",
+                        cluster, available_clusters
+                    ))
+                    .into());
+                }
+            }
+        };
+        Ok(config.clusters.get(&cluster.to_string()).unwrap().clone())
+    }
+
+    fn read_config(&self) -> Result<GlobalConfig, Error> {
+        match GlobalConfig::read(&GlobalConfig::path()?) {
+            Ok(mut config) => {
+                config.logs = self.logs_file.clone();
+                Ok(config)
+            }
+            Err(e) => Err(e),
+        }
     }
 
     async fn load_theme(file: &Path, name: &str) -> Result<Theme, Error> {

@@ -64,16 +64,6 @@ where
         self
     }
 
-    fn read_config(&self) -> Result<GlobalConfig, Error> {
-        match GlobalConfig::read(&GlobalConfig::path()?) {
-            Ok(mut config) => {
-                config.logs = self.logs_file.clone();
-                Ok(config)
-            }
-            Err(e) => Err(e),
-        }
-    }
-
     async fn run(&self, yozefu_config: Option<YozefuConfig>) -> Result<(), TuiError> {
         init_files().await?;
         match &self.subcommands {
@@ -81,21 +71,13 @@ where
             None => {
                 // Load the config from the yozefu config file
                 let yozefu_config = match yozefu_config {
-                    None => self.yozefu_config_of(self.default_command.cluster())?,
+                    None => self.default_command.yozefu_config()?,
                     Some(c) => c,
                 };
-                let command = self.default_command.clone();
+                let mut command = self.default_command.clone();
+                command.logs_file = self.logs_file.clone();
                 command.execute(yozefu_config).await
             }
-        }
-    }
-
-    /// Returns the kafka client config
-    fn yozefu_config_of(&self, cluster: T) -> Result<YozefuConfig, Error> {
-        let config = self.read_config()?;
-        match config.clusters.get(&cluster.to_string()) {
-            Some(c) => Ok(YozefuConfig::new(c.clone())),
-            None => Err(Error::Error(format!("Unknown cluster '{}'. Make sure you have defined a configuration for this cluster or specify another cluster with the '--cluster' option.", cluster))),
         }
     }
 }
