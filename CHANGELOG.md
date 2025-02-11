@@ -1,3 +1,20 @@
+## What's Changed in v0.0.7
+* Develop by @Mcdostone in [#42](https://github.com/MAIF/yozefu/pull/42)
+* build: update dependencies by @Mcdostone
+* refactor: cached filters are now passed to the `SearchContext` by @Mcdostone
+* refactor: introducing the trait `Cluster` for the `--cluster` argument by @Mcdostone
+* fix: trying to get rid of static variables by @Mcdostone
+* refactor: simplify the `Component` trait by @Mcdostone
+* refactor: Move common dependencies to the root `Cargo.toml` by @Mcdostone
+* refactor: remove `#[async_trait]` from `Search` trait by @Mcdostone
+* refactor: make TUI components `pub(crate)` by @Mcdostone
+* docs: add screenshots of the tool by @Mcdostone
+* docs: make try-it.sh display the URL to download yozefu based on user's machine by @Mcdostone
+* fix: make cluster argument not optional since it's required by @Mcdostone
+* Changelog for v0.0.6 by @github-actions[bot] in [#41](https://github.com/MAIF/yozefu/pull/41)
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.6...v0.0.7
+
 ## What's Changed in v0.0.6
 * Develop by @Mcdostone in [#37](https://github.com/MAIF/yozefu/pull/37)
 * build: update dependencies by @Mcdostone
