@@ -25,7 +25,7 @@ By default, [the kafka consumer is configured](https://github.com/MAIF/yozefu/bl
 
 <a href="https://mcdostone.github.io/yozefu.mp4" target="_blank">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./docs/screenshots/dark.png">
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/MAIF/yozefu/raw/HEAD/docs/screenshots/light.png">
     <img alt="Demo of Yozefu. In this demo, the user selects a topic and sees and real time new records published to Kafka." src="./docs/screenshots/light.png">
   </picture>
 </a>
