@@ -101,7 +101,6 @@ jobs:
         run: |
           echo "release=$(bash ./.github/workflows/semver.sh diff ${{ needs.setup.outputs.currentVersion }} ${{ needs.setup.outputs.nextVersion }})" >> "$GITHUB_OUTPUT"
       - name: Prepare report.md
-        if: ${{ needs.setup.outputs.nextVersion == '' }}
         run: |
           {
           printf "> [!WARNING]"
@@ -109,7 +108,6 @@ jobs:
           printf '```bash'
           } > ./report.md
       - name: Run cargo semver-checks
-        if: ${{ needs.setup.outputs.nextVersion != '' && steps.semver.outputs.release  != '' }}
         id: check
         run: |
           printf "\`cargo-semver-checks\` has detected some issues: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\n" > report.md
@@ -174,7 +172,7 @@ jobs:
             printf "\n"
             echo '```shell'
             printf "git checkout %s\n" "$branch"
-            echo "cargo release ${{ steps.bump.outputs.bump }} --no-push --no-publish --no-confirm --execute"
+            echo "cargo release ${{ steps.bump.outputs.bump }} --no-push --no-tag --no-publish --no-confirm --execute"
             echo "git push"
             echo '```'
             echo "More details at https://github.com/MAIF/yozefu/blob/main/docs/release/README.md"
