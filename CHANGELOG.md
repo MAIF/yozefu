@@ -1,3 +1,13 @@
+## What's Changed in 0.0.8
+* chore: Release version v0.0.8
+* build: update dependencies
+* build: `strum` as a workspace dependency
+* ci: compute the next version instead of failing the github action
+* docs: fix video link on crates.io
+* fix: better error message when the cluster is unknown or missing
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.8...0.0.8
+
 ## What's Changed in v0.0.7
 * Develop by @Mcdostone in [#42](https://github.com/MAIF/yozefu/pull/42)
 * build: update dependencies by @Mcdostone
