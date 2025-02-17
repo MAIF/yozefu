@@ -17,7 +17,7 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 chrono = { version = "0.4.39", features = ["serde"], optional = true }
 itertools = "0.14.0"
-strum = { version = "0.27.0", features = ["derive", "strum_macros"], optional = true }
+strum = { version = "0.27.1", features = ["derive", "strum_macros"], optional = true }
 fuzzydate = {version = "0.2.2", optional = true }
 nom = "8.0.0"
 rdkafka = { version = "0.37.0", features = [], optional = true}
