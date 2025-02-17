@@ -1,3 +1,18 @@
+## What's Changed in v0.0.8
+* fix: better error message when the cluster is unknown or missing by @Mcdostone in [#45](https://github.com/MAIF/yozefu/pull/45)
+* build: update dependencies by @Mcdostone
+* build: `strum` as a workspace dependency by @Mcdostone
+* ci: compute the next version instead of failing the github action by @Mcdostone
+* docs: fix video link on crates.io by @Mcdostone
+* fix: better error message when the cluster is unknown or missing by @Mcdostone
+* refactor: change error message when the cluster is unknown by @Mcdostone
+* refactor: specify the MSRV by @Mcdostone
+* build: update Dockerfile by @Mcdostone
+* docs: fix screenshot URLs by @Mcdostone
+* Changelog for v0.0.7 by @github-actions[bot] in [#44](https://github.com/MAIF/yozefu/pull/44)
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.7...v0.0.8
+
 ## What's Changed in v0.0.7
 * Develop by @Mcdostone in [#42](https://github.com/MAIF/yozefu/pull/42)
 * build: update dependencies by @Mcdostone
