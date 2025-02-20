@@ -18,10 +18,10 @@ mod vertical_scrollable_block;
 
 use crossterm::event::{KeyEvent, MouseEvent};
 use ratatui::{
+    Frame,
     layout::Rect,
     style::{Style, Stylize},
     widgets::{Block, BorderType},
-    Frame,
 };
 pub(crate) use root_component::RootComponent;
 pub(crate) use shortcut::Shortcut;
@@ -35,7 +35,7 @@ pub use state::State;
 
 use serde::Deserialize;
 
-use crate::{records_buffer::RecordsBuffer, tui::Event, Action, TuiError};
+use crate::{Action, TuiError, records_buffer::RecordsBuffer, tui::Event};
 
 pub(crate) type ConcurrentRecordsBuffer = LazyLock<Arc<Mutex<RecordsBuffer>>>;
 static BUFFER: ConcurrentRecordsBuffer =

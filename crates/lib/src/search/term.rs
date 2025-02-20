@@ -1,11 +1,11 @@
 use std::fmt::Display;
 
 use nom::{
-    branch::alt, bytes::complete::tag, combinator::map, sequence::preceded, IResult, Parser,
+    IResult, Parser, branch::alt, bytes::complete::tag, combinator::map, sequence::preceded,
 };
 
 use super::{
-    atom::{parse_atom, Atom},
+    atom::{Atom, parse_atom},
     wsi::wsi,
 };
 

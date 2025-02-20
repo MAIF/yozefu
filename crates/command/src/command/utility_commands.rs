@@ -7,8 +7,8 @@ use strum::{Display, EnumString};
 use crate::log::init_logging_stderr;
 
 use super::{
-    config_command::ConfigCommand, configure::ConfigureCommand, Command, CreateFilterCommand,
-    ImportFilterCommand,
+    Command, CreateFilterCommand, ImportFilterCommand, config_command::ConfigCommand,
+    configure::ConfigureCommand,
 };
 
 #[derive(Subcommand, Debug)]

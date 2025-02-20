@@ -1,9 +1,9 @@
 //! Scroll state for the widgets with vertical scroll
 
 use ratatui::{
+    Frame,
     layout::Rect,
     widgets::{Scrollbar, ScrollbarOrientation, ScrollbarState as RatatuiScrollbarState},
-    Frame,
 };
 
 #[derive(Default)]

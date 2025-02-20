@@ -1,8 +1,8 @@
 //! This component is a layout component that renders `[TopicsComponent]` and `[RecordsComponent]`.
 use ratatui::{
+    Frame,
     layout::{Constraint, Direction, Layout, Rect},
     widgets::Clear,
-    Frame,
 };
 use std::sync::{Arc, Mutex};
 

@@ -3,11 +3,11 @@ use std::{
     sync::{LazyLock, Mutex},
 };
 
-use extism::{convert::Json, Plugin};
+use extism::{Plugin, convert::Json};
 use itertools::Itertools;
 use lib::{
-    search::filter::{Filter, FilterInput},
     FilterResult,
+    search::filter::{Filter, FilterInput},
 };
 
 use super::{Search, SearchContext};

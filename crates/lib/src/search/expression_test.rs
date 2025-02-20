@@ -1,7 +1,7 @@
 use crate::search::{
     atom::Atom,
     compare::{CompareExpression, NumberOperator, StringOperator},
-    expression::{parse_or_expression, AndExpression, Expression},
+    expression::{AndExpression, Expression, parse_or_expression},
     term::Term,
 };
 

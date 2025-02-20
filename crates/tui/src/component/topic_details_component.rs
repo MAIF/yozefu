@@ -6,18 +6,18 @@ use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use itertools::Itertools;
 use lib::{ConsumerGroupDetail, ConsumerGroupState, TopicDetail};
 use ratatui::{
+    Frame,
     layout::{Alignment, Constraint, Margin, Rect},
     style::{Modifier, Style, Stylize},
     text::{Line, Span, Text},
     widgets::{
         Block, BorderType, Borders, Cell, Clear, Padding, Paragraph, Row, Table, TableState,
     },
-    Frame,
 };
 use thousands::Separable;
 use tokio::sync::mpsc::UnboundedSender;
 
-use crate::{error::TuiError, Action, Notification};
+use crate::{Action, Notification, error::TuiError};
 
 use super::{Component, ComponentName, State, WithHeight};
 

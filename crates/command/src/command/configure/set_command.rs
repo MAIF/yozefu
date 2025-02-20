@@ -39,13 +39,16 @@ impl CliCommand for ConfigureSetCommand {
             serde_json::from_str(&self.value).unwrap_or(Value::String(self.value.clone()));
         match std::mem::discriminant(old_value) == std::mem::discriminant(&new_value) {
             true => {
-                let _  = std::mem::replace(old_value, new_value);
+                let _ = std::mem::replace(old_value, new_value);
                 info!("'{}' is now equal to '{}'", property_name, old_value);
                 let c: GlobalConfig = serde_json::from_value(config)?;
                 fs::write(file, serde_json::to_string_pretty(&c)?)?;
                 Ok(())
-            },
-            false => Err(Error::Error(format!("Old value is '{}'. The new value is '{}'. As you can see, these are 2 different types", old_value, new_value))),
+            }
+            false => Err(Error::Error(format!(
+                "Old value is '{}'. The new value is '{}'. As you can see, these are 2 different types",
+                old_value, new_value
+            ))),
         }
     }
 }

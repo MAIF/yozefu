@@ -2,18 +2,18 @@
 
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::{
+    Frame,
     layout::Rect,
     style::Stylize,
     text::{Line, Span},
     widgets::{Block, BorderType, Borders, Clear, Padding, Paragraph, Wrap},
-    Frame,
 };
 
-use crate::{error::TuiError, Action};
+use crate::{Action, error::TuiError};
 
 use super::{
-    issue_component::IssueComponent, scroll_state::ScrollState, Component, ComponentName, Shortcut,
-    State,
+    Component, ComponentName, Shortcut, State, issue_component::IssueComponent,
+    scroll_state::ScrollState,
 };
 
 const HELP_HEIGHT: usize = 42;

@@ -1,12 +1,12 @@
 //! This app is both a kafka consumer and a kafka admin client.
 use lib::{
-    kafka::SchemaRegistryClient, search::offset::FromOffset, ConsumerGroupDetail, Error,
-    ExportedKafkaRecord, KafkaRecord, TopicDetail,
+    ConsumerGroupDetail, Error, ExportedKafkaRecord, KafkaRecord, TopicDetail,
+    kafka::SchemaRegistryClient, search::offset::FromOffset,
 };
 use log::{info, warn};
 use rdkafka::{
-    consumer::{BaseConsumer, Consumer, StreamConsumer},
     Offset, TopicPartitionList,
+    consumer::{BaseConsumer, Consumer, StreamConsumer},
 };
 use thousands::Separable;
 

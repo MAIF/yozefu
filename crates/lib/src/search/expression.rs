@@ -8,13 +8,13 @@
 /// ```
 use std::fmt::Display;
 
-use nom::bytes::complete::tag_no_case;
 use nom::Parser;
+use nom::bytes::complete::tag_no_case;
 use nom::{
-    branch::alt, bytes::complete::tag, combinator::map, multi::many0, sequence::preceded, IResult,
+    IResult, branch::alt, bytes::complete::tag, combinator::map, multi::many0, sequence::preceded,
 };
 
-use super::term::{parse_term, Term};
+use super::term::{Term, parse_term};
 use super::wsi::wsi;
 
 // https://stackoverflow.com/questions/9509048/antlr-parser-for-and-or-logic-how-to-get-expressions-between-logic-operators

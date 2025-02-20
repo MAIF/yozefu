@@ -1,7 +1,7 @@
 //! module defining the configuration of the yozefu application
 
 use super::{Configuration, SchemaRegistryConfig};
-use crate::{configuration::ClusterConfig, APPLICATION_NAME};
+use crate::{APPLICATION_NAME, configuration::ClusterConfig};
 use std::{collections::HashMap, path::PathBuf};
 
 /// composed of kafka properties and
