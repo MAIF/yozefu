@@ -1,6 +1,6 @@
 use lib::{
-    search::{filter::Filter, offset::FromOffset},
     SearchQuery,
+    search::{filter::Filter, offset::FromOffset},
 };
 
 use super::{Search, SearchContext};

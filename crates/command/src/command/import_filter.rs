@@ -35,7 +35,10 @@ impl Command for ImportFilterCommand {
         let destination = self.destination()?;
         let name = self.name();
         if fs::metadata(&destination).is_ok() && !self.force {
-            return Err(Error::Error(format!("The wasm function '{}' already exists. If you want to import it again, please delete it first or use the '--force' flag.", destination.display())));
+            return Err(Error::Error(format!(
+                "The wasm function '{}' already exists. If you want to import it again, please delete it first or use the '--force' flag.",
+                destination.display()
+            )));
         }
 
         self.check_wasm_module(&self.file)?;
@@ -85,7 +88,7 @@ fn check_presence_of_functions(plugin: &mut Plugin) -> Result<(), Error> {
                 return Err(Error::Error(format!(
                     "'{}' is missing in the search filter. Make sure the wasm module exports a '{}' filter",
                     function_name, function_name
-                )))
+                )));
             }
         }
     }

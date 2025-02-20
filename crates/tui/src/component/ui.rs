@@ -1,7 +1,7 @@
 //! Module gathering the code to run the terminal user interface.
 
-use app::search::{Search, SearchContext};
 use app::App;
+use app::search::{Search, SearchContext};
 use chrono::DateTime;
 use crossterm::event::KeyEvent;
 use futures::{StreamExt, TryStreamExt};
@@ -9,9 +9,9 @@ use itertools::Itertools;
 use lib::KafkaRecord;
 use log::{error, info, warn};
 use ratatui::prelude::Rect;
+use rdkafka::Message;
 use rdkafka::consumer::{Consumer, StreamConsumer};
 use rdkafka::message::OwnedMessage;
-use rdkafka::Message;
 use std::collections::HashSet;
 use std::fs;
 use std::time::Duration;
@@ -26,7 +26,7 @@ use crate::error::TuiError;
 use crate::schema_detail::SchemaDetail;
 use crate::tui;
 
-use super::{ConcurrentRecordsBuffer, State, BUFFER};
+use super::{BUFFER, ConcurrentRecordsBuffer, State};
 
 pub struct Ui {
     app: App,

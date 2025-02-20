@@ -6,8 +6,8 @@ pub mod error;
 
 #[cfg(feature = "native")]
 pub use {
-    error::Error, kafka::topic::*, kafka::ExportedKafkaRecord, search::parse_search_query,
-    search::SearchQuery,
+    error::Error, kafka::ExportedKafkaRecord, kafka::topic::*, search::SearchQuery,
+    search::parse_search_query,
 };
 
 pub mod kafka;
@@ -15,5 +15,5 @@ pub mod search;
 pub use kafka::Comparable;
 pub use kafka::DataType;
 pub use kafka::KafkaRecord;
-pub use search::compare::StringOperator;
 pub use search::FilterResult;
+pub use search::compare::StringOperator;

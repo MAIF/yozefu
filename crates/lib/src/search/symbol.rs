@@ -1,12 +1,12 @@
 //! Symbols built-in variables representing each attribute of a kafka record
 //! Symbols have also aliases: 't' for 'topic, 'o' for 'offset'...
 use nom::{
+    IResult, Parser,
     branch::alt,
     bytes::complete::{tag, tag_no_case, take_while},
     combinator::{map, opt, recognize, value},
     error::ErrorKind,
     sequence::preceded,
-    IResult, Parser,
 };
 use strum::Display;
 

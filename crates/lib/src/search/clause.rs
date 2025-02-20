@@ -1,17 +1,17 @@
-use nom::bytes::complete::tag_no_case;
 /// Clauses are similar to clauses in the SQL language.
 use nom::Parser;
+use nom::bytes::complete::tag_no_case;
 use nom::{
+    IResult,
     branch::alt,
     combinator::{map, opt},
     sequence::{pair, preceded},
-    IResult,
 };
 
-use super::expression::{parse_or_expression, Expression};
+use super::expression::{Expression, parse_or_expression};
 use super::number::parse_unsigned_number;
-use super::offset::{parse_from_offset, FromOffset};
-use super::order::{parse_order, parse_order_keyword, Order, OrderKeyword};
+use super::offset::{FromOffset, parse_from_offset};
+use super::order::{Order, OrderKeyword, parse_order, parse_order_keyword};
 use super::wsi::wsi;
 
 #[derive(Debug, Clone, PartialEq)]

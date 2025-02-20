@@ -5,18 +5,18 @@ use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use itertools::Itertools;
 use lib::ExportedKafkaRecord;
 use ratatui::{
+    Frame,
     layout::{Alignment, Constraint, Rect},
     style::{Style, Stylize},
     text::{Span, Text},
     widgets::{Block, BorderType, Borders, Cell, Row, Table, TableState},
-    Frame,
 };
 use thousands::Separable;
 use throbber_widgets_tui::ThrobberState;
 use tokio::sync::mpsc::UnboundedSender;
 use tokio::sync::watch::Receiver;
 
-use crate::{action::Notification, error::TuiError, records_buffer::BufferAction, Action};
+use crate::{Action, action::Notification, error::TuiError, records_buffer::BufferAction};
 
 use super::{Component, ComponentName, ConcurrentRecordsBuffer, Shortcut, State};
 

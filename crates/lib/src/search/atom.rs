@@ -2,13 +2,13 @@
 use std::fmt::Display;
 
 use nom::{
-    branch::alt, bytes::complete::tag, combinator::map, sequence::delimited, IResult, Parser,
+    IResult, Parser, branch::alt, bytes::complete::tag, combinator::map, sequence::delimited,
 };
 
 use super::{
-    compare::{parse_compare, CompareExpression},
-    expression::{parse_or_expression, Expression},
-    filter::{parse_filter, Filter},
+    compare::{CompareExpression, parse_compare},
+    expression::{Expression, parse_or_expression},
+    filter::{Filter, parse_filter},
     symbol::Symbol,
     wsi::wsi,
 };

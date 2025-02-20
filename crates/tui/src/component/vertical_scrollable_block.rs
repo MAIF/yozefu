@@ -1,9 +1,9 @@
 use super::{Component, Shortcut, WithHeight};
 use crossterm::event::{KeyCode, KeyEvent, MouseEvent};
 use ratatui::{
+    Frame,
     layout::{Margin, Rect},
     widgets::{Block, Scrollbar, ScrollbarOrientation, ScrollbarState},
-    Frame,
 };
 use tokio::sync::mpsc::UnboundedSender;
 

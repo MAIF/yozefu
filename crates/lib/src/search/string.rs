@@ -1,9 +1,9 @@
 use nom::{
+    IResult, Parser,
     branch::alt,
     bytes::complete::{tag, take_until},
     combinator::map,
     sequence::delimited,
-    IResult, Parser,
 };
 
 /// A string is delimited by single or double quotes.

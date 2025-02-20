@@ -4,8 +4,8 @@ use std::fmt::Display;
 use crate::search::wsi::wsi;
 #[cfg(feature = "native")]
 use nom::{
-    branch::alt, bytes::complete::tag, bytes::complete::tag_no_case, combinator::value,
-    sequence::pair, IResult, Parser,
+    IResult, Parser, branch::alt, bytes::complete::tag, bytes::complete::tag_no_case,
+    combinator::value, sequence::pair,
 };
 
 #[derive(Debug, PartialEq, Clone, Eq)]

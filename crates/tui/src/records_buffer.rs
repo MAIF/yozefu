@@ -6,8 +6,8 @@
 
 use circular_buffer::{CircularBuffer, Iter};
 use lib::{
-    search::{Order, OrderBy},
     KafkaRecord,
+    search::{Order, OrderBy},
 };
 use rayon::prelude::*;
 use tokio::sync::watch::{self, Receiver, Sender};
