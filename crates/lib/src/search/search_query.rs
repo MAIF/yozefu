@@ -1,16 +1,16 @@
 use itertools::Itertools;
 use nom::{
+    Parser,
     branch::alt,
     combinator::{eof, map},
     multi::many_till,
-    Parser,
 };
 
 use crate::error::SearchError;
 
 use super::{
     clause::{
-        parse_expression, parse_from_offset_clause, parse_limit, parse_order_by, SearchClause,
+        SearchClause, parse_expression, parse_from_offset_clause, parse_limit, parse_order_by,
     },
     expression::Expression,
     offset::FromOffset,

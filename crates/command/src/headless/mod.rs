@@ -1,10 +1,10 @@
 //! Module gathering code for the headless mode.
 
+use app::App;
 use app::search::Search;
 use app::search::SearchContext;
-use app::App;
-use rdkafka::message::OwnedMessage;
 use rdkafka::Message;
+use rdkafka::message::OwnedMessage;
 use std::time::Duration;
 use std::time::Instant;
 use tokio::select;

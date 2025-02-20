@@ -155,6 +155,7 @@ jobs:
         run: |
           b="major"
           for t in patch minor; do
+            echo "Checking whether the next version is $t"
             if cargo semver-checks --color never --package yozefu-lib --package yozefu-app --package yozefu-wasm-types --package yozefu-command --baseline-rev "${{ needs.setup.outputs.currentVersion }}" --release-type "$t"; then
               b="$t"
               break
@@ -163,7 +164,6 @@ jobs:
           echo $b
           echo "bump=$b" >> "$GITHUB_OUTPUT"
       - name: Comment the pull request
-        
         run: |
           echo "::info title=Next version:: Last public version is '${{ needs.setup.outputs.currentVersion }}' but version of this branch is '${{ needs.setup.outputs.nextVersion }}'."
           {

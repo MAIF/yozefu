@@ -68,7 +68,7 @@ impl CliCommand for ConfigureGetCommand {
                         return Err(Error::Error(format!(
                             "There is no '{}' property in the config file",
                             self.property
-                        )))
+                        )));
                     }
                 }
                 Ok(())

@@ -1,11 +1,11 @@
 use std::fmt::Display;
 
 use nom::{
+    IResult, Parser,
     branch::alt,
     bytes::{complete::tag, tag_no_case},
     combinator::{map, value},
     sequence::preceded,
-    IResult, Parser,
 };
 
 use super::{

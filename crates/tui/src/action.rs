@@ -1,7 +1,7 @@
 use app::search::ValidSearchQuery;
 use std::collections::HashSet;
 
-use lib::{kafka::SchemaId, search::OrderBy, KafkaRecord, TopicDetail};
+use lib::{KafkaRecord, TopicDetail, kafka::SchemaId, search::OrderBy};
 
 use crate::schema_detail::SchemaDetail;
 

@@ -3,7 +3,7 @@ use rdkafka::message::OwnedMessage;
 use serde::Deserialize;
 use std::fs;
 use tokio::runtime::Runtime;
-use yozefu_lib::{parse_search_query, ExportedKafkaRecord, KafkaRecord};
+use yozefu_lib::{ExportedKafkaRecord, KafkaRecord, parse_search_query};
 
 #[test]
 fn test_inputs() {

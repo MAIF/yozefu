@@ -4,15 +4,15 @@ use std::collections::HashSet;
 use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers};
 use itertools::Itertools;
 use ratatui::{
+    Frame,
     layout::{Constraint, Direction, Layout, Position, Rect},
     style::{Style, Stylize},
     widgets::{Block, BorderType, Borders, Clear, List, ListItem, ListState, Padding, Paragraph},
-    Frame,
 };
 use tokio::sync::mpsc::UnboundedSender;
-use tui_input::{backend::crossterm::EventHandler, Input};
+use tui_input::{Input, backend::crossterm::EventHandler};
 
-use crate::{error::TuiError, Action};
+use crate::{Action, error::TuiError};
 
 use super::{Component, ComponentName, Shortcut, State};
 

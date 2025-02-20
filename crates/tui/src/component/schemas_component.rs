@@ -5,21 +5,21 @@
 
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::{
+    Frame,
     layout::Rect,
     style::{Style, Stylize},
     text::{Line, Span, Text},
     widgets::{Block, Borders, Clear, Padding, Paragraph, Wrap},
-    Frame,
 };
 use tokio::sync::mpsc::UnboundedSender;
 
 use crate::{
+    Action,
     error::TuiError,
     schema_detail::{ExportedSchemasDetails, SchemaDetail},
-    Action,
 };
 
-use super::{scroll_state::ScrollState, Component, ComponentName, Shortcut, State};
+use super::{Component, ComponentName, Shortcut, State, scroll_state::ScrollState};
 
 #[derive(Default)]
 pub(crate) struct SchemasComponent<'a> {

@@ -19,13 +19,13 @@
 
 use itertools::Itertools;
 use nom::{
+    IResult, Parser,
     branch::alt,
     bytes::complete::tag,
     character::complete::{alphanumeric1, one_of},
     combinator::{map, recognize},
     multi::{many1, separated_list0},
     sequence::delimited,
-    IResult, Parser,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{Number, Value};

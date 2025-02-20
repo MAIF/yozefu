@@ -1,10 +1,10 @@
 use chrono::{DateTime, Local};
 use fuzzydate::parse;
 use nom::{
+    IResult, Parser,
     branch::alt,
     bytes::complete::tag_no_case,
     combinator::{map_res, value},
-    IResult, Parser,
 };
 
 use super::{string::parse_string, wsi::wsi};

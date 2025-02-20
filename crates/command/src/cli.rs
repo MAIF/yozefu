@@ -2,8 +2,8 @@
 use crate::cluster::Cluster;
 use crate::command::{Command, MainCommand, UtilityCommands};
 use crate::theme::init_themes_file;
-use app::configuration::{ClusterConfig, GlobalConfig, SchemaRegistryConfig, YozefuConfig};
 use app::APPLICATION_NAME;
+use app::configuration::{ClusterConfig, GlobalConfig, SchemaRegistryConfig, YozefuConfig};
 use clap::command;
 use lib::Error;
 use reqwest::Url;

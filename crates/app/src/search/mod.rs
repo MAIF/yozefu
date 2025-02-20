@@ -10,9 +10,8 @@ use extism::{Manifest, Plugin, Wasm};
 use filter::{CACHED_FILTERS, PARSE_PARAMETERS_FUNCTION_NAME};
 use itertools::Itertools;
 use lib::{
-    parse_search_query,
+    KafkaRecord, SearchQuery, parse_search_query,
     search::{filter::Filter, offset::FromOffset},
-    KafkaRecord, SearchQuery,
 };
 use log::error;
 

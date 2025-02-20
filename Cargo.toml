@@ -18,18 +18,18 @@ default-members = [
     "crates/wasm-types",
 #    "crates/wasm-blueprints/rust",
 ]
+resolver = "3"
 
-resolver = "2"
 
 [workspace.package]
 version = "0.0.8"
-edition = "2021"
+edition = "2024"
 authors = ["Yann Prono <yann.prono@maif.fr>"]
 readme = "README.md"
 homepage = "https://github.com/MAIF/yozefu"
 repository = "https://github.com/MAIF/yozefu.git"
 license = "Apache-2.0"
-rust-version = "1.80.1"
+rust-version = "1.85.0"
 
 
 [workspace.dependencies]
@@ -39,9 +39,9 @@ command = { package = "yozefu-command", path = "crates/command/", version = "0.0
 yozefu = { package = "yozefu", path = "crates/bin/", version = "0.0.8" }
 tui = { package = "yozefu-tui", path = "crates/tui/", version = "0.0.8" }
 wasm-types = { package = "wasm-types", path = "crates/wasm-types/", version = "0.0.8" }
-serde_json = { version = "1.0.138", features = ["preserve_order"] }
-serde = { version = "1.0.217", features = ["derive"] }
-log = {version = "0.4.25" }
+serde_json = { version = "1.0.139", features = ["preserve_order"] }
+serde = { version = "1.0.218", features = ["derive"] }
+log = {version = "0.4.26" }
 strum = {version = "0.27.1" }
 
 [profile.release]

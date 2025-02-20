@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use lib::Error;
-use rdkafka::{config::FromClientConfig, ClientConfig};
+use rdkafka::{ClientConfig, config::FromClientConfig};
 
 mod cluster_config;
 mod global_config;
@@ -9,8 +9,8 @@ mod internal_config;
 mod yozefu_config;
 
 pub use cluster_config::ClusterConfig;
-pub use cluster_config::SchemaRegistryConfig;
 pub use cluster_config::KAFKA_PROPERTIES_WITH_LOCATIONS;
+pub use cluster_config::SchemaRegistryConfig;
 pub use global_config::GlobalConfig;
 pub use internal_config::InternalConfig;
 pub use yozefu_config::YozefuConfig;

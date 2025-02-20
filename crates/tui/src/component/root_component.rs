@@ -10,21 +10,21 @@ use std::{
 
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use ratatui::{
+    Frame,
     layout::{Constraint, Direction, Flex, Layout, Margin, Rect},
     widgets::{Clear, Paragraph},
-    Frame,
 };
 use tokio::sync::{mpsc::UnboundedSender, watch::Receiver};
 
-use crate::{error::TuiError, records_buffer::BufferAction, Action, Notification};
+use crate::{Action, Notification, error::TuiError, records_buffer::BufferAction};
 
 use super::{
-    footer_component::FooterComponent, help_component::HelpComponent,
-    progress_bar_component::ProgressBarComponent, record_details_component::RecordDetailsComponent,
-    records_component::RecordsComponent, schemas_component::SchemasComponent,
-    search_component::SearchComponent, topic_details_component::TopicDetailsComponent,
+    Component, ComponentName, ConcurrentRecordsBuffer, State, footer_component::FooterComponent,
+    help_component::HelpComponent, progress_bar_component::ProgressBarComponent,
+    record_details_component::RecordDetailsComponent, records_component::RecordsComponent,
+    schemas_component::SchemasComponent, search_component::SearchComponent,
+    topic_details_component::TopicDetailsComponent,
     topics_and_records_component::TopicsAndRecordsComponent, topics_component::TopicsComponent,
-    Component, ComponentName, ConcurrentRecordsBuffer, State,
 };
 
 pub(crate) struct RootComponent {
@@ -248,7 +248,10 @@ impl Component for RootComponent {
                 match self.views.first().unwrap() {
                     ComponentName::Records => self.views[0] = ComponentName::TopicsAndRecords,
                     ComponentName::TopicsAndRecords => self.views[0] = ComponentName::Records,
-                    _ => warn!("View '{}' does not support toggling. This instruction should not be unreachable", self.views.first().unwrap()),
+                    _ => warn!(
+                        "View '{}' does not support toggling. This instruction should not be unreachable",
+                        self.views.first().unwrap()
+                    ),
                 }
                 self.notify_footer()?;
                 if self.views.len() == 1 {

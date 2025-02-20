@@ -40,6 +40,8 @@ use chrono::{DateTime, Local, Utc};
 use rdkafka::message::{Headers, Message, OwnedMessage};
 
 #[cfg(feature = "native")]
+use super::SchemaRegistryClient;
+#[cfg(feature = "native")]
 use super::avro::avro_to_json;
 use super::data_type::DataType;
 use super::schema::Schema;
@@ -49,8 +51,6 @@ use super::schema::SchemaId;
 use super::schema::SchemaType;
 #[cfg(feature = "native")]
 use super::schema_registry_client::SchemaResponse;
-#[cfg(feature = "native")]
-use super::SchemaRegistryClient;
 
 #[cfg(feature = "native")]
 impl KafkaRecord {
@@ -176,7 +176,9 @@ impl KafkaRecord {
         DataType::String(format!(
             "  Error: Protobuf deserialization is not supported yet in Yozefu. Any contribution is welcome!\n Github: https://github.com/MAIF/yozefu\nPayload: {:?}\n String: {}\n Schema:\n{}",
             payload,
-            String::from_utf8(payload.to_vec()).unwrap_or_default().trim(),
+            String::from_utf8(payload.to_vec())
+                .unwrap_or_default()
+                .trim(),
             schema,
         ))
     }
@@ -201,10 +203,19 @@ impl KafkaRecord {
                 match serde_json::from_slice(payload) {
                     Ok(e) => (DataType::Json(e), None),
                     Err(_e) => {
-                        match Self::try_deserialize_json(Self::extract_data_from_payload_with_schema_header(payload)) {
+                        match Self::try_deserialize_json(
+                            Self::extract_data_from_payload_with_schema_header(payload),
+                        ) {
                             Ok(e) => (e, Some(Schema::new(id, None))),
-                            Err(_e) => (DataType::String(format!("Yozefu was not able to retrieve the schema {} because there is no schema registry configured. Please visit https://github.com/MAIF/yozefu/blob/main/docs/schema-registry/README.md for more details.\nPayload: {:?}\n String: {}", id, payload,
-                            String::from_utf8(payload.to_vec()).unwrap_or_default())), Some(Schema::new(id, None)))
+                            Err(_e) => (
+                                DataType::String(format!(
+                                    "Yozefu was not able to retrieve the schema {} because there is no schema registry configured. Please visit https://github.com/MAIF/yozefu/blob/main/docs/schema-registry/README.md for more details.\nPayload: {:?}\n String: {}",
+                                    id,
+                                    payload,
+                                    String::from_utf8(payload.to_vec()).unwrap_or_default()
+                                )),
+                                Some(Schema::new(id, None)),
+                            ),
                         }
                     }
                 }
@@ -216,13 +227,16 @@ impl KafkaRecord {
                     Ok(None) => (None, Some(Schema::new(s, None))),
                     Err(_e) => {
                         let payload = payload.unwrap_or_default();
-                        return (DataType::String(
-                            format!("{}.\nYozefu was not able to retrieve the schema {}.\nPlease make sure the schema registry is correctly configured.\nPayload: {:?}\n String: {}", 
-                            _e,
-                            s.0,
-                            payload,
-                            String::from_utf8(payload.to_vec()).unwrap_or_default())),
-                            Some(Schema::new(s, None)));
+                        return (
+                            DataType::String(format!(
+                                "{}.\nYozefu was not able to retrieve the schema {}.\nPlease make sure the schema registry is correctly configured.\nPayload: {:?}\n String: {}",
+                                _e,
+                                s.0,
+                                payload,
+                                String::from_utf8(payload.to_vec()).unwrap_or_default()
+                            )),
+                            Some(Schema::new(s, None)),
+                        );
                     }
                 };
                 match p.len() <= 5 {

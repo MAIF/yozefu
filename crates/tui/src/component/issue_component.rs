@@ -1,9 +1,9 @@
 use ratatui::{
+    Frame,
     layout::{Constraint, Flex, Layout, Rect},
     style::{Style, Stylize},
     text::Line,
     widgets::{Block, BorderType, Borders, Clear, Padding, Paragraph},
-    Frame,
 };
 
 use crate::error::TuiError;

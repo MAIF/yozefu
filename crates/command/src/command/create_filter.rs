@@ -11,8 +11,8 @@ use log::{info, warn};
 use strum::{Display, EnumIter, EnumString};
 
 use crate::{
-    command::{default_editor, Command},
     APPLICATION_NAME,
+    command::{Command, default_editor},
 };
 use std::process::Command as ProcessCommand;
 

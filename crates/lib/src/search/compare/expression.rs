@@ -8,13 +8,13 @@ use std::fmt::Display;
 
 #[cfg(feature = "native")]
 use chrono::{DateTime, Local};
-use nom::bytes::complete::tag_no_case;
 use nom::Parser;
+use nom::bytes::complete::tag_no_case;
 use nom::{
+    IResult,
     branch::alt,
     bytes::complete::tag,
     combinator::{map, value},
-    IResult,
 };
 
 use super::number::NumberOperator;
@@ -78,8 +78,8 @@ pub fn parse_compare(input: &str) -> IResult<&str, CompareExpression> {
         number::parse_number,
         string::parse_string,
         symbol::{
-            parse_header_symbol, parse_key, parse_offset, parse_partition, parse_size,
-            parse_timestamp_symbol, parse_topic, parse_value_symbol, Symbol,
+            Symbol, parse_header_symbol, parse_key, parse_offset, parse_partition, parse_size,
+            parse_timestamp_symbol, parse_topic, parse_value_symbol,
         },
         timestamp::parse_timestamp,
         wsi::wsi,

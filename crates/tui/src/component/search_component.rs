@@ -8,17 +8,17 @@ use std::{path::PathBuf, time::Duration};
 use app::search::ValidSearchQuery;
 use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers};
 use itertools::Itertools;
-use lib::{error::SearchError, Error};
+use lib::{Error, error::SearchError};
 use ratatui::{
+    Frame,
     layout::{Position, Rect},
     style::{Style, Stylize},
     text::{Line, Span},
     widgets::{Block, BorderType, Borders, Padding, Paragraph, Wrap},
-    Frame,
 };
 use tokio::{select, sync::mpsc::UnboundedSender, time::Instant};
 use tokio_util::sync::CancellationToken;
-use tui_input::{backend::crossterm::EventHandler, Input};
+use tui_input::{Input, backend::crossterm::EventHandler};
 
 use crate::{
     error::TuiError,

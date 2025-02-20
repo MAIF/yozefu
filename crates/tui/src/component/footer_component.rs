@@ -2,10 +2,10 @@
 use crossterm::event::KeyEvent;
 
 use ratatui::{
+    Frame,
     layout::Rect,
     style::{Color, Style, Stylize},
     text::{Line, Span},
-    Frame,
 };
 use tokio::sync::mpsc::UnboundedSender;
 

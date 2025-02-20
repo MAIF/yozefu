@@ -1,11 +1,11 @@
+use nom::Parser;
 use nom::character::complete::char;
 use nom::multi::many0;
-use nom::Parser;
 use nom::{
+    IResult,
     character::complete::digit1,
     combinator::{map_res, opt, recognize},
     sequence::pair,
-    IResult,
 };
 
 /// Parses an unsigned number.

@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use crate::search::wsi::wsi;
 use nom::Parser;
-use nom::{branch::alt, bytes::complete::tag, combinator::value, IResult};
+use nom::{IResult, branch::alt, bytes::complete::tag, combinator::value};
 
 #[derive(Debug, PartialEq, Clone, Eq)]
 pub enum NumberOperator {

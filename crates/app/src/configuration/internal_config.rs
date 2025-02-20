@@ -6,7 +6,7 @@ use chrono::Local;
 
 use crate::configuration::{GlobalConfig, SchemaRegistryConfig};
 
-use super::{yozefu_config::YozefuConfig, Configuration};
+use super::{Configuration, yozefu_config::YozefuConfig};
 
 #[derive(Debug, Clone)]
 pub struct InternalConfig {

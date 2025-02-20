@@ -23,17 +23,17 @@ use lib::Error;
 use log::{debug, info, warn};
 use rdkafka::consumer::BaseConsumer;
 use strum::{Display, EnumString};
-use tui::error::TuiError;
 use tui::Theme;
+use tui::error::TuiError;
 use tui::{State, Ui};
 
+use crate::headless::Headless;
 use crate::headless::formatter::{
     JsonFormatter, KafkaFormatter, PlainFormatter, SimpleFormatter, TransposeFormatter,
 };
-use crate::headless::Headless;
 use crate::log::{init_logging_file, init_logging_stderr};
 use crate::theme::update_themes;
-use crate::{Cli, Cluster, APPLICATION_NAME};
+use crate::{APPLICATION_NAME, Cli, Cluster};
 
 fn parse_cluster<T>(s: &str) -> Result<T, Error>
 where
@@ -118,7 +118,10 @@ where
                     yozefu_config.set_kafka_property(key, value);
                 }
                 None => {
-                    return Err(TuiError::from(Error::Error(format!("Invalid kafka property '{}', expected a '=' symbol to separate the property and its value.", property))));
+                    return Err(TuiError::from(Error::Error(format!(
+                        "Invalid kafka property '{}', expected a '=' symbol to separate the property and its value.",
+                        property
+                    ))));
                 }
             }
         }
@@ -247,13 +250,18 @@ where
             Some(theme) => theme,
             None => {
                 update_themes().await?;
-                warn!("Theme '{}' not found. Available themes are [{}]. Make sure it is defined in '{}'",
-                name,
-                themes.keys().join(", "),
-                file.display());
+                warn!(
+                    "Theme '{}' not found. Available themes are [{}]. Make sure it is defined in '{}'",
+                    name,
+                    themes.keys().join(", "),
+                    file.display()
+                );
 
                 let theme = themes.iter().next().unwrap().1;
-                info!("Since the theme was not found, I'm going to use the first available theme '{}'", theme.name);
+                info!(
+                    "Since the theme was not found, I'm going to use the first available theme '{}'",
+                    theme.name
+                );
                 theme
             }
         };

@@ -1,9 +1,9 @@
 use nom::Parser;
-use nom::{branch::alt, bytes::complete::tag, combinator::value, IResult};
+use nom::{IResult, branch::alt, bytes::complete::tag, combinator::value};
 
 use super::symbol::{
-    parse_key, parse_offset, parse_partition, parse_size, parse_timestamp_symbol, parse_topic,
-    parse_value, Symbol,
+    Symbol, parse_key, parse_offset, parse_partition, parse_size, parse_timestamp_symbol,
+    parse_topic, parse_value,
 };
 use super::wsi::wsi;
 
