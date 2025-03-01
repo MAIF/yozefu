@@ -1,0 +1,14 @@
+{
+    "record": {
+        "value": "",
+        "key": "21965",
+        "topic": "public-french-addresses",
+        "timestamp": 1732479526752,
+        "partition": 0,
+        "offset": 4,
+        "headers": {}
+    },
+    "params": [
+        "965"
+    ]
+}

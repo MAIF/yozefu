@@ -1,0 +1,15 @@
+{
+    "name": "yozefu-wasm-blueprints-rust",
+    "version": "1.0.0",
+    "description": "",
+    "main": "src/index.js",
+    "scripts": {
+      "build": "node esbuild.js && extism-js dist/index.js -i src/index.d.ts -o dist/plugin.wasm"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "BSD-3-Clause",
+    "devDependencies": {
+      "esbuild": "^0.19.6"
+    }
+  }

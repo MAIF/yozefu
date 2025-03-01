@@ -7,6 +7,7 @@ env:
   RUSTDOCFLAGS: '--deny warnings'
   MINIMUM_SUPPORTED_RUST_VERSION: 1.80.1
   GOLANG_VERSION: 1.23.3
+  JS_VERSION: 22
 
 on:
   schedule:
@@ -74,3 +75,21 @@ jobs:
           tinygo-version: '0.34.0'
       - name: Build golang search filter
         run: make -C crates/wasm-blueprints/golang/ build test
+
+  wasm-js:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup JS ${{ env.JS_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.JS_VERSION }}
+      - name: Setup Go ${{ env.GOLANG_VERSION }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GOLANG_VERSION }}
+      - name: Install extism CLI
+        run: go install github.com/extism/cli/extism@latest
+      - name: Build golang search filter
+        run: make -C crates/wasm-blueprints/js/ build test
+        continue-on-error: true
