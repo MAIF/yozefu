@@ -57,7 +57,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Temporary fix in Cargo.toml
         run: sed -i -E 's#git = "ssh.+#path = "../../wasm-types" }#g' crates/wasm-blueprints/rust/Cargo.toml
-      - name: Build rust search filter
+      - name: Build a Rust search filter
         run: make -C crates/wasm-blueprints/rust/ build test
 
   wasm-golang:
@@ -73,7 +73,7 @@ jobs:
       - uses: acifani/setup-tinygo@v2
         with:
           tinygo-version: '0.34.0'
-      - name: Build golang search filter
+      - name: Build a Golang search filter
         run: make -C crates/wasm-blueprints/golang/ build test
 
   wasm-js:
@@ -90,6 +90,6 @@ jobs:
           go-version: ${{ env.GOLANG_VERSION }}
       - name: Install extism CLI
         run: go install github.com/extism/cli/extism@latest
-      - name: Build golang search filter
+      - name: Build a JS search filter
         run: make -C crates/wasm-blueprints/js/ build test
         continue-on-error: true

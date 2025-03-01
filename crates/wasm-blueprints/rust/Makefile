@@ -1,6 +1,6 @@
 .DEFAULT_GOAL = help
 TARGET = module.wasm
-.PHONY: help $(TARGET)
+.PHONY: help
 DOCKER_IMAGE = yozefu-wasm-blueprints-rust
 
 build: ## Try to build the wasm module. If it fails, it tries to build with Docker

@@ -1,6 +1,6 @@
 .DEFAULT_GOAL = help
 TARGET = module.wasm
-.PHONY: help $(TARGET) test
+.PHONY: help test
 DOCKER_IMAGE = yozefu-wasm-blueprints-js
 
 build: ## Try to build the wasm module. If it fails, it tries to build with Docker
@@ -17,7 +17,7 @@ $(TARGET): ## Build the wasm module
 	npm install
 	npm run build
 	
-test: ## Run the tests
+test: $(TARGET) ## Run the tests
 	cat "tests/parameters.json" | extism call --wasi --stdin $(TARGET) parse_parameters
 	cat "tests/match.json" | extism call --stdin $(TARGET) matches | grep -q '"match":true'
 	cat "tests/no-match.json" | extism call --stdin $(TARGET) matches | grep -q '"match":false'

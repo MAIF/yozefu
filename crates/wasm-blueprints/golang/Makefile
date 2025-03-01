@@ -1,12 +1,12 @@
 .DEFAULT_GOAL = help
 TARGET = module.wasm
-.PHONY: help $(TARGET)
+.PHONY: help
 DOCKER_IMAGE = yozefu-wasm-blueprints-golang
 
 build: ## Try to build the wasm module. If it fails, it tries to build with Docker
 	make -S $(TARGET) || make -S build-from-docker
 
-build-from-docker: $(TARGET) ## Build the wasm module with Docker
+build-from-docker: ## Build the wasm module with Docker
 	@echo " 🐋 Trying to build wasm module with docker"
 	docker build -t $(DOCKER_IMAGE) .
 	docker create --name $(DOCKER_IMAGE) $(DOCKER_IMAGE)
