@@ -1,3 +1,15 @@
+## What's Changed in v0.0.9
+* build: rust 1.85.0, 2024 edition by @Mcdostone in [#51](https://github.com/MAIF/yozefu/pull/51)
+* build: update dependencies by @Mcdostone
+* ci: add cargo deny to build CI by @Mcdostone
+* docs: documentation for golang search filter, fix Makefile by @Mcdostone
+* feat: try to add support for JS by @Mcdostone
+* build: rust 1.85.0, 2024 edition by @Mcdostone
+* test: fix try-it.sh by @Mcdostone
+* Changelog for v0.0.8 by @github-actions[bot] in [#50](https://github.com/MAIF/yozefu/pull/50)
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.8...v0.0.9
+
 ## What's Changed in v0.0.8
 * fix: better error message when the cluster is unknown or missing by @Mcdostone in [#45](https://github.com/MAIF/yozefu/pull/45)
 * build: update dependencies by @Mcdostone
