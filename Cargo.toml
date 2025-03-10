@@ -40,7 +40,7 @@ yozefu = { package = "yozefu", path = "crates/bin/", version = "0.0.9" }
 tui = { package = "yozefu-tui", path = "crates/tui/", version = "0.0.9" }
 wasm-types = { package = "wasm-types", path = "crates/wasm-types/", version = "0.0.9" }
 serde_json = { version = "1.0.140", features = ["preserve_order"] }
-serde = { version = "1.0.218", features = ["derive"] }
+serde = { version = "1.0.219", features = ["derive"] }
 log = {version = "0.4.26" }
 strum = {version = "0.27.1" }
 
