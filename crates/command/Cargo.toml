@@ -31,7 +31,7 @@ chrono = "0.4.40"
 strum = { workspace = true, features = ["derive", "strum_macros"] }
 indicatif = { version = "0.17.11", features = ["tokio"] }
 tempfile = "3.17.1"
-tokio-util = "0.7.13"
+tokio-util = "0.7.14"
 futures = "0.3.31"
 itertools = "0.14.0"
 tokio = { version = "1", features = ["full", "tracing"] }
