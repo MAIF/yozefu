@@ -45,7 +45,7 @@ impl Display for Error {
 impl Display for SearchError {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
-            SearchError::Parse(e) => write!(f, "Cannot parse query '{}'", e),
+            SearchError::Parse(e) => write!(f, "Cannot parse the search query at '{}'", e),
         }
     }
 }

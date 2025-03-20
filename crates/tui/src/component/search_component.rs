@@ -9,6 +9,7 @@ use app::search::ValidSearchQuery;
 use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers};
 use itertools::Itertools;
 use lib::{Error, error::SearchError};
+use log::error;
 use ratatui::{
     Frame,
     layout::{Position, Rect},
@@ -66,6 +67,7 @@ impl SearchComponent {
                 _ = tokio::time::sleep(Duration::from_millis(700)) => {
                     if input.len() > 5 {
                         if let Err(e) = ValidSearchQuery::from(&input, &filters_dir) {
+                            error!("{}", e.to_string());
                             tt.as_ref().unwrap().send(Action::Notification(Notification::new(log::Level::Error, e.to_string()))).unwrap();
                         }
                     }
