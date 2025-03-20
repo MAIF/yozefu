@@ -151,3 +151,36 @@ services:
     image: apicurio/apicurio-registry:latest
     ports:
       - "9007:8080"
+
+  conduktor-console:
+    container_name: yozefu-conduktor-console
+    image: conduktor/conduktor-console:1.31.2
+    ports:
+      - "9008:8080"
+    environment:
+      CDK_DATABASE_URL: "postgresql://postgres:rootroot@yozefu-postgresql:5432/conduktor-console"
+      CDK_ORGANIZATION_NAME: "getting-started"
+      CDK_CLUSTERS_0_ID: "kafka"
+      CDK_CLUSTERS_0_NAME: "kafka"
+      CDK_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:19092"
+      CDK_CLUSTERS_0_SCHEMAREGISTRY_URL: "http://schema-registry:${SCHEMA_REGISTRY_PORT:-8081}"
+      CDK_CLUSTERS_0_COLOR: "#6A57C8"
+      CDK_CLUSTERS_0_ICON: "kafka"
+    depends_on:
+      postgresql:
+        condition: service_healthy
+
+  # Conduktor stores its metadata in PostgreSQL.
+  # Consider using an external managed database for production usage.
+  # https://docs.conduktor.io/platform/get-started/configuration/database/
+  postgresql:
+    image: postgres:17
+    container_name: yozefu-postgresql
+    environment:
+      POSTGRES_DB: "conduktor-console"
+      POSTGRES_PASSWORD: "rootroot"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
