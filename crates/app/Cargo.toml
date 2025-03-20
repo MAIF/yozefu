@@ -19,7 +19,7 @@ log = { workspace = true }
 lib = { workspace = true, features = ["native"] }
 itertools = "0.14.0"
 thousands = "0.2.0"
-indexmap = "2.7.1"
+indexmap = "2.8.0"
 rdkafka = { version = "0.37.0", features = ["cmake-build"] }
 extism = "1.10.0"
 url = { version = "2.5.4", features = ["serde"] }
