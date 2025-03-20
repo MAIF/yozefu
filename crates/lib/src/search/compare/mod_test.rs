@@ -1,4 +1,7 @@
-use crate::{search::compare::parse_compare, search::parse_search_query};
+use crate::search::{
+    compare::{parse_compare, parse_equal},
+    parse_search_query,
+};
 
 #[test]
 fn test_parse_compare() {
@@ -19,4 +22,14 @@ fn test_parse_search_query() {
         )
         .is_ok()
     );
+}
+
+#[test]
+fn test_parse_equal() {
+    assert!(parse_equal(r#"="#).is_ok());
+}
+
+#[test]
+fn test_parse_equal_2() {
+    assert!(parse_equal(r#"=="#).is_ok());
 }

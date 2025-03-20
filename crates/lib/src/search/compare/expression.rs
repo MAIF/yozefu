@@ -74,7 +74,7 @@ impl Display for CompareExpression {
 #[cfg(feature = "native")]
 pub fn parse_compare(input: &str) -> IResult<&str, CompareExpression> {
     use crate::search::{
-        compare::string::parse_string_operator,
+        compare::{parse_equal, string::parse_string_operator},
         number::parse_number,
         string::parse_string,
         symbol::{
@@ -99,7 +99,7 @@ pub fn parse_compare(input: &str) -> IResult<&str, CompareExpression> {
         map(
             (
                 value(Symbol::OffsetTail, wsi(tag("offsetTail"))),
-                wsi(tag("==")),
+                parse_equal,
                 wsi(parse_number),
             ),
             |(_, _, r)| CompareExpression::OffsetTail(r),

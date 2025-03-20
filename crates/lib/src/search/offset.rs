@@ -9,6 +9,7 @@ use nom::{
 };
 
 use super::{
+    compare::parse_equal,
     number::parse_number,
     symbol::{parse_end_keyword, parse_offset},
     timestamp::parse_timestamp,
@@ -62,7 +63,7 @@ pub(crate) fn parse_from_offset(input: &str) -> IResult<&str, FromOffset> {
                 wsi(alt((tag("beginning"), tag_no_case("begin")))),
             ),
             map(
-                (parse_offset, wsi(tag("==")), wsi(parse_number)),
+                (parse_offset, parse_equal, wsi(parse_number)),
                 |(_, _, d)| FromOffset::Offset(d),
             ),
             map(wsi(parse_number), FromOffset::Offset),

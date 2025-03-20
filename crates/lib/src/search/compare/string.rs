@@ -29,6 +29,8 @@ impl Display for StringOperator {
 
 #[cfg(feature = "native")]
 pub fn parse_string_operator(input: &str) -> IResult<&str, StringOperator> {
+    use super::parse_equal;
+
     alt((
         value(StringOperator::Contain, wsi(alt((tag("~="), tag("=~"))))),
         value(
@@ -48,7 +50,7 @@ pub fn parse_string_operator(input: &str) -> IResult<&str, StringOperator> {
                 wsi(tag_no_case("with")),
             )),
         ),
-        value(StringOperator::Equal, wsi(tag("=="))),
+        value(StringOperator::Equal, parse_equal),
         value(StringOperator::NotEqual, wsi(tag("!="))),
     ))
     .parse(input)

@@ -4,6 +4,8 @@ use crate::search::wsi::wsi;
 use nom::Parser;
 use nom::{IResult, branch::alt, bytes::complete::tag, combinator::value};
 
+use super::parse_equal;
+
 #[derive(Debug, PartialEq, Clone, Eq)]
 pub enum NumberOperator {
     GreaterThan,
@@ -33,7 +35,7 @@ pub fn parse_number_operator(input: &str) -> IResult<&str, NumberOperator> {
         value(NumberOperator::LowerOrEqual, wsi(tag("<="))),
         value(NumberOperator::GreaterThan, wsi(tag(">"))),
         value(NumberOperator::LowerThan, wsi(tag("<"))),
-        value(NumberOperator::Equal, wsi(tag("=="))),
+        value(NumberOperator::Equal, parse_equal),
         value(NumberOperator::NotEqual, wsi(tag("!="))),
     ))
     .parse(input)
