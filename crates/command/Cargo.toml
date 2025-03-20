@@ -38,11 +38,9 @@ tokio = { version = "1", features = ["full", "tracing"] }
 rdkafka = { version = "0.37.0", features = [
     "libz-static",
     "cmake-build",
-    "libz-static",
     "curl-static",
-    "libz",
     "zstd",
-    "external-lz4",
+    #"external-lz4",
 ] }
 extism = { version = "1.10.0" }
 indexmap = "2.8.0"
