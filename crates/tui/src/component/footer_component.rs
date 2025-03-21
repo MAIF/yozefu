@@ -4,7 +4,7 @@ use crossterm::event::KeyEvent;
 use ratatui::{
     Frame,
     layout::Rect,
-    style::{Color, Style, Stylize},
+    style::{Style, Stylize},
     text::{Line, Span},
 };
 use tokio::sync::mpsc::UnboundedSender;
@@ -153,8 +153,8 @@ impl Component for FooterComponent {
                 1,
             );
             let notification = match n.level {
-                log::Level::Error => notification.fg(Color::LightRed).underlined(),
-                log::Level::Warn => notification.fg(Color::Yellow),
+                log::Level::Error => notification.fg(state.theme.red).underlined(),
+                log::Level::Warn => notification.fg(state.theme.yellow),
                 _ => notification,
             };
             f.render_widget(notification, r);

@@ -21,7 +21,7 @@
     "fg_disabled": "Black",
     "bg_active": "Green",
     "fg_active": "Black",
-    "dialog_border": "Yellow",
+    "dialog_border": "Black",
     "autocomplete": "#646464"
   },
   "dark": {
