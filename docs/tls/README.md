@@ -13,7 +13,7 @@ The steps are always the same:
 3. Save the file and run start the tool `yozf -c my-cluster`
 
 > [!WARNING]
-> `SASL_SSL` security protocol is not available for `aarch64-unknown-linux-gnu` and `windows` targets. I'm facing some compilation issues.
+> `SASL_SSL` security protocol is not available for `windows` targets. I'm facing some compilation issues.
 
 
 ## Confluent

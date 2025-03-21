@@ -14,10 +14,27 @@ use tui::error::TuiError;
 pub use clap::Parser;
 use indexmap::IndexMap;
 
+const VERSION_MESSAGE: &str = concat!(
+    env!("CARGO_PKG_VERSION"),
+    "\n",
+    env!("CARGO_PKG_REPOSITORY"),
+    "\n",
+    env!("CARGO_PKG_AUTHORS")
+);
+
 // https://github.com/clap-rs/clap/issues/975
 /// CLI parser
 #[derive(Parser)]
-#[command(author, version, about = "A terminal user interface to navigate Kafka topics and search for Kafka records.", name = APPLICATION_NAME, bin_name = APPLICATION_NAME, display_name = APPLICATION_NAME, long_about = None, propagate_version = true, args_conflicts_with_subcommands = true)]
+#[command(author,
+    version = VERSION_MESSAGE,
+    about = "A terminal user interface to navigate Kafka topics and search for Kafka records.", 
+    name = APPLICATION_NAME,
+    bin_name = APPLICATION_NAME,
+    display_name = APPLICATION_NAME,
+    long_about = None,
+    propagate_version = true,
+    args_conflicts_with_subcommands = true
+)]
 pub struct Cli<T>
 where
     T: Cluster,

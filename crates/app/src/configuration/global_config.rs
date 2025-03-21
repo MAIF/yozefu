@@ -87,7 +87,7 @@ impl TryFrom<&PathBuf> for GlobalConfig {
             initial_query: "from end - 10".to_string(),
             clusters: IndexMap::default(),
             default_kafka_config: IndexMap::default(),
-            theme: default_theme().to_string(),
+            theme: default_theme(),
             show_shortcuts: true,
             export_directory: default_export_directory(),
         })

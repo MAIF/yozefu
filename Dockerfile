@@ -7,7 +7,7 @@ RUN --mount=type=bind,source=crates,target=crates \
     --mount=type=cache,target=/usr/local/cargo/registry/ \
     <<EOF
 set -e
-apt-get update && apt-get install --no-install-recommends -y build-essential cmake
+apt-get update && apt-get install --no-install-recommends -y build-essential cmake libclang-dev
 cargo build --release --all-features --locked
 cp ./target/release/yozf /tmp/yozf
 EOF
