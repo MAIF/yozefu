@@ -39,6 +39,8 @@ rdkafka = { version = "0.37.0", features = [
     "cmake-build",
     "libz-static",
     "curl-static",
+    "zstd",
+    "external-lz4"
 ] }
 extism = { version = "1.10.0" }
 indexmap = "2.8.0"

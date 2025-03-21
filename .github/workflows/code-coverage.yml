@@ -13,7 +13,7 @@ env:
   RUST_BACKTRACE: 1
   RUSTFLAGS: "-D warnings"
   RUSTDOCFLAGS: '--deny warnings'
-  MINIMUM_SUPPORTED_RUST_VERSION: 1.80.1
+  MINIMUM_SUPPORTED_RUST_VERSION: 1.85.0
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

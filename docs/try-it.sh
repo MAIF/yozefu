@@ -66,15 +66,6 @@ function fallback_produce {
     wait
 }
 
-# Make sure these commands are installed
-function check_commands_are_installed {
-    for cmd in docker git bash sed jq curl; do
-        if ! command -v $cmd &> /dev/null; then
-            echo " ❌ This script requires programs to be installed on your machine. Unfortunately, I was not able to find '$cmd'. Install '$cmd' and try again."
-            exit 1
-        fi
-    done
-}
 
 # The latest version of the tool
 function latest_version {
@@ -117,63 +108,83 @@ function clone_repository {
     fi
 }
 
-check_commands_are_installed
+
+for cmd in bash jq curl; do
+    if ! command -v $cmd &> /dev/null; then
+        echo " ❌ This script requires programs to be installed on your machine. Unfortunately, I was not able to find '$cmd'. Install '$cmd' and try again."
+        ready=1
+    fi
+done
 
 
-if [ "$BASH_SOURCE" = "" ]; then
-    clone_repository
-    bash /tmp/yozefu/docs/try-it.sh
-    exit 0
+ready=0
+missing=""
+for cmd in docker git sed; do
+    if ! command -v $cmd &> /dev/null; then
+        missing="$missing $cmd"
+    fi
+done
+if [ "$missing" != "" ]; then
+        missing=$(echo "$missing" | xargs)
+        echo " ℹ️ For a better experience, I inbite you to install the commands '$missing'. With these commands installed, you'll be able to try yozefu with a Kafka cluster."
+        ready=1
 fi
 
-repo=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/.." &> /dev/null && pwd )
-if [ ! -f "$repo/Cargo.toml" ]; then
-    clone_repository
-    cp "$( dirname -- "${BASH_SOURCE[0]}" )/try-it.sh" /tmp/yozefu/docs/try-it.sh
-    bash /tmp/yozefu/docs/try-it.sh
+if [ "$ready" = "0" ]; then
+    if [ "$BASH_SOURCE" = "" ]; then
+        clone_repository
+        bash /tmp/yozefu/docs/try-it.sh
+        exit 0
+    fi
+
+    repo=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/.." &> /dev/null && pwd )
+    if [ ! -f "$repo/Cargo.toml" ]; then
+        clone_repository
+        cp "$( dirname -- "${BASH_SOURCE[0]}" )/try-it.sh" /tmp/yozefu/docs/try-it.sh
+        bash /tmp/yozefu/docs/try-it.sh
+    fi
+
+    topic="public-french-addresses"
+    query="kafka"
+    type="json"
+
+    if [ $# -ge 1 ]; then
+        query="$1"
+    fi
+
+    if [ $# -ge 2 ]; then
+        type="$2"
+    fi
+
+    if [ $# -ge 3 ]; then
+        topic="$3"
+    fi
+
+    if [ $# -ge 4 ]; then
+        url="$4"
+    fi
+
+
+    echo " 📦 Repository is '$repo'"
+    echo " 🐋 Starting kafka"
+    docker compose -f "${repo}/compose.yml" up kafka schema-registry -d --wait --no-recreate
+    docker compose -f "${repo}/compose.yml" exec -T kafka \
+      /usr/bin/kafka-topics \
+      --create --if-not-exists          \
+      --bootstrap-server localhost:9092 \
+      --partitions 3                    \
+      --topic "${topic}"
+
+    if jbang --version &> /dev/null; then
+        echo " 🤖 jbang run ${repo}/docs/schemas/MyProducer.java --type $type --topic $topic $query"
+        jbang run "${repo}/docs/schemas/MyProducer.java" --type "$type" --topic "$topic" "$query"
+    else
+        echo " ℹ️ About to use the default producer 'kafka-console-producer.sh'. Install jbang to create a kafka producer using the schema registry."
+        echo " 🏡 Searching french addresses matching the query '${query}'"
+        echo " 📣 About to producing records to topic '${topic}'"
+        fallback_produce "$topic" "$query"
+    fi
 fi
-
-topic="public-french-addresses"
-query="kafka"
-type="json"
-
-if [ $# -ge 1 ]; then
-    query="$1"
-fi
-
-if [ $# -ge 2 ]; then
-    type="$2"
-fi
-
-if [ $# -ge 3 ]; then
-    topic="$3"
-fi
-
-if [ $# -ge 4 ]; then
-    url="$4"
-fi
-
-
-echo " 📦 Repository is '$repo'"
-echo " 🐋 Starting kafka"
-docker compose -f "${repo}/compose.yml" up kafka schema-registry -d --wait --no-recreate
-docker compose -f "${repo}/compose.yml" exec -T kafka \
-  /usr/bin/kafka-topics \
-  --create --if-not-exists          \
-  --bootstrap-server localhost:9092 \
-  --partitions 3                    \
-  --topic "${topic}"
-
-if jbang --version &> /dev/null; then
-    echo " 🤖 jbang run ${repo}/docs/schemas/MyProducer.java --type $type --topic $topic $query"
-    jbang run "${repo}/docs/schemas/MyProducer.java" --type "$type" --topic "$topic" "$query"
-else
-    echo " ℹ️ About to use the default producer 'kafka-console-producer.sh'. Install jbang to create a kafka producer using the schema registry."
-    echo " 🏡 Searching french addresses matching the query '${query}'"
-    echo " 📣 About to producing records to topic '${topic}'"
-    fallback_produce "$topic" "$query"
-fi
-
 
 # Invite to try the tool
 if ! command -v cargo &> /dev/null
