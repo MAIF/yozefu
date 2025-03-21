@@ -63,7 +63,11 @@ fn default_export_directory() -> PathBuf {
 }
 
 fn default_theme() -> String {
-    "light".to_string()
+    if cfg!(target_os = "windows") {
+        "dark".to_string()
+    } else {
+        "light".to_string()
+    }
 }
 
 fn default_show_shortcuts() -> bool {
@@ -83,7 +87,7 @@ impl TryFrom<&PathBuf> for GlobalConfig {
             initial_query: "from end - 10".to_string(),
             clusters: IndexMap::default(),
             default_kafka_config: IndexMap::default(),
-            theme: default_theme(),
+            theme: default_theme().to_string(),
             show_shortcuts: true,
             export_directory: default_export_directory(),
         })
