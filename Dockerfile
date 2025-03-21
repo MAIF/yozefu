@@ -7,7 +7,7 @@ RUN --mount=type=bind,source=crates,target=crates \
     --mount=type=cache,target=/usr/local/cargo/registry/ \
     <<EOF
 set -e
-apt-get update && apt-get install --no-install-recommends -y build-essential cmake libclang-dev libsasl2-dev libssl-dev pkg-config
+apt-get update && apt-get install --no-install-recommends -y build-essential cmake libzstd-dev libclang-dev libsasl2-dev libssl-dev pkg-config
 cargo build --release --all-features --locked
 cp ./target/release/yozf /tmp/yozf
 EOF
@@ -23,7 +23,7 @@ RUN adduser \
     --uid "${UID}" \
     yozefu
 RUN apt-get update && \
-    apt-get install --no-install-recommends vim jq ca-certificates libsasl2-dev libssl-dev --yes && \
+    apt-get install --no-install-recommends vim jq ca-certificates --yes && \
     rm -rf /var/lib/apt/lists/*
 COPY --from=builder "/tmp/yozf" /bin/app
 RUN <<EOF

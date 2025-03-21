@@ -22,9 +22,30 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check:
-    name: Check
+
+  check-each-package:
+    name: Check ${{ matrix.package }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package:
+          - "yozefu-lib"
+          - "yozefu-app"
+          - "yozefu-command"
+          - "yozefu-tui"
+          - "yozefu-wasm-types"
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions-rust-lang/setup-rust-toolchain@v1
+      with:
+        toolchain: stable
+    - uses: Swatinem/rust-cache@v2
+    - name: Run cargo check
+      run: cargo check --locked --release --package ${{ matrix.package }}
+
+  check:
+    runs-on: ubuntu-latest
+    needs: [check-each-package]
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -33,8 +54,6 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Run cargo check
         run: cargo check --all-features --locked --release --all
-        env: 
-          CARGO_NET_GIT_FETCH_WITH_CLI: true
 
   build:
     name: Build w/o features
@@ -72,9 +91,9 @@ jobs:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             features: ""
-          - os: ubuntu-latest
+          - os: ubuntu-24.04-arm
             target: aarch64-unknown-linux-gnu
-            features: "--no-default-features --features ssl-vendored"
+            features: ""
           - os: windows-latest
             target: x86_64-pc-windows-gnu
             features: "--no-default-features"
