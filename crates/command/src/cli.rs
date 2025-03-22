@@ -2,6 +2,7 @@
 use crate::cluster::Cluster;
 use crate::command::{Command, MainCommand, UtilityCommands};
 use crate::theme::init_themes_file;
+use crate::version::VERSION_MESSAGE;
 use app::APPLICATION_NAME;
 use app::configuration::{ClusterConfig, GlobalConfig, SchemaRegistryConfig, YozefuConfig};
 use clap::command;
@@ -13,14 +14,6 @@ use tui::error::TuiError;
 
 pub use clap::Parser;
 use indexmap::IndexMap;
-
-const VERSION_MESSAGE: &str = concat!(
-    env!("CARGO_PKG_VERSION"),
-    "\n",
-    env!("CARGO_PKG_REPOSITORY"),
-    "\n",
-    env!("CARGO_PKG_AUTHORS")
-);
 
 // https://github.com/clap-rs/clap/issues/975
 /// CLI parser

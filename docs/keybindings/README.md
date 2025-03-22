@@ -32,14 +32,15 @@ The choices I made are completely personal. I use a qwerty apple keyboard for yo
 <br />
 
 **Records list**
-| Keybinding                   | Description                                   |
-| ---------------------------- | :-------------------------------------------- |
-| <kbd>C</kbd>                 | Copy kafka record to clipboard                |
-| <kbd>O</kbd>                 | Open the kafka record in the web browser      |
-| <kbd>E</kbd>                 | Export kafka record to the file               |
-| <kbd>F</kbd>                 | Keep selecting the last consumed kafka record |
-| <kbd>Enter</kbd>             | Open the selected record                      |
-| <kbd>↑</kbd> or <kbd>↓</kbd> | Previous/next record                          |
+| Keybinding                     | Description                                   |
+| ------------------------------ | :-------------------------------------------- |
+| <kbd>C</kbd>                   | Copy kafka record to clipboard                |
+| <kbd>O</kbd>                   | Open the kafka record in the web browser      |
+| <kbd>E</kbd>                   | Export kafka record to the file               |
+| <kbd>Ctrl</kbd> + <kbd>E</kbd> | Export all records to the file                |
+| <kbd>F</kbd>                   | Keep selecting the last consumed kafka record |
+| <kbd>Enter</kbd>               | Open the selected record                      |
+| <kbd>↑</kbd> or <kbd>↓</kbd>   | Previous/next record                          |
 
 
 <br />
@@ -68,8 +69,8 @@ The choices I made are completely personal. I use a qwerty apple keyboard for yo
 
 
 **Search**
-| Keybinding                   | Description           |
-| ---------------------------- | :-------------------- |
-| <kbd>↓</kbd> or <kbd>↑</kbd> | Browse history        |
-| <kbd>→</kbd>                 | Accept autocomplete |
-| <kbd>Enter</kbd>             | Search kafka records  |
+| Keybinding                   | Description          |
+| ---------------------------- | :------------------- |
+| <kbd>↓</kbd> or <kbd>↑</kbd> | Browse history       |
+| <kbd>→</kbd>                 | Accept autocomplete  |
+| <kbd>Enter</kbd>             | Search kafka records |

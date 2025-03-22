@@ -110,6 +110,10 @@ exceptions = [
     { allow = ["BSL-1.0"], crate = "lazy-bytes-cast" },
     { allow = ["Zlib"], crate = "throbber-widgets-tui" },
     { allow = ["Zlib"], crate = "adler32" },
+    { allow = ["Zlib"], crate = "const_format" },
+    { allow = ["Zlib"], crate = "konst_macro_rules" },
+    { allow = ["Zlib"], crate = "const_format_proc_macros" },
+    { allow = ["Zlib"], crate = "konst" }
 ]
 
 # Some crates don't have (easily) machine readable licensing information,

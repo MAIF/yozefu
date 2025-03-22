@@ -24,17 +24,23 @@ concurrency:
 jobs:
 
   check:
-    name: Check ${{ matrix.package }}
+    name: Check ${{ matrix.package.name }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         package:
-          - "yozefu-lib"
-          - "yozefu-app"
-          - "yozefu-command"
-          - "yozefu-tui"
-          - "yozefu-wasm-types"
-          - "yozefu"
+          - name: yozefu-lib
+            command: cargo check --locked --package yozefu-lib
+          - name: yozefu-app
+            command: cargo check --locked --package yozefu-app
+          - name: yozefu-command
+            command: cargo check --locked --package yozefu-command
+          - name: yozefu-tui
+            command: cargo check --locked --package yozefu-tui
+          - name: yozefu-wasm-types
+            command: cargo check --locked --package yozefu-wasm-types
+          - name: yozefu
+            command: cargo run --locked -- --version
     steps:
     - uses: actions/checkout@v4
     - uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -42,7 +48,7 @@ jobs:
         toolchain: stable
     - uses: Swatinem/rust-cache@v2
     - name: Run cargo check
-      run: cargo check --locked --release --package ${{ matrix.package }}
+      run: ${{ matrix.package.command }}
 
   build:
     name: Build w/o features
@@ -204,10 +210,10 @@ jobs:
       uses: actions/checkout@v4
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
-    - name: Build and push
+    - name: Build
       uses: docker/build-push-action@v6
-      id: push
       with:
+        context: .
         push: false
         cache-from: type=gha
         cache-to: type=gha,mode=max
