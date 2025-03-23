@@ -8,6 +8,7 @@ categories = [
     "gui",
     "development-tools"
 ]
+documentation = "https://docs.rs/yozefu-tui"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true

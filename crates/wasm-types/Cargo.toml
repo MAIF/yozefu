@@ -4,6 +4,7 @@ readme = "README.md"
 description = "Types and structures for defining WebAssembly modules"
 keywords = ["kafka", "consumer", "search", "avro", "wasm"]
 categories = ["data-structures", "wasm"]
+documentation = "https://docs.rs/yozefu-wasm-types"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true

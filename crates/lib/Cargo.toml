@@ -4,6 +4,7 @@ description = "Core library of yozefu"
 readme = "README.md"
 keywords = ["kafka", "consumer", "search", "avro"]
 categories = ["data-structures", "parser-implementations"]
+documentation = "https://docs.rs/yozefu-lib"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true

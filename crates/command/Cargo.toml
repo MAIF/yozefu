@@ -8,6 +8,7 @@ categories = [
     "development-tools",
     "command-line-interface",
 ]
+documentation = "https://docs.rs/yozefu-command"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true

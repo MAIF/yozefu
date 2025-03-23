@@ -4,6 +4,7 @@ description = "The Kafka consumer of Yozefu"
 keywords = ["kafka", "consumer", "search", "avro"]
 categories = ["command-line-utilities", "development-tools", "gui"]
 readme = "README.md"
+documentation = "https://docs.rs/yozefu-app"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true

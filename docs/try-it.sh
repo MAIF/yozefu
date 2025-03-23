@@ -126,7 +126,7 @@ for cmd in docker git sed; do
 done
 if [ "$missing" != "" ]; then
         missing=$(echo "$missing" | xargs)
-        echo " ℹ️ For a better experience, I inbite you to install the commands '$missing'. With these commands installed, you'll be able to try yozefu with a Kafka cluster."
+        echo " ℹ️ For a better experience, I invite you to install the commands '$missing'. With these commands installed, you'll be able to try yozefu with a Kafka cluster."
         ready=1
 fi
 
@@ -194,9 +194,9 @@ then
         echo " 🎉 Finally, start the tool"
         echo "    yozf -c localhost"
     else
-        echo -e "    It looks like you haven't installed \033[1myozefu\033[0m yet:"
-        echo "       1. Go to https://github.com/MAIF/yozefu/releases/latest"
-        echo "       2. Download the binary that matches your operating system"
+        echo -e " It looks like you haven't installed \033[1myozefu\033[0m yet:"
+        echo "     1. Go to https://github.com/MAIF/yozefu/releases/latest"
+        echo "     2. Download the binary that matches your operating system"
         instructions
     fi
 else
