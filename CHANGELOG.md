@@ -1,3 +1,28 @@
+## What's Changed in v0.0.10
+* fix: rollback regarding commit and branch by @Mcdostone
+* Develop by @Mcdostone in [#66](https://github.com/MAIF/yozefu/pull/66)
+* docs: add link to https://docs.rs by @Mcdostone
+* chore: Release version v0.0.10 by @Mcdostone
+* feat: improve the `--version` output by @Mcdostone
+* build: simplify cross config by @Mcdostone
+* style: the default theme on windows is dark by @Mcdostone
+* docs: improve try-it.sh by @Mcdostone
+* ci: improve CI, some errors were not caught by @Mcdostone
+* build: try to fix static rdkakfa by @Mcdostone
+* style: update themes file by @Mcdostone
+* test: fix tests and semver-checks by @Mcdostone
+* build: fix docker build, `libclang-dev` was missing by @Mcdostone
+* fix: log error when the search query is invalid by @Mcdostone
+* build: update dependencies by @Mcdostone
+* docs: update demo gif by @Mcdostone
+* feat: equal could be '==' or '=' by @Mcdostone
+* docs: create vhs demo by @Mcdostone
+* docs: add conduktor for tests by @Mcdostone
+* docs: update documentation by @Mcdostone
+* Changelog for v0.0.9 by @github-actions[bot] in [#58](https://github.com/MAIF/yozefu/pull/58)
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.9...v0.0.10
+
 ## What's Changed in v0.0.9
 * build: rust 1.85.0, 2024 edition by @Mcdostone in [#51](https://github.com/MAIF/yozefu/pull/51)
 * build: update dependencies by @Mcdostone
