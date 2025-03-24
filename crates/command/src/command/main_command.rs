@@ -352,7 +352,7 @@ where
             info!(
                 "Executed command: {} -c {} --headless --topics {} '{}'",
                 binary,
-                cluster.to_string(),
+                cluster,
                 topics.join(","),
                 query
             )
