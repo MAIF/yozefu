@@ -38,7 +38,6 @@ itertools = "0.14.0"
 tokio = { version = "1", features = ["full", "tracing"] }
 rdkafka = { version = "0.37.0", features = [
     "cmake-build",
-    "libz-static",
     "curl-static",
     "zstd",
     "external-lz4",
@@ -58,4 +57,8 @@ gssapi-vendored = [
     "rdkafka/gssapi-vendored",
     "tui/gssapi-vendored",
     "app/gssapi-vendored",
+]
+
+libz-static = [
+    "rdkafka/libz-static",
 ]
