@@ -27,10 +27,14 @@ tokio = { version = "1", features = ["full"] }
 command = { workspace = true }
 
 [features]
-default = ["ssl-vendored", "gssapi-vendored"]
+default = ["ssl-vendored", "gssapi-vendored", "libz-static"]
 ssl-vendored = [
     "command/ssl-vendored"
 ]
 gssapi-vendored = [
     "command/gssapi-vendored"
 ]
+libz-static = [
+    "command/libz-static"
+]
+
