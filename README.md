@@ -12,9 +12,9 @@ It is an alternative tool to [AKHQ](https://akhq.io/), [redpanda console](https:
 
 The tool offers the following features:
  - A real-time access to data published to topics.
- - A search query language inspired from SQL providing a fine-grained way filtering capabilities.
+ - A [search query language](https://github.com/MAIF/yozefu/tree/main/docs/query-language/README.md) inspired from SQL providing a fine-grained way filtering capabilities.
  - Ability to search kafka records across multiple topics.
- - Support for extending the search engine with [user-defined filters](./docs/search-filter/README.md) written in WebAssembly ([Extism](https://extism.org/)).
+ - Support for extending the search engine with [user-defined filters](https://github.com/MAIF/yozefu/tree/main/docs/search-filter/README.md) written in WebAssembly ([Extism](https://extism.org/)).
  - The tool can be used as a terminal user interface or a CLI with the `--headless` flag.
  - One keystroke to export kafka records for further analysis.
  - Support for registering multiple kafka clusters, each with specific kafka consumer properties.
@@ -33,8 +33,8 @@ By default, [the kafka consumer is configured](https://github.com/MAIF/yozefu/bl
 ## Limitations
 
  - The tool is designed only to consume kafka records. There is no feature to produce records or manage a cluster.
- - Serialization formats such as `json`, `xml` or plain text are supported. [Avro](https://avro.apache.org/) support is [experimental for now](./docs/schema-registry/README.md). [Protobuf](https://protobuf.dev/) is not supported.
- - The tool uses a ring buffer to store the [last 500 kafka records](./crates/tui/src/records_buffer.rs#L20).
+ - Serialization formats such as `json`, `xml` or plain text are supported. [Avro](https://avro.apache.org/) support is [experimental for now](https://github.com/MAIF/yozefu/tree/main/docs/schema-registry/README.md). [Protobuf](https://protobuf.dev/) is not supported.
+ - The tool uses a ring buffer to store the [last 500 kafka records](https://github.com/MAIF/yozefu/blob/main/crates/tui/src/records_buffer.rs#L17).
  - There is probably room for improvement regarding the throughput (lot of `clone()` and deserialization).
  - Yozefu has been tested on MacOS Silicon but not on Windows or Linux. Feedback or contributions are welcome.
 
