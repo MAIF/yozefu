@@ -18,7 +18,7 @@ const BUILD_TYPE: &'static str = "release";
 
 const GIT_BRANCH: &str = match option_env!("GITHUB_REF_NAME") {
     Some(v) => v,
-    None => "unknown"
+    None => "unknown",
 };
 
 const GIT_COMMIT: &str = match option_env!("GITHUB_SHA") {
