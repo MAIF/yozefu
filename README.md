@@ -97,7 +97,7 @@ yozf -c localhost
 
  - [The query language.](https://github.com/MAIF/yozefu/tree/main/docs/query-language/README.md)
  - [Creating a search filter.](https://github.com/MAIF/yozefu/tree/main/docs/search-filter/README.md)
- - [TLS encryption and authentication](https://github.com/MAIF/yozefu/tree/main/docs/tls/README.md).
+ - [TLS encryption and authentication.](https://github.com/MAIF/yozefu/tree/main/docs/tls/README.md)
  - [URL templates to switch to web applications.](https://github.com/MAIF/yozefu/tree/main/docs/url-templates/README.md)
  - [Schema registry.](https://github.com/MAIF/yozefu/tree/main/docs/schema-registry/README.md)
  - [Themes.](https://github.com/MAIF/yozefu/tree/main/docs/themes/README.md)
