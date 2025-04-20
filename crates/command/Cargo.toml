@@ -19,7 +19,7 @@ rust-version.workspace = true
 
 
 [dependencies]
-clap = { version = "4.5.32", features = [
+clap = { version = "4.5.37", features = [
     "derive",
     "env",
     "color",
@@ -27,7 +27,7 @@ clap = { version = "4.5.32", features = [
 ] }
 serde_json = { workspace = true }
 log = { workspace = true }
-env_logger = "0.11.7"
+env_logger = "0.11.8"
 chrono = "0.4.40"
 strum = { workspace = true, features = ["derive", "strum_macros"] }
 indicatif = { version = "0.17.11", features = ["tokio"] }
@@ -43,7 +43,7 @@ rdkafka = { version = "0.37.0", features = [
     "external-lz4",
 ] }
 extism = { version = "1.10.0" }
-indexmap = "2.8.0"
+indexmap = "2.9.0"
 tui = { workspace = true }
 app = { workspace = true }
 lib = { workspace = true }
