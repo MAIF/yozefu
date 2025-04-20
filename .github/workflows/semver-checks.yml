@@ -56,7 +56,7 @@ jobs:
         continue-on-error: true
         run: |
           gh pr view "${{ github.event.number }}" --json comments --jq '.comments[] | select(.author.login == "github-actions") | .url' | grep -E 'issuecomment-(.+)' | cut -d '-' -f2 > comments.txt
-          xargs -I {} gh api -X DELETE "/repos/MAIF/yozefu/issues/comments/{}" < comments.txt
+          xargs -I {} gh api -X DELETE "/repos/${{ github.repository }}/issues/comments/{}" < comments.txt
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: dtolnay/rust-toolchain@master
