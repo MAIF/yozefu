@@ -283,8 +283,7 @@ where
             query,
             self.topics.clone(),
             state.clone(),
-        )
-        .await?;
+        );
 
         self.check_connection(yozefu_config)?;
         ui.run(self.topics.clone(), state).await

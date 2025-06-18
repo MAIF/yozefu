@@ -16,3 +16,6 @@ use lib::KafkaRecord;
 pub trait KafkaFormatter: Sync + Send {
     fn fmt(&self, record: &KafkaRecord) -> String;
 }
+
+#[cfg(test)]
+pub mod plain_formatter_test;

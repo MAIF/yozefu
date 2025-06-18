@@ -1,0 +1,7 @@
+---
+source: crates/tui/src/component/footer_component.rs
+expression: terminal.backend()
+---
+"[CTRL + T]:Run tests   [CTRL + H]:Help   [TAB]:Next panel   "
+"                                                            "
+"                                                            "

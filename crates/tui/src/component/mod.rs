@@ -1,4 +1,5 @@
 mod footer_component;
+mod header_component;
 mod help_component;
 mod issue_component;
 mod progress_bar_component;
@@ -10,17 +11,20 @@ mod scroll_state;
 mod search_component;
 mod shortcut;
 mod state;
+mod styles;
 mod topic_details_component;
 mod topics_and_records_component;
 mod topics_component;
 pub mod ui;
 mod vertical_scrollable_block;
 
+#[cfg(test)]
+use app::configuration::GlobalConfig;
 use crossterm::event::{KeyEvent, MouseEvent};
 use ratatui::{
     Frame,
     layout::Rect,
-    style::{Style, Stylize},
+    style::Style,
     widgets::{Block, BorderType},
 };
 pub(crate) use root_component::RootComponent;
@@ -53,6 +57,7 @@ pub(crate) enum FocusDirection {
 pub(crate) enum ComponentName {
     Records,
     Topics,
+    Header,
     Footer,
     RecordDetails,
     TopicsAndRecords,
@@ -136,4 +141,39 @@ pub(crate) trait Component {
     fn shortcuts(&self) -> Vec<Shortcut> {
         vec![]
     }
+}
+
+#[cfg(test)]
+pub mod mod_test;
+#[cfg(test)]
+pub mod records_component_test;
+#[cfg(test)]
+pub mod root_component_test;
+
+#[cfg(test)]
+pub fn default_global_config() -> GlobalConfig {
+    use app::configuration::GlobalConfig;
+
+    let temp_dir = tempfile::tempdir().unwrap();
+    let temp_path = temp_dir.path().to_path_buf();
+
+    GlobalConfig {
+        path: temp_path.clone().join("config.json"),
+        yozefu_directory: temp_path.join("config"),
+        logs: None,
+        default_url_template: "".to_string(),
+        initial_query: "".to_string(),
+        theme: "light".to_string(),
+        clusters: indexmap::IndexMap::default(),
+        default_kafka_config: indexmap::IndexMap::default(),
+        history: vec![],
+        show_shortcuts: true,
+        export_directory: std::path::PathBuf::from(""),
+    }
+}
+
+#[cfg(test)]
+pub fn default_state() -> State {
+    use crate::Theme;
+    State::new("localhost", Theme::light(), &default_global_config())
 }

@@ -6,7 +6,7 @@ use itertools::Itertools;
 use ratatui::{
     Frame,
     layout::{Constraint, Direction, Layout, Position, Rect},
-    style::{Style, Stylize},
+    style::Style,
     widgets::{Block, BorderType, Borders, Clear, List, ListItem, ListState, Padding, Paragraph},
 };
 use tokio::sync::mpsc::UnboundedSender;
@@ -288,4 +288,20 @@ impl Component for TopicsComponent {
         }
         shortcuts
     }
+}
+
+#[cfg(test)]
+use crate::assert_draw;
+
+#[test]
+fn test_draw() {
+    let mut component = TopicsComponent::default();
+    component
+        .update(Action::Topics(vec![
+            "private-random-people".to_string(),
+            "public-french-addresses".to_string(),
+            "public-patisserie-delights".to_string(),
+        ]))
+        .unwrap();
+    assert_draw!(component, 60, 5)
 }

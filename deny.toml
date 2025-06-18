@@ -28,7 +28,7 @@ targets = [
     "aarch64-apple-darwin",
     "x86_64-apple-darwin",
     "x86_64-pc-windows-gnu",
-    "x86_64-pc-windows-msvc"
+    "x86_64-pc-windows-msvc",
 ]
 # When creating the dependency graph used as the source of truth when checks are
 # executed, this field can be used to prune crates from the graph, removing them
@@ -69,7 +69,8 @@ feature-depth = 1
 # A list of advisory IDs to ignore. Note that ignored advisories will still
 # output a note when they are encountered.
 ignore = [
-    "RUSTSEC-2024-0436",
+    "RUSTSEC-2024-0436" # paste crate
+    #"RUSTSEC-0000-0000",
     #{ id = "RUSTSEC-0000-0000", reason = "you can specify a reason the advisory is ignored" },
     #"a-crate-that-is-yanked@0.1.1", # you can also ignore yanked crate versions if you wish
     #{ crate = "a-crate-that-is-yanked@0.1.1", reason = "you can specify why you are ignoring the yanked crate" },
@@ -94,7 +95,7 @@ allow = [
     "MPL-2.0",
     "BSD-3-Clause",
     "ISC",
-    "Unicode-3.0"
+    "Unicode-3.0",
 ]
 # The confidence threshold for detecting a license from license text.
 # The higher the value, the more closely the license text must be to the
@@ -107,13 +108,15 @@ exceptions = [
     # Each entry is the crate and version constraint, and its specific allow
     # list
     { allow = ["Zlib"], crate = "foldhash" },
-    { allow = ["BSL-1.0"], crate = "lazy-bytes-cast" },
     { allow = ["Zlib"], crate = "throbber-widgets-tui" },
     { allow = ["Zlib"], crate = "adler32" },
     { allow = ["Zlib"], crate = "const_format" },
     { allow = ["Zlib"], crate = "konst_macro_rules" },
     { allow = ["Zlib"], crate = "const_format_proc_macros" },
-    { allow = ["Zlib"], crate = "konst" }
+    { allow = ["Zlib"], crate = "konst" },
+    { allow = ["BSL-1.0"], crate = "clipboard-win" },
+    { allow = ["BSL-1.0"], crate = "error-code" },
+    { allow = ["CDLA-Permissive-2.0"], crate = "webpki-roots" },
 ]
 
 # Some crates don't have (easily) machine readable licensing information,
@@ -122,9 +125,7 @@ exceptions = [
 [[licenses.clarify]]
 name = "ring"
 expression = "ISC AND MIT AND OpenSSL"
-license-files = [
-    { path = "LICENSE", hash = 0xbd0eed23 }
-]
+license-files = [{ path = "LICENSE", hash = 0xbd0eed23 }]
 # The package spec the clarification applies to
 
 # The SPDX expression for the license requirements of the crate

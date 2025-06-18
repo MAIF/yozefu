@@ -30,6 +30,7 @@ pub struct Theme {
     pub fg_active: Color,
     pub dialog_border: Color,
     pub autocomplete: Color,
+    pub shortcuts: Option<Color>,
 }
 
 impl Theme {
@@ -58,6 +59,7 @@ impl Theme {
             fg_disabled: Color::Black,
             bg_active: Color::Green,
             fg_active: Color::Black,
+            shortcuts: Some(Color::DarkGray),
         }
     }
 }

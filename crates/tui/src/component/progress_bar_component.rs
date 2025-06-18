@@ -44,3 +44,20 @@ impl Widget for ProgressBarComponent {
         );
     }
 }
+
+#[test]
+fn test_draw() {
+    use insta::assert_snapshot;
+    use ratatui::{Terminal, backend::TestBackend};
+
+    let mut component = ProgressBarComponent::default();
+    let mut terminal = Terminal::new(TestBackend::new(50, 3)).unwrap();
+    component.set_length(100);
+    component.set_progress(30);
+    terminal
+        .draw(|frame| {
+            frame.render_widget(component, frame.area());
+        })
+        .unwrap();
+    assert_snapshot!(terminal.backend());
+}

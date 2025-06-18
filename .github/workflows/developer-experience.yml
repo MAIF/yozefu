@@ -21,14 +21,16 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: read
 
 jobs:
   try-it:
    runs-on: ubuntu-latest
+   permissions:
+    contents: read
    steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Setup JBang
         uses: jbangdev/setup-jbang@main
       - name: Setup JDK
@@ -43,8 +45,12 @@ jobs:
 
   wasm-rust:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
@@ -62,8 +68,12 @@ jobs:
 
   wasm-golang:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Setup Go ${{ env.GOLANG_VERSION }}
         uses: actions/setup-go@v5
         with:
@@ -78,8 +88,12 @@ jobs:
 
   wasm-js:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Setup JS ${{ env.JS_VERSION }}
         uses: actions/setup-node@v4
         with:

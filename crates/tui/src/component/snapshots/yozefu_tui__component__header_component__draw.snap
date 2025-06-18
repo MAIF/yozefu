@@ -1,0 +1,7 @@
+---
+source: crates/tui/src/component/header_component.rs
+expression: terminal.backend()
+---
+" test   Topics                                   "
+"                                                  "
+"                                                  "

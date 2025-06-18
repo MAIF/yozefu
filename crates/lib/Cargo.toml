@@ -16,21 +16,21 @@ rust-version.workspace = true
 [dependencies]
 serde = { workspace = true }
 serde_json = { workspace = true }
-chrono = { version = "0.4.40", features = ["serde"], optional = true }
+chrono = { version = "0.4.41", features = ["serde"], optional = true }
 itertools = "0.14.0"
 strum = { workspace = true, features = ["derive", "strum_macros"], optional = true }
 fuzzydate = {version = "0.2.3", optional = true }
 nom = "8.0.0"
 rdkafka = { version = "0.37.0", features = [], optional = true}
 url = "2.5.4"
-apache-avro = "0.17.0"
-reqwest = { version = "0.12.15", features = ["json"] }
+apache-avro = "0.18.0"
+reqwest = { version = "0.12.20", features = ["json"] }
 
 
 [dev-dependencies]
-insta = { version = "1.42.2", features = ["filters", "glob"] }
+insta = { version = "1.43.1", features = ["filters", "glob"] }
 protobuf = "3.7.2"
-tokio = { version = "1.44.2", features = ["rt"] }
+tokio = { version = "1.45.1", features = ["rt", "macros"] }
 
 [features]
 native = [

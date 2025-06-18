@@ -13,9 +13,9 @@ use ratatui::{
 };
 use tokio::sync::mpsc::UnboundedSender;
 
-use crate::{Action, error::TuiError};
+use crate::{Action, Theme, error::TuiError};
 
-use super::{Component, ComponentName, Shortcut, State, scroll_state::ScrollState};
+use super::{Component, ComponentName, Shortcut, State, scroll_state::ScrollState, styles};
 
 #[derive(Default)]
 pub(crate) struct RecordDetailsComponent<'a> {
@@ -23,6 +23,7 @@ pub(crate) struct RecordDetailsComponent<'a> {
     lines: Vec<Line<'a>>,
     search_query: String,
     scroll: ScrollState,
+    theme: Option<Theme>,
     action_tx: Option<UnboundedSender<Action>>,
 }
 
@@ -33,14 +34,14 @@ impl RecordDetailsComponent<'_> {
         }
     }
 
-    fn generate_span(key: &str, value: String) -> Line<'_> {
-        Line::from(vec![
-            Span::styled(
-                format!("{:>12}: ", key.to_string()),
-                Style::default().bold(),
-            ),
-            Span::styled(value.to_string(), Style::default()),
-        ])
+    fn generate_span<'a>(key: &str, value: Line<'a>) -> Line<'a> {
+        let mut spans = vec![Span::styled(
+            format!("{:>12}: ", key.to_string()),
+            Style::default().bold(),
+        )];
+        spans.extend(value.spans);
+
+        Line::from(spans)
     }
 
     fn show_schema(&mut self) -> Result<(), TuiError> {
@@ -70,32 +71,24 @@ impl RecordDetailsComponent<'_> {
             self.record = Some(KafkaRecord::default());
         }
 
+        let theme = self.theme.clone().unwrap_or(Theme::light());
+
         let record = self.record.as_ref().unwrap();
         let mut to_render = vec![
             Line::default(),
-            Self::generate_span("Topic", record.topic.clone()),
+            Self::generate_span("Topic", record.topic.clone().into()),
             Self::generate_span(
                 "Timestamp",
-                self.record
-                    .as_ref()
-                    .unwrap()
-                    .timestamp
-                    .unwrap_or(0)
-                    .to_string(),
+                record.timestamp.unwrap_or(0).to_string().into(),
             ),
+            Self::generate_span("DateTime", styles::colorize_timestamp(record, &theme)),
+            Self::generate_span("Offset", record.offset.to_string().into()),
             Self::generate_span(
-                "DateTime",
-                self.record
-                    .as_ref()
-                    .unwrap()
-                    .timestamp_as_local_date_time()
-                    .map(|e| e.to_rfc3339_opts(chrono::SecondsFormat::Millis, false))
-                    .unwrap_or("".to_string()),
+                "Partition",
+                record.partition.to_string().fg(theme.yellow).into(),
             ),
-            Self::generate_span("Offset", record.offset.to_string()),
-            Self::generate_span("Partition", record.partition.to_string()),
-            Self::generate_span("Size", ByteSize(record.size as u64).to_string()),
-            Self::generate_span("Headers", "".to_string()),
+            Self::generate_span("Size", ByteSize(record.size as u64).to_string().into()),
+            //Self::generate_span("Headers", "".to_string().into()),
         ];
 
         let longest_header_key = self
@@ -150,24 +143,26 @@ impl RecordDetailsComponent<'_> {
             match &s.schema_type {
                 Some(t) => to_render.push(Self::generate_span(
                     "Key schema",
-                    format!("{} - {}", s.id, t),
+                    format!("{} - {}", s.id, t).into(),
                 )),
-                None => to_render.push(Self::generate_span("Key schema", s.id.to_string())),
+                None => to_render.push(Self::generate_span("Key schema", s.id.to_string().into())),
             }
         }
         if let Some(s) = &record.value_schema {
             match &s.schema_type {
                 Some(t) => to_render.push(Self::generate_span(
                     "Value schema",
-                    format!("{} - {}", s.id, t),
+                    format!("{} - {}", s.id, t).into(),
                 )),
-                None => to_render.push(Self::generate_span("Value schema", s.id.to_string())),
+                None => {
+                    to_render.push(Self::generate_span("Value schema", s.id.to_string().into()))
+                }
             }
         }
 
         to_render.extend(vec![
-            Self::generate_span("Key", record.key_as_string.clone()),
-            Self::generate_span("Value", "".to_string()),
+            Self::generate_span("Key", record.key_as_string.clone().fg(theme.green).into()),
+            Self::generate_span("Value", "".to_string().into()),
         ]);
 
         //let syntax = SYNTAX_SET.find_syntax_by_extension("json").unwrap();
@@ -278,6 +273,9 @@ impl Component for RecordDetailsComponent<'_> {
     }
 
     fn draw(&mut self, f: &mut Frame<'_>, rect: Rect, state: &State) -> Result<(), TuiError> {
+        if self.theme.is_none() {
+            self.theme = Some(state.theme.clone());
+        }
         let p = Paragraph::new(self.lines.clone())
             .wrap(Wrap { trim: false })
             .scroll((self.scroll.value(), 0));

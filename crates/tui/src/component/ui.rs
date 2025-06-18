@@ -40,14 +40,9 @@ pub struct Ui {
 }
 
 impl Ui {
-    pub async fn new(
-        app: App,
-        query: String,
-        selected_topics: Vec<String>,
-        state: State,
-    ) -> Result<Self, TuiError> {
+    pub fn new(app: App, query: String, selected_topics: Vec<String>, state: State) -> Self {
         let config = app.config.clone();
-        Ok(Self {
+        Self {
             should_quit: false,
             worker: CancellationToken::new(),
             app,
@@ -56,7 +51,7 @@ impl Ui {
             root: RootComponent::new(query, selected_topics, &config.global, &BUFFER, state),
             records_sender: None,
             last_tick_key_events: Vec::new(),
-        })
+        }
     }
 
     pub fn save_config(&self) -> Result<(), TuiError> {
@@ -154,7 +149,7 @@ impl Ui {
                         }
                         ll.dispatch_metrics();
                         if let Some(limit) = query.limit {
-                            if Some(ll.matched_and_read().0) >= Some(limit) {
+                            if Some(ll.stats().matched) >= Some(limit) {
                                 token_cloned.cancel();
                             }
                         }
