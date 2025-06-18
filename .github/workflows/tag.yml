@@ -9,11 +9,7 @@ env:
 
 permissions:
   contents: write
-  actions: write
-  packages: write
-  attestations: write
-  id-token: write
-  pull-requests: write
+
 on:
   push:
     branches:
@@ -32,6 +28,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Get tags
         run: git fetch --tags origin
       - name: Install Rust
@@ -39,24 +37,37 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Configure git
         run: |
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name "${ACTOR}"
+          git config --global user.email "${ACTOR_ID}+${ACTOR}@users.noreply.github.com"
           git config --global push.autoSetupRemote true
+        env:
+          ACTOR: ${{ github.actor }}
+          ACTOR_ID: ${{ github.actor_id }}
+
       - name: Get the version
         id: current
         run: echo "version=$(cargo pkgid --manifest-path crates/bin/Cargo.toml | cut -d '@' -f2)" >> "$GITHUB_OUTPUT"
       - name: Create git tag
         id: tag
         run:  |
-          if git tag -a "v${{ steps.current.outputs.version }}" -m "${{ steps.current.outputs.version }}"; then
+          if git tag -a "v${VERSION}" -m "${VERSION}"; then
             echo "created=true" >> "$GITHUB_OUTPUT"
           else
-            echo "::notice title=Git tag:: The version ${{ steps.current.outputs.version }} already exists. The \`publish\` workflow won't be executed."
+            echo "::notice title=Git tag:: The version ${VERSION} already exists. The \`publish\` workflow won't be executed."
             echo "created=false" >> "$GITHUB_OUTPUT"
           fi
+        env:
+          VERSION: ${{ steps.current.outputs.version }}
 
   publish:
     needs: tag
     if: ${{ needs.tag.outputs.created == 'true' }}
     uses: ./.github/workflows/publish.yml
+    permissions:
+      contents: write
+      actions: write
+      packages: write
+      attestations: write
+      id-token: write
+      pull-requests: write
     secrets: inherit

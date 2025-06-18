@@ -20,3 +20,6 @@ pub use data_type::Comparable;
 pub use data_type::DataType;
 pub use kafka_record::KafkaRecord;
 pub use schema::SchemaId;
+
+#[cfg(test)]
+mod kafka_record_test;

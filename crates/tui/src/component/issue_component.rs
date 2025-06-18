@@ -55,3 +55,12 @@ impl Component for IssueComponent {
         Ok(())
     }
 }
+
+#[cfg(test)]
+use crate::assert_draw;
+
+#[test]
+fn test_draw() {
+    let mut component = IssueComponent::default();
+    assert_draw!(component, 60, 15)
+}

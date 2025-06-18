@@ -1,0 +1,19 @@
+---
+source: crates/tui/src/component/issue_component.rs
+expression: terminal.backend()
+---
+"                                                            "
+"    ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓  "
+"    ┃                                                    ┃  "
+"    ┃     ʕノ•ᴥ•ʔノ ︵ ┻━┻                               ┃  " Hidden by multi-width symbols: [(12, " "), (18, " "), (21, " ")]
+"    ┃     Alt: Your mate flipping the desk               ┃  "
+"    ┃                                                    ┃  "
+"    ┃     Are you struggling with the tool?              ┃  "
+"    ┃     Leave us an issue so we can improve it:        ┃  "
+"    ┃     https://github.com/MAIF/yozefu/issues          ┃  "
+"    ┃                                                    ┃  "
+"    ┃     Press any key to close.                        ┃  "
+"    ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛  "
+"                                                            "
+"                                                            "
+"                                                            "

@@ -34,6 +34,8 @@ jobs:
       version: ${{ steps.release.outputs.version }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
@@ -46,10 +48,13 @@ jobs:
     needs: version
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Create github release
-        run: gh release create "v${{ needs.version.outputs.version }}" --generate-notes
+        run: gh release create "v${VERSION}" --generate-notes
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.version.outputs.version }}
 
   changelog:
     needs: [version, create-release]
@@ -84,6 +89,8 @@ jobs:
             features: "--no-default-features --features ssl-vendored"
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: houseabsolute/actions-rust-cross@v1
         with:
           target: ${{ matrix.platforms.target }}
@@ -97,7 +104,7 @@ jobs:
           name="$(cargo metadata --manifest-path crates/bin/Cargo.toml --no-deps --format-version=1 | jq -r '.packages[] | select(.name=="yozefu").targets[0].name')"
           source=target/${{ matrix.platforms.target }}/release/${name}
           archive="yozefu-${{matrix.platforms.target }}"
-          subjectName="${name}-${{matrix.platforms.target }}-${{ needs.version.outputs.version }}"
+          subjectName="${name}-${{matrix.platforms.target }}-${VERSION}"
           binaryName="${subjectName}"
           destination="dist/${binaryName}"
           if [ "${{ matrix.platforms.os }}" = "windows-latest" ]; then
@@ -113,6 +120,8 @@ jobs:
             echo "destination=${destination}"
             echo "binaryName=${binaryName}"
           } >> "$GITHUB_OUTPUT"
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
 
       - name: Attest
         uses: actions/attest-build-provenance@v2
@@ -125,13 +134,19 @@ jobs:
 
       - name: Rename binary
         shell: bash
-        run: mv "${{ steps.variables.outputs.source }}" "${{ steps.variables.outputs.destination }}"
+        run: mv "${SOURCE}" "${DEST}"
+        env:
+          SOURCE: ${{ steps.variables.outputs.source }}
+          DEST: ${{ steps.variables.outputs.destination }}
 
       - name: Build archive for Windows
         shell: bash
         working-directory: ./dist
         if: matrix.platforms.os == 'windows-latest'
-        run: 7z a "${{ steps.variables.outputs.archive }}.zip" "${{ steps.variables.outputs.binaryName }}"
+        run: 7z a "${ARCHIVE}.zip" "${BINARY}"
+        env:
+          ARCHIVE: ${{ steps.variables.outputs.archive }}
+          BINARY: ${{ steps.variables.outputs.binaryName }}
 
       - name: Build archive for unix systems
         if: matrix.platforms.os != 'windows-latest'
@@ -173,6 +188,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
     - name: Extract metadata
@@ -225,6 +242,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2

@@ -63,16 +63,23 @@ impl DataType {
         let v = match json_pointer {
             Some(path) => {
                 let path = path.replace(['.', '['], "/").replace(']', "");
+
                 match value.pointer(&path) {
-                    Some(d) => match d {
-                        serde_json::Value::Null => "null".to_string(),
-                        serde_json::Value::Bool(v) => v.to_string(),
-                        serde_json::Value::Number(v) => v.to_string(),
-                        serde_json::Value::String(v) => v.to_string(),
-                        serde_json::Value::Array(_) => return false,
-                        serde_json::Value::Object(_) => return false,
-                    },
-                    None => return false,
+                    Some(d) => {
+                        println!("{:?} {:?} {:?}", path, value, d);
+                        match d {
+                            serde_json::Value::Null => "null".to_string(),
+                            serde_json::Value::Bool(v) => v.to_string(),
+                            serde_json::Value::Number(v) => v.to_string(),
+                            serde_json::Value::String(v) => v.to_string(),
+                            serde_json::Value::Array(_) => return false,
+                            serde_json::Value::Object(_) => return false,
+                        }
+                    }
+                    None => {
+                        println!("nope");
+                        return false;
+                    }
                 }
             }
             None => serde_json::to_string(value).unwrap(),
@@ -125,4 +132,25 @@ impl Display for DataType {
             DataType::String(s) => write!(f, "{}", s),
         }
     }
+}
+
+#[test]
+fn test_compare_string() {
+    let data_type = DataType::String("hello world".to_string());
+    assert!(data_type.compare(&None, &StringOperator::Contain, "world"));
+    assert!(data_type.compare(&None, &StringOperator::Equal, "hello world"));
+    assert!(data_type.compare(&None, &StringOperator::StartWith, "hello"));
+    assert!(!data_type.compare(&None, &StringOperator::NotEqual, "hello world"));
+    assert!(data_type.compare(&None, &StringOperator::Equal, "hello world"));
+}
+
+#[test]
+fn test_compare_json() {
+    use serde_json::json;
+    let data_type = DataType::Json(json!({"hello": "world"}));
+    assert!(data_type.compare(&None, &StringOperator::Contain, "world"));
+    assert!(data_type.compare(&Some("/hello".into()), &StringOperator::Equal, "world"));
+    assert!(data_type.compare(&Some("/hello".into()), &StringOperator::StartWith, "world"));
+    assert!(!data_type.compare(&Some("/hello".into()), &StringOperator::NotEqual, "world"));
+    assert!(!data_type.compare(&None, &StringOperator::Equal, "goodbye"));
 }

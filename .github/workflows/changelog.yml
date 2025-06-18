@@ -6,12 +6,6 @@ env:
   RUSTFLAGS: "-D warnings"
   RUSTDOCFLAGS: '--deny warnings'
 
-permissions:
-  id-token: write
-  packages: write
-  contents: write
-  pull-requests: write
-
 on:
   workflow_dispatch:
   workflow_call:
@@ -20,10 +14,16 @@ jobs:
   changelog:
     name: Create changelog
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      packages: write
+      contents: write
+      pull-requests: write
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
+          persist-credentials: false
           fetch-tags: 'true'
           fetch-depth: 0
       - name: Install Rust
@@ -46,23 +46,28 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Commit changelog
         run: |
-          git checkout -b "changelog/${{ steps.release.outputs.version }}"
+          git checkout -b "changelog/${VERSION}"
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           set +e
           git add CHANGELOG.md
           git commit -m "chore: Update changelog"
-          git push origin "changelog/${{ steps.release.outputs.version }}" --force
+          git push origin "changelog/${VERSION}" --force
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+
       - name: Check out repository
         uses: actions/checkout@v4
         with:
           ref: "changelog/${{ steps.release.outputs.version }}"
+          persist-credentials: false
       - name: Create pull request for changelog
         run: |
-          alreadyExists=$(gh pr list --json headRefName | jq '.[] | select(.headRefName == "changelog/${{ steps.release.outputs.version }}") | any')
+          alreadyExists=$(gh pr list --json headRefName | jq '.[] | select(.headRefName == "changelog/${VERSION}") | any')
           if [[ "$alreadyExists" == "" ]]; then
             branch=$(git branch --show-current)
-            gh pr create --head "$branch" --title "Changelog for ${{ steps.release.outputs.version }}" --body "This PR updates the changelog for version ${{ steps.release.outputs.version }}."
+            gh pr create --head "$branch" --title "Changelog for ${VERSION}" --body "This PR updates the changelog for version ${VERSION}."
           fi
         env: 
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.release.outputs.version }}

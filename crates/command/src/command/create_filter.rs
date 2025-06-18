@@ -49,18 +49,8 @@ impl Command for CreateFilterCommand {
 
         let editor = default_editor(&None);
 
-        info!("Cloning the filter repository to '{}'", repo_dir.display());
-        let output = ProcessCommand::new("git")
-            .arg("clone")
-            .arg("git@github.com:MAIF/yozefu.git")
-            .arg("--depth")
-            .arg("1")
-            .arg(&repo_dir)
-            .spawn()?
-            .wait()?;
-
-        match output.success() {
-            true => {
+        match self.clone_repository(&repo_dir) {
+            Ok(()) => {
                 self.prepare_git_repository(&repo_dir)?;
 
                 info!(
@@ -72,7 +62,7 @@ impl Command for CreateFilterCommand {
                     repo_dir.display()
                 );
             }
-            false => {
+            Err(_e) => {
                 warn!("I was not able to clone the repository. Please download it manually.");
                 println!("    mkdir -p '{}'", repo_dir.parent().unwrap().display());
                 println!(
@@ -119,4 +109,53 @@ impl CreateFilterCommand {
 
         Ok(())
     }
+
+    /// try the clone the filter repository from GitHub,
+    /// first with SSH, then with HTTPS.
+    fn clone_repository(&self, repo_dir: &Path) -> Result<(), Error> {
+        info!("Cloning the filter repository to '{}'", repo_dir.display());
+        let mut output = ProcessCommand::new("git")
+            .arg("clone")
+            .arg("git@github.com:MAIF/yozefu.git")
+            .arg("--depth")
+            .arg("1")
+            .arg(repo_dir)
+            .spawn()?
+            .wait()?;
+
+        if !output.success() {
+            output = ProcessCommand::new("git")
+                .arg("clone")
+                .arg("https://github.com/MAIF/yozefu.git")
+                .arg("--depth")
+                .arg("1")
+                .arg(repo_dir)
+                .spawn()?
+                .wait()?;
+        }
+
+        match output.success() {
+            true => Ok(()),
+            false => Err(Error::Error("Failed to clone the repository".to_string())),
+        }
+    }
+}
+
+#[tokio::test]
+async fn test_success() {
+    use itertools::Itertools;
+    let temp_dir = tempfile::tempdir().expect("Failed to create temp directory");
+    let command = CreateFilterCommand {
+        language: SupportedLanguages::Rust,
+        directory: Some(temp_dir.path().to_path_buf()),
+        name: "sha256".to_string(),
+    };
+
+    assert!(command.execute().await.is_ok());
+    assert!(
+        !fs::read_dir(temp_dir.path())
+            .unwrap()
+            .collect_vec()
+            .is_empty()
+    )
 }

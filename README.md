@@ -1,11 +1,16 @@
-# Yōzefu
+<p align="center" style="width: 150px">
+<picture>
+    <source width="150" media="(prefers-color-scheme: dark)" srcset="./docs/assets/logo.svg">
+    <img width="150" alt="Logo Yozefu" src="./docs/assets/logo.svg">
+  </picture>
+</p>
 
-<!--
-<a href="https://github.com/MAIF/yozefu/releases"><img src="https://img.shields.io/github/v/release/MAIF/yozefu?style=flatd&color=f8be75&logo=GitHub"></a>-->
+<p align="center">
 <a href="https://crates.io/crates/yozefu/"><img src="https://img.shields.io/crates/v/yozefu?logo=Rust"></a>
 <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/MSRV-1.85.0+-lightgray.svg?logo=rust" alt="Minimum supported Rust version: 1.85.0 or plus"/></a>
 <a href="https://github.com/MAIF/yozefu/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="Licence"/></a>
 
+</p>
 
 Yōzefu is an interactive terminal user interface (TUI) application for exploring data of a kafka cluster.
 It is an alternative tool to [AKHQ](https://akhq.io/), [redpanda console](https://www.redpanda.com/redpanda-console-kafka-ui) or [the kafka plugin for JetBrains IDEs](https://plugins.jetbrains.com/plugin/21704-kafka).
@@ -23,12 +28,10 @@ The tool offers the following features:
 By default, [the kafka consumer is configured](https://github.com/MAIF/yozefu/blob/main/crates/command/src/command/main_command.rs#L318-L325) with the property `enable.auto.commit` set to `false`, meaning no kafka consumer offset will be published to kafka.
 
 
-<a href="https://mcdostone.github.io/yozefu.mp4" target="_blank">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://vhs.charm.sh/vhs-ptWKq7uXOYLqVkJpALH1O.gif">
-    <img alt="Demo of Yozefu: The user selects a topic and sees and real time new records published to Kafka." src="https://vhs.charm.sh/vhs-6mXYKZzLJ37Q8t3Yor0odi.gif">
-  </picture>
-</a>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://vhs.charm.sh/vhs-7aFh9OpgpiXOgvHNLzCDSf.gif">
+  <img alt="Demo of Yozefu: The user selects a topic and sees and real time new records published to Kafka." src="https://vhs.charm.sh/vhs-2Uy3mdX128hjJdXx0RRQN0.gif">
+</picture>
 
 ## Limitations
 
@@ -86,7 +89,7 @@ gh attestation verify --repo MAIF/yozefu $(which yozf)
 
 
 ```bash
-# It clones this repository, starts a docker kafka node and produce some json records
+# It clones this repository, starts a docker kafka node and produces json records
 curl -L "https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/try-it.sh" | bash
 
 yozf -c localhost
@@ -111,18 +114,18 @@ yozf -c localhost
 <table>
   <tr>
     <td>
-      <img alt="A table listing topics and kafka records" src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/screenshots/topics.png">
+      <img alt="A table listing topics and kafka records" src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/assets/topics.png">
     </td>
     <td>
-      <img alt="A table listing kafka records" src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/screenshots/records.png">
+      <img alt="A table listing kafka records" src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/assets/records.png">
     </td>
   </tr>
   <tr>
     <td>
-      <img alt="View of a selected kafka records" src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/screenshots/record.png">
+      <img alt="View of a selected kafka records" src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/assets/record.png">
     </td>
     <td>
-      <img alt="View of the help page" src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/screenshots/help.png">
+      <img alt="View of the help page" src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/assets/help.png">
     </td>
   </tr>
 </table>

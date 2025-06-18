@@ -20,10 +20,10 @@ use crate::{Action, Notification, error::TuiError, records_buffer::BufferAction}
 
 use super::{
     Component, ComponentName, ConcurrentRecordsBuffer, State, footer_component::FooterComponent,
-    help_component::HelpComponent, progress_bar_component::ProgressBarComponent,
-    record_details_component::RecordDetailsComponent, records_component::RecordsComponent,
-    schemas_component::SchemasComponent, search_component::SearchComponent,
-    topic_details_component::TopicDetailsComponent,
+    header_component::HeaderComponent, help_component::HelpComponent,
+    progress_bar_component::ProgressBarComponent, record_details_component::RecordDetailsComponent,
+    records_component::RecordsComponent, schemas_component::SchemasComponent,
+    search_component::SearchComponent, topic_details_component::TopicDetailsComponent,
     topics_and_records_component::TopicsAndRecordsComponent, topics_component::TopicsComponent,
 };
 
@@ -51,7 +51,7 @@ impl RootComponent {
         let mut footer = FooterComponent::default();
         footer.show_shortcuts(config.show_shortcuts);
 
-        let mut components: [Arc<Mutex<dyn Component>>; 9] = [
+        let mut components: [Arc<Mutex<dyn Component>>; 10] = [
             Arc::new(Mutex::new(TopicsComponent::new(selected_topics))),
             Arc::new(Mutex::new(RecordsComponent::new(records))),
             Arc::new(Mutex::new(TopicDetailsComponent::default())),
@@ -64,6 +64,7 @@ impl RootComponent {
             Arc::new(Mutex::new(footer)),
             Arc::new(Mutex::new(HelpComponent::default())),
             Arc::new(Mutex::new(SchemasComponent::new())),
+            Arc::new(Mutex::new(HeaderComponent::default())),
             Arc::new(Mutex::new(FooterComponent::default())),
         ];
 
@@ -328,6 +329,9 @@ impl Component for RootComponent {
             }
             Action::RecordsToRead(length) => {
                 self.progress_bar.set_length(length);
+                let mut a = self.buffer_rx.clone();
+                let BufferAction::Stats(mut stats) = *a.borrow_and_update();
+                stats.total_to_read = length;
             }
             Action::CopyToClipboard(ref content) => {
                 let mut ctx = ClipboardContext::new().unwrap();
@@ -366,8 +370,8 @@ impl Component for RootComponent {
             return Ok(());
         }
         let mut a = self.buffer_rx.clone();
-        let BufferAction::Count(count) = *a.borrow_and_update();
-        self.progress_bar.set_progress(count.1);
+        let BufferAction::Stats(stats) = *a.borrow_and_update();
+        self.progress_bar.set_progress(stats.read);
         f.render_widget(Clear, rect);
 
         let last_view = self.views.last().unwrap();
@@ -379,6 +383,7 @@ impl Component for RootComponent {
         let chunks: std::rc::Rc<[Rect]> = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
+                Constraint::Min(2),
                 Constraint::Percentage(100),
                 Constraint::Min(3),
                 Constraint::Min(3),
@@ -386,14 +391,17 @@ impl Component for RootComponent {
             .split(Rect::new(
                 rect.x + 2,
                 rect.y + 1,
-                rect.width.saturating_sub(6),
+                rect.width.saturating_sub(2),
                 rect.height.saturating_sub(0),
             ));
 
-        //if self.state.focused == ComponentName::Search {
-        //    search_block = self.make_block_focused(&self.state, search_block);
-        //};
         main_component
+            .lock()
+            .unwrap()
+            .draw(f, chunks[1], &self.state)?;
+        self.components
+            .get_mut(&ComponentName::Header)
+            .unwrap()
             .lock()
             .unwrap()
             .draw(f, chunks[0], &self.state)?;
@@ -402,15 +410,15 @@ impl Component for RootComponent {
             .unwrap()
             .lock()
             .unwrap()
-            .draw(f, chunks[1], &self.state)?;
+            .draw(f, chunks[2], &self.state)?;
         self.components
             .get_mut(&ComponentName::Footer)
             .unwrap()
             .lock()
             .unwrap()
-            .draw(f, chunks[2].inner(Margin::new(1, 0)), &self.state)?;
+            .draw(f, chunks[3].inner(Margin::new(1, 0)), &self.state)?;
 
-        f.render_widget(self.progress_bar.clone(), rect);
+        //f.render_widget(self.progress_bar.clone(), rect);
         //f.render_widget(search_block, chunks[1]);
 
         Ok(())

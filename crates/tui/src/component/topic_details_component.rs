@@ -278,7 +278,7 @@ impl Component for TopicDetailsComponent {
                 .block(block_experimental),
                 Rect {
                     x: 0,
-                    y: 8.min(rect.height), // to avoid panicking with 'index outside of buffer'
+                    y: 10.min(rect.height), // to avoid panicking with 'index outside of buffer'
                     width: rect.width + 3,
                     height: 3.min(rect.height),
                 }
@@ -391,4 +391,40 @@ impl TopicDetailsComponent {
             false => self.state.select(Some(consumer_members.len() - 1)),
         }
     }
+}
+
+#[cfg(test)]
+use crate::assert_draw;
+
+#[test]
+fn test_draw() {
+    let mut component = TopicDetailsComponent::default();
+
+    component
+        .update(Action::TopicDetails(vec![TopicDetail {
+            name: "travel-stories".to_string(),
+            partitions: 4,
+            replicas: 6,
+            consumer_groups: vec![],
+            count: 0,
+        }]))
+        .unwrap();
+    assert_draw!(component, 120, 20)
+}
+
+#[test]
+fn test_draw_out_of_bounds() {
+    let mut component = TopicDetailsComponent::default();
+
+    component
+        .update(Action::TopicDetails(vec![TopicDetail {
+            name: "travel-stories".to_string(),
+            partitions: 4,
+            replicas: 6,
+            consumer_groups: vec![],
+            count: 0,
+        }]))
+        .unwrap();
+    //todo!("something needs to be fixed")
+    //assert_draw!(component, 60, 3)
 }

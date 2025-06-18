@@ -95,6 +95,28 @@ fn check_presence_of_functions(plugin: &mut Plugin) -> Result<(), Error> {
     Ok(())
 }
 
+#[tokio::test]
+async fn test_name() {
+    let temp_dir = tempfile::tempdir().expect("Failed to create temp directory");
+    let command = ImportFilterCommand {
+        file: temp_dir.path().join("my_filter.wasm"),
+        filter_name: Some("my-filter".to_string()),
+        force: false,
+    };
+    assert_eq!(command.name(), "my-filter");
+}
+
+#[tokio::test]
+async fn test_name_from_file_path() {
+    let temp_dir = tempfile::tempdir().expect("Failed to create temp directory");
+    let command = ImportFilterCommand {
+        file: temp_dir.path().join("random.wasm"),
+        filter_name: None,
+        force: false,
+    };
+    assert_eq!(command.name(), "random");
+}
+
 //fn check_parse_parameters(plugin: &mut Plugin) -> Result<(), Error> {
 //    match plugin
 //        .call::<String, i32>(PARSE_PARAMETERS_FUNCTION_NAME, "[]".to_string())

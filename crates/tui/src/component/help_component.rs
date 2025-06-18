@@ -70,8 +70,8 @@ impl Component for HelpComponent {
         let block = self.make_block_focused_with_state(state, block);
 
         let text = vec![
-            Line::from(""),
-            Line::from(""),
+            Line::from(Span::raw("")),
+            Line::from(Span::raw("")),
             Line::from("                                                           Key      Description").bold(),
             Line::from("                                                             /      Focus search input"),
             Line::from("                                                           ESC      Close the window/app"),
@@ -80,27 +80,27 @@ impl Component for HelpComponent {
             Line::from(""),
 
             Line::from("                                                      Variable      Type                        Alias       Description").bold(),
-            Line::from("                                                         topic      String                          t       Kafka topic"),
-            Line::from("                                                        offset      Number                          o       Offset of the record"),
-            Line::from("                                                           key                                      k       Key of the record"),
-            Line::from("                                                         value                                      v       Value of the record"),
-            Line::from("                                                     partition      Number                          p       Partition of the record"),
-            Line::from("                                                     timestamp      String                         ts       Timestamp of the record"),
-            Line::from("                                                          size      String                         si       Size of the record"),
-            Line::from("                                                       headers      Map<String, String>             h       Headers of the record"),
+            Line::from(vec![Span::raw("                                                         topic      "), Span::from("String").fg(state.theme.green), Span::from("                          t").fg(state.theme.blue), Span::from("        Kafka topic")]),
+            Line::from(vec![Span::raw("                                                        offset      "), Span::from("Number").fg(state.theme.green), Span::from("                          o").fg(state.theme.blue), Span::from("       Offset of the record")]),
+            Line::from(vec![Span::raw("                                                           key      "), Span::from(""), Span::from("                                k").fg(state.theme.blue), Span::from("       Key of the record")]),
+            Line::from(vec![Span::raw("                                                         value      "), Span::from(""), Span::from("                                v").fg(state.theme.blue), Span::from("       Value of the record")]),
+            Line::from(vec![Span::raw("                                                     partition      "), Span::from("Number").fg(state.theme.green), Span::from("                          p").fg(state.theme.blue), Span::from("       Partition of the record")]),
+            Line::from(vec![Span::raw("                                                     timestamp      "), Span::from("String").fg(state.theme.green), Span::from("                         ts").fg(state.theme.blue), Span::from("       Timestamp of the record")]),
+            Line::from(vec![Span::raw("                                                          size      "), Span::from("String").fg(state.theme.green), Span::from("                         si").fg(state.theme.blue), Span::from("       Size of the record")]),
+            Line::from(vec![Span::raw("                                                       headers      "), Span::from("Map<String, String>").fg(state.theme.green), Span::from("             h").fg(state.theme.blue), Span::from("       Headers of the record")]),
+            Line::from(Span::raw("")),
+
+            Line::from(vec![Span::from("                                                      Operator"), Span::from("      Type").fg(state.theme.green), Span::from("                                    Description").bold()]),
+            Line::from(vec![Span::from("                                     == | != | > | >= | < | <="), Span::from("      Number | String").fg(state.theme.green), Span::from("                         Wayne's world, party time! Excellent!")]),
+            Line::from(vec![Span::from("                                                 contains | ~="), Span::from("      String").fg(state.theme.green), Span::from("                                  Test if the variable contains the specified string")]),
+            Line::from(vec![Span::from("                                                   starts with"), Span::from("      String").fg(state.theme.green), Span::from("                                  Test if the variable starts with the specified string")]),
             Line::from(""),
 
-            Line::from("                                                      Operator      Type                                    Description").bold(),
-            Line::from("                                     == | != | > | >= | < | <=      Number | String                         Wayne's world, party time! Excellent!"),
-            Line::from("                                                 contains | ~=      String                                  Test if the variable contains the specified string"),
-            Line::from("                                                   starts with      String                                  Test if the variable starts with the specified string"),
-            Line::from(""),
 
-
-            Line::from("                                                        Clause      Syntax                                  Description").bold(),
-            Line::from("                                                         limit      limit <number>                          Limit the number of kafka records to receive"),
-            Line::from("                                                          from      from <begin|end|date|offset>            Start consuming records from the beginning, the end or a date"),
-            Line::from("                                                      order by      order by <var> <asc|desc>               Sort kafka records"),
+            Line::from(vec![Span::from("                                                        Clause      Syntax                                  Description").bold()]),
+            Line::from(vec![Span::from("                                                         limit      limit <"), Span::from("number").fg(state.theme.yellow), Span::from(">                          Limit the number of kafka records to receive")]),
+            Line::from(vec![Span::from("                                                          from      from <"), Span::from("begin").fg(state.theme.yellow), Span::from("|"), Span::from("end").fg(state.theme.yellow), Span::from("|"), Span::from("date").fg(state.theme.yellow), Span::from("|"), Span::from("offset").fg(state.theme.yellow), Span::from(">            Start consuming records from the beginning, the end or a date")]),
+            Line::from(vec![Span::from("                                                      order by      order by <"), Span::from("var").fg(state.theme.yellow), Span::from("> <"), Span::from("asc").fg(state.theme.yellow), Span::from("|"), Span::from("desc").fg(state.theme.yellow), Span::from(">               Sort kafka records")]),
             Line::from(""),
 
             Line::from("                                                         Input      Description").bold(),
@@ -154,4 +154,13 @@ impl Component for HelpComponent {
 
         Ok(())
     }
+}
+
+#[cfg(test)]
+use crate::assert_draw;
+
+#[test]
+fn test_draw() {
+    let mut component = HelpComponent::default();
+    assert_draw!(component, 300, 60)
 }

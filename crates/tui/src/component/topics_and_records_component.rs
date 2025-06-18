@@ -40,3 +40,49 @@ impl Component for TopicsAndRecordsComponent {
         Ok(())
     }
 }
+
+#[cfg(test)]
+use crate::assert_draw;
+
+#[cfg(test)]
+#[test]
+fn test_draw() {
+    use lib::{DataType, KafkaRecord};
+    use serde_json::json;
+
+    use crate::component::{
+        BUFFER, records_component::RecordsComponent, topics_component::TopicsComponent,
+    };
+
+    let topics_component = TopicsComponent::new(vec!["topic1".to_string()]);
+    let records_component = RecordsComponent::new(&BUFFER);
+    BUFFER.lock().unwrap().reset();
+    BUFFER.lock().unwrap().push(KafkaRecord {
+        topic: "movie-trailers".into(),
+        timestamp: None,
+        partition: 0,
+        offset: 314,
+        headers: Default::default(),
+        key_schema: None,
+        value_schema: None,
+        size: 4348,
+        key: DataType::String("7f12bd3b-4c96-4ba1-b010-8092234eec13".into()),
+        key_as_string: "7f12bd3b-4c96-4ba1-b010-8092234eec13".into(),
+        value: DataType::Json(json!(
+            r#"{
+            {
+            "title" : "Swiss Army Man",
+            "year": 20013
+            }
+            
+            }"#
+        )),
+        value_as_string: Default::default(),
+    });
+
+    let mut component = TopicsAndRecordsComponent::new(
+        Arc::new(Mutex::new(topics_component)),
+        Arc::new(Mutex::new(records_component)),
+    );
+    assert_draw!(component, 120, 5)
+}
