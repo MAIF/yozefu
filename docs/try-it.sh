@@ -172,7 +172,7 @@ if [ "$ready" = "0" ]; then
       /usr/bin/kafka-topics \
       --create --if-not-exists          \
       --bootstrap-server localhost:9092 \
-      --partitions 3                    \
+      --partitions 12                    \
       --topic "${topic}"
 
     if jbang --version &> /dev/null; then

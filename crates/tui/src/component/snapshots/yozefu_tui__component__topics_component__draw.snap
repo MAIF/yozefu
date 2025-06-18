@@ -1,0 +1,9 @@
+---
+source: crates/tui/src/component/topics_component.rs
+expression: terminal.backend()
+---
+"┏ Topics ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
+"┃ [ ] private-random-people                                ┃"
+"┃ [ ] public-french-addresses                              ┃"
+"┃ [ ] public-patisserie-delights                           ┃"
+"┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"

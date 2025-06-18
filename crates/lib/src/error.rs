@@ -74,12 +74,6 @@ impl From<serde_json::Error> for Error {
     }
 }
 
-impl From<&str> for Error {
-    fn from(e: &str) -> Self {
-        Error::Error(e.to_string())
-    }
-}
-
 impl From<TryFromIntError> for Error {
     fn from(e: TryFromIntError) -> Self {
         Error::Error(e.to_string())
@@ -96,4 +90,12 @@ impl From<Utf8Error> for Error {
     fn from(e: Utf8Error) -> Self {
         Error::Error(e.to_string())
     }
+}
+
+#[test]
+fn test_serde_to_error() {
+    use serde_json::Value;
+    let result = serde_json::from_str::<Value>("{notvalid}");
+    let error: Error = result.unwrap_err().into();
+    assert!(matches!(error, Error::SerdeError(_)));
 }

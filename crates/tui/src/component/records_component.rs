@@ -1,8 +1,8 @@
 //! Component showing in real time incoming kafka records.
+
 use app::search::ValidSearchQuery;
 use copypasta::{ClipboardContext, ClipboardProvider};
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
-use itertools::Itertools;
 use lib::ExportedKafkaRecord;
 use ratatui::{
     Frame,
@@ -16,9 +16,14 @@ use throbber_widgets_tui::ThrobberState;
 use tokio::sync::mpsc::UnboundedSender;
 use tokio::sync::watch::Receiver;
 
-use crate::{Action, action::Notification, error::TuiError, records_buffer::BufferAction};
+use crate::{
+    Action,
+    action::Notification,
+    error::TuiError,
+    records_buffer::{BufferAction, Stats},
+};
 
-use super::{Component, ComponentName, ConcurrentRecordsBuffer, Shortcut, State};
+use super::{Component, ComponentName, ConcurrentRecordsBuffer, Shortcut, State, styles};
 
 pub(crate) struct RecordsComponent<'a> {
     records: &'a ConcurrentRecordsBuffer,
@@ -26,7 +31,7 @@ pub(crate) struct RecordsComponent<'a> {
     status: ThrobberState,
     search_query: ValidSearchQuery,
     consuming: bool,
-    count: (usize, usize, usize),
+    stats: Stats,
     follow: bool,
     action_tx: Option<UnboundedSender<Action>>,
     buffer_tx: Receiver<BufferAction>,
@@ -44,7 +49,7 @@ impl<'a> RecordsComponent<'a> {
             status: Default::default(),
             search_query: Default::default(),
             consuming: Default::default(),
-            count: Default::default(),
+            stats: Default::default(),
             follow: Default::default(),
             action_tx: Default::default(),
             buffer_tx,
@@ -54,11 +59,11 @@ impl<'a> RecordsComponent<'a> {
     }
 
     fn buffer_is_empty(&self) -> bool {
-        self.count.2 == 0
+        self.stats.buffer_size == 0
     }
 
     fn buffer_len(&self) -> usize {
-        self.count.2
+        self.stats.buffer_size
     }
 
     fn next(&mut self) {
@@ -77,13 +82,6 @@ impl<'a> RecordsComponent<'a> {
             None => 0,
         };
         self.state.select(Some(i));
-    }
-
-    fn shorten_topic(topic: &str) -> String {
-        let t = topic.replace('_', "");
-        let parts = t.split('.');
-        let e = parts.map(|e| e.chars().next().unwrap_or('_')).join(".");
-        e
     }
 
     fn show_details(&mut self) -> Result<(), TuiError> {
@@ -140,9 +138,9 @@ impl<'a> RecordsComponent<'a> {
         }
     }
 
-    pub fn on_new_record(&mut self, count: (usize, usize, usize)) -> Result<(), TuiError> {
-        self.count = count;
-        let length = count.2;
+    pub fn on_new_record(&mut self, stats: Stats) -> Result<(), TuiError> {
+        self.stats = stats;
+        let length = self.stats.buffer_size;
         let empty_buffer = length == 0;
         if self.follow && !empty_buffer {
             self.state.select(Some(length - 1));
@@ -292,18 +290,18 @@ impl Component for RecordsComponent<'_> {
 
     fn update(&mut self, action: Action) -> Result<Option<Action>, TuiError> {
         let mut a = self.buffer_tx.clone();
-        let BufferAction::Count(count) = *a.borrow_and_update();
-        let _ = self.on_new_record(count);
+        let BufferAction::Stats(stats) = *a.borrow_and_update();
+        let _ = self.on_new_record(stats);
         match action.clone() {
             Action::NewConsumer() => {
-                self.count = (0, 0, 0);
+                self.stats = Default::default();
             }
             Action::Tick => self.status.calc_next(),
             Action::SelectedTopics(topics) => self.selected_topics = topics.len(),
             Action::Consuming => self.consuming = true,
             Action::StopConsuming() => {
                 self.consuming = false;
-                self.count = (0, 0, 0);
+                self.stats = Default::default();
             }
             Action::Search(search_query) => {
                 self.state.select(None);
@@ -325,12 +323,11 @@ impl Component for RecordsComponent<'_> {
 
         let normal_style = Style::default();
         let header_cells = vec![
-            Cell::new(Text::from("Timestamp")),
-            Cell::new(Text::from("Offset").alignment(Alignment::Right)),
-            Cell::new(Text::from("Partition").alignment(Alignment::Right)),
-            Cell::new(Text::from("Topic").alignment(Alignment::Right)),
-            Cell::new(Text::from("Key").alignment(Alignment::Right)),
-            Cell::new(Text::from("Value")),
+            Cell::new(Text::from("Timestamp")).bold(),
+            Cell::new(Text::from("Topic").alignment(Alignment::Right)).bold(),
+            Cell::new(Text::from("Offset").alignment(Alignment::Right)).bold(),
+            Cell::new(Text::from("Key").alignment(Alignment::Right)).bold(),
+            Cell::new(Text::from("Value")).bold(),
         ];
         let header = Row::new(header_cells)
             .style(normal_style)
@@ -347,16 +344,22 @@ impl Component for RecordsComponent<'_> {
                     return Row::new(Vec::<Cell>::new()).height(1_u16);
                 }
             }
+
             let cells = vec![
-                Cell::new(Text::from(
-                    item.timestamp_as_local_date_time()
-                        .map(|e| e.to_rfc3339_opts(chrono::SecondsFormat::Millis, false))
-                        .unwrap_or("".to_string()),
-                )),
+                Cell::new(styles::colorize_timestamp(item, &state.theme)),
+                Cell::new(
+                    Text::from(styles::colorize_and_shorten_topic(
+                        &item.topic,
+                        item.partition,
+                        &state.theme,
+                    ))
+                    .alignment(Alignment::Right),
+                ),
                 Cell::new(Text::from(item.offset.to_string()).alignment(Alignment::Right)),
-                Cell::new(Text::from(item.partition.to_string()).alignment(Alignment::Right)),
-                Cell::new(Text::from(Self::shorten_topic(&item.topic)).alignment(Alignment::Right)),
-                Cell::new(Text::from(item.key_as_string.to_string()).alignment(Alignment::Right)),
+                Cell::new(
+                    styles::colorize_key(&item.key_as_string, &state.theme)
+                        .alignment(Alignment::Right),
+                ),
                 Cell::new(Text::from(Self::truncate_value(
                     &item.value_as_string,
                     &rect,
@@ -367,15 +370,15 @@ impl Component for RecordsComponent<'_> {
         let table = Table::new(
             rows,
             [
-                Constraint::Min(30),
-                Constraint::Min(10),
-                Constraint::Min(10),
-                Constraint::Min(11),
+                Constraint::Min(29),
                 Constraint::Min(12),
+                Constraint::Min(7),
+                Constraint::Min(10),
                 Constraint::Percentage(100),
             ],
         )
         .header(header)
+        .column_spacing(2)
         .row_highlight_style(match focused {
             true => Style::default()
                 .bg(state.theme.bg_focused_selected)
@@ -388,9 +391,16 @@ impl Component for RecordsComponent<'_> {
 
         let metrics = Span::styled(
             format!(
-                " {} / {} ",
-                self.count.0.separate_with_underscores(),
-                self.count.1.separate_with_underscores()
+                " {} / {}",
+                self.stats.matched.separate_with_underscores(),
+                self.stats.read.separate_with_underscores(),
+                //self.stats.read
+                //    .checked_div(self.stats.read)
+                //    .unwrap_or(0)
+                //    .checked_mul(100)
+                //    .unwrap_or(0)
+                //    .checked_div(self.stats.total_to_read)
+                //    .unwrap_or(0),
             ),
             Style::default(),
         );
@@ -403,14 +413,14 @@ impl Component for RecordsComponent<'_> {
                 .right()
                 .checked_sub(u16::try_from(metrics.width())?)
                 .unwrap_or(1000)
-                .checked_sub(10)
+                .checked_sub(11)
                 .unwrap_or(1000),
             inner.y,
             metrics.width() as u16,
             1,
         );
 
-        if self.consuming && self.count.1 != 0 {
+        if self.consuming && self.stats.read != 0 {
             f.render_widget(metrics, metrics_area);
         }
         if self.consuming {

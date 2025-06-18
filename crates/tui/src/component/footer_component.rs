@@ -4,15 +4,12 @@ use crossterm::event::KeyEvent;
 use ratatui::{
     Frame,
     layout::Rect,
-    style::{Style, Stylize},
+    style::{Color, Stylize},
     text::{Line, Span},
 };
 use tokio::sync::mpsc::UnboundedSender;
 
-use crate::{
-    action::{Action, Notification},
-    error::TuiError,
-};
+use crate::{action::Action, error::TuiError};
 
 use super::{Component, ComponentName, Shortcut, State};
 
@@ -20,19 +17,23 @@ use super::{Component, ComponentName, Shortcut, State};
 pub struct FooterComponent {
     shortcuts: Vec<Shortcut>,
     main_component: ComponentName,
-    state: Vec<ComponentName>,
-    notification: Option<Notification>,
     action_tx: Option<UnboundedSender<Action>>,
-    ticks: u64,
     show_shortcuts: bool,
 }
 
 impl FooterComponent {
-    fn generate_shortcuts(&self, _state: &State) -> Vec<Span<'static>> {
+    fn generate_shortcuts(&self, state: &State) -> Vec<Span<'static>> {
         let mut spans = vec![];
         for shortcut in &self.shortcuts {
-            spans.push(format!("[{}]", shortcut.key).bold());
-            spans.push(format!(":{}   ", shortcut.description).into());
+            spans.push(
+                format!("[{}]", shortcut.key)
+                    .bold()
+                    .fg(state.theme.shortcuts.unwrap_or(Color::DarkGray)),
+            );
+            spans.push(
+                format!(":{}   ", shortcut.description)
+                    .fg(state.theme.shortcuts.unwrap_or(Color::DarkGray)),
+            );
         }
 
         spans
@@ -76,19 +77,8 @@ impl Component for FooterComponent {
                 self.shortcuts.push(Shortcut::new("TAB", "Next panel"));
                 self.shortcuts.push(Shortcut::new("ESC", "Quit"));
             }
-            Action::ViewStack((main_component, views)) => {
+            Action::ViewStack((main_component, _views)) => {
                 self.main_component = main_component;
-                self.state = views;
-            }
-            Action::Notification(notification) => {
-                self.ticks = 0;
-                self.notification = Some(notification)
-            }
-            Action::Tick => {
-                self.ticks += 1;
-                if self.ticks > 20 {
-                    self.notification = None;
-                }
             }
             _ => (),
         }
@@ -96,69 +86,30 @@ impl Component for FooterComponent {
     }
 
     fn draw(&mut self, f: &mut Frame<'_>, rect: Rect, state: &State) -> Result<(), TuiError> {
-        let mut view_stack = self.state.clone();
-        view_stack.dedup();
-        view_stack.push(state.focused.clone());
-        let mut help = vec![];
-        help.push(
-            format!(" {} ", state.cluster)
-                .black()
-                .bold()
-                .bg(state.theme.white),
-        );
-        help.push(" ".into());
-        for v in view_stack.iter().enumerate() {
-            let colors = match v.0 == view_stack.len() - 1 {
-                true => (state.theme.bg_active, state.theme.fg_active),
-                false => (state.theme.bg_disabled, state.theme.fg_disabled),
-            };
-            if v.0 > 0 {
-                #[cfg(not(debug_assertions))]
-                help.push("—".fg(colors.0));
-                #[cfg(debug_assertions)]
-                help.push("".to_string().bg(colors.0).fg(state.theme.bg));
-            }
-            let prefix = match v.0 {
-                0 if self.main_component == ComponentName::TopicsAndRecords => "◧ ",
-                0 if self.main_component == ComponentName::Records => "□ ",
-                _ => "",
-            };
-
-            help.push(
-                format!(" {}{:<8}", prefix, v.1.label())
-                    .bg(colors.0)
-                    .fg(colors.1)
-                    .bold(),
-            );
-            #[cfg(debug_assertions)]
-            help.push("".fg(colors.0));
-        }
-
-        help.push(Span::from("  "));
+        let mut help: Vec<Span<'static>> = vec![];
         if self.show_shortcuts {
             help.extend(self.generate_shortcuts(state));
         }
 
         let line = Line::from(help);
         f.render_widget(line, rect);
-
-        if let Some(n) = &self.notification {
-            let notification =
-                Span::styled(n.message.to_string(), Style::default().italic().not_bold());
-            let r = Rect::new(
-                rect.width
-                    .saturating_sub(u16::try_from(n.message.len().checked_sub(3).unwrap_or(3))?),
-                rect.y,
-                n.message.len() as u16,
-                1,
-            );
-            let notification = match n.level {
-                log::Level::Error => notification.fg(state.theme.red).underlined(),
-                log::Level::Warn => notification.fg(state.theme.yellow),
-                _ => notification,
-            };
-            f.render_widget(notification, r);
-        }
         Ok(())
     }
+}
+
+#[cfg(test)]
+use crate::assert_draw;
+
+#[test]
+fn test_draw() {
+    let mut component = FooterComponent::default();
+    // TODO doesn't make sense
+    component.show_shortcuts(true);
+    component
+        .update(Action::Shortcuts(
+            vec![Shortcut::new("CTRL + T", "Run tests")],
+            true,
+        ))
+        .unwrap();
+    assert_draw!(component, 60, 3)
 }

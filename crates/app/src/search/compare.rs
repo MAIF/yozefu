@@ -7,9 +7,8 @@ use lib::{
     },
 };
 
-use crate::search::Search;
-
 use super::SearchContext;
+use crate::search::Search;
 
 impl Search for CompareExpression {
     fn offset(&self) -> Option<FromOffset> {
@@ -107,4 +106,34 @@ impl Search for CompareExpression {
     fn filters(&self) -> Vec<Filter> {
         vec![]
     }
+}
+
+#[test]
+fn test_matches() {
+    use crate::search::filter::CACHED_FILTERS;
+    use lib::kafka::KafkaRecord;
+    use std::path::PathBuf;
+
+    let compare = CompareExpression::Offset(NumberOperator::Equal, 42);
+    let record = KafkaRecord {
+        topic: "test-topic".to_string(),
+        partition: 0,
+        offset: 42,
+        key: lib::DataType::String("key".to_string()),
+        value: lib::DataType::String("value".to_string()),
+        timestamp: None,
+        headers: std::collections::BTreeMap::new(),
+        key_schema: None,
+        value_schema: None,
+        size: 12,
+        key_as_string: "key".to_string(),
+        value_as_string: "value".to_string(),
+    };
+    let context = SearchContext {
+        record: &record,
+        filters: &CACHED_FILTERS,
+        filters_directory: PathBuf::from("."),
+    };
+
+    assert!(compare.matches(&context))
 }

@@ -1,0 +1,7 @@
+---
+source: crates/tui/src/component/search_component.rs
+expression: terminal.backend()
+---
+"╭ Search ──────────────────────────────────────────────────╮"
+"│                                                          │"
+"╰──────────────────────────────────────────────────────────╯"

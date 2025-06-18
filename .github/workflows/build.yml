@@ -26,6 +26,8 @@ jobs:
   check:
     name: Check ${{ matrix.package.name }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       matrix:
         package:
@@ -43,6 +45,8 @@ jobs:
             command: cargo run --locked -- --version
     steps:
     - uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - uses: actions-rust-lang/setup-rust-toolchain@v1
       with:
         toolchain: stable
@@ -54,6 +58,8 @@ jobs:
     name: Build w/o features
     needs: check
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       matrix:
         rust:
@@ -62,6 +68,8 @@ jobs:
           - nightly
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: ${{ matrix.rust }}
@@ -74,6 +82,8 @@ jobs:
     needs: check
     runs-on: ${{ matrix.platforms.os }}
     continue-on-error: true
+    permissions:
+      contents: read
     strategy:
       matrix:
         platforms:
@@ -98,6 +108,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: houseabsolute/actions-rust-cross@v1
         with:
           target: ${{ matrix.platforms.target }}
@@ -108,8 +120,12 @@ jobs:
     needs: check
     name: Clippy
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
@@ -122,8 +138,12 @@ jobs:
     needs: check
     name: License
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
@@ -137,8 +157,12 @@ jobs:
     needs: check
     name: Format
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
@@ -151,17 +175,25 @@ jobs:
     needs: check
     name: Unused dependencies
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: Swatinem/rust-cache@v2
       - uses: bnjbvr/cargo-machete@main
 
   tests:
     needs: check
     name: Tests
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
@@ -173,9 +205,13 @@ jobs:
   doc:
     needs: check
     name: Documentation
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
@@ -187,13 +223,17 @@ jobs:
     name: Lychee
     runs-on: ubuntu-latest
     needs: [check]
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: lycheeverse/lychee-action@v2
         name: Link Checker
         # https://github.com/lycheeverse/lychee/issues/1405
         with:
-          args: --exclude-loopback README.md './crates/app/README.md' './crates/command/README.md' './crates/lib/README.md' './crates/wasm-types/README.md' './crates/bin/src/**' './crates/app/src/**' './crates/command/src/**' './crates/lib/src/**' './crates/wasm-types/src/**' './docs/*.md' --exclude-path ./docs/url-templates/README.md --exclude-path ./docs/schema-registry/README.md  --exclude 'https://docs.rs'
+          args: --accept '100..=103,200..=299,429' --exclude-loopback README.md './crates/app/README.md' './crates/command/README.md' './crates/lib/README.md' './crates/wasm-types/README.md' './crates/bin/src/**' './crates/app/src/**' './crates/command/src/**' './crates/lib/src/**' './crates/wasm-types/src/**' './docs/*.md' --exclude-path ./docs/url-templates/README.md --exclude-path ./docs/schema-registry/README.md  --exclude 'https://docs.rs'
 
   # https://docs.github.com/en/actions/use-cases-and-examples/publishing-packages/publishing-docker-images
   docker:
@@ -208,6 +248,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
     - name: Build
@@ -222,16 +264,24 @@ jobs:
     name: Typos
     runs-on: ubuntu-latest
     needs: [check]
+    permissions:
+      contents: read
     steps:
     - name: Checkout Actions Repository
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: Check spelling of the project
       uses: crate-ci/typos@master
 
   cargo-deny:
     name: Cargo deny
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: [check]
     steps:
     - uses: actions/checkout@v4
+      with:
+          persist-credentials: false
     - uses: EmbarkStudios/cargo-deny-action@v2

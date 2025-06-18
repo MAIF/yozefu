@@ -136,3 +136,21 @@ fn test_parse_order_keyword() {
     assert_eq!(parse_order_keyword(r#"asc"#), Ok(("", OrderKeyword::Asc)));
     assert_eq!(parse_order_keyword(r#"desc"#), Ok(("", OrderKeyword::Desc)));
 }
+
+#[test]
+fn test_fmt() {
+    assert_eq!(
+        format!("{}", OrderBy::new(Order::Key, OrderKeyword::Asc)),
+        "order by key asc"
+    );
+    assert_eq!(
+        format!("{}", OrderBy::new(Order::Value, OrderKeyword::Desc)),
+        "order by value desc"
+    );
+}
+
+#[test]
+fn test_is_descending() {
+    assert!(OrderBy::new(Order::Key, OrderKeyword::Desc).is_descending());
+    assert!(!OrderBy::new(Order::Partition, OrderKeyword::Asc).is_descending());
+}

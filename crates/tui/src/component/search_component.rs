@@ -13,7 +13,7 @@ use log::error;
 use ratatui::{
     Frame,
     layout::{Position, Rect},
-    style::{Style, Stylize},
+    style::Style,
     text::{Line, Span},
     widgets::{Block, BorderType, Borders, Padding, Paragraph, Wrap},
 };
@@ -46,7 +46,7 @@ impl SearchComponent {
     pub fn new(input: &str, history: Vec<String>, filters_directory: PathBuf) -> Self {
         Self {
             input: Input::from(input),
-            index_history: history.len() - 1,
+            index_history: history.len().saturating_sub(1),
             history,
             filters_directory,
             ..Self::default()
@@ -288,3 +288,62 @@ impl Component for SearchComponent {
         ]
     }
 }
+
+#[cfg(test)]
+use crate::assert_draw;
+
+#[test]
+fn test_draw() {
+    let mut component = SearchComponent::default();
+    assert_draw!(component, 60, 3)
+}
+
+#[test]
+fn test_empty_history_underflow() {
+    let component = SearchComponent::new("from begin", vec![], PathBuf::from("."));
+    assert_eq!(component.index_history, 0);
+}
+
+//#[cfg(test)]
+//use quickcheck_macros::quickcheck;
+//
+//#[cfg(test)]
+//#[quickcheck]
+//fn test_responsiveness(width: u16, height: u16) -> bool {
+//    true
+//    info!(
+//        "Testing responsiveness with width: {}, height: {}",
+//        width, height
+//    );
+//    use crate::Theme;
+//    use app::configuration::GlobalConfig;
+//    use log::info;
+//    use ratatui::{Terminal, backend::TestBackend};
+//    let mut component = SearchComponent::default();
+//
+//    let temp_dir = tempfile::tempdir().unwrap();
+//    let temp_path = temp_dir.path().to_path_buf();
+//
+//    let state = State::new(
+//        "test",
+//        Theme::light(),
+//        &GlobalConfig {
+//            path: temp_path.clone().join("config.json"),
+//            yozefu_directory: temp_path.join("config"),
+//            logs: None,
+//            default_url_template: "".to_string(),
+//            initial_query: "".to_string(),
+//            theme: "light".to_string(),
+//            clusters: indexmap::IndexMap::default(),
+//            default_kafka_config: indexmap::IndexMap::default(),
+//            history: vec![],
+//            show_shortcuts: true,
+//            export_directory: std::path::PathBuf::from(""),
+//        },
+//    );
+//
+//    let mut terminal = Terminal::new(TestBackend::new(width, height)).unwrap();
+//    terminal
+//        .draw(|frame| component.draw(frame, frame.area(), &state).unwrap())
+//        .is_ok()
+//}

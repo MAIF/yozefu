@@ -48,7 +48,7 @@ impl Headless {
 
     pub async fn run(&self) -> Result<(), Error> {
         if self.topics.is_empty() {
-            return Err("Please specify topics to consume".into());
+            return Err(Error::Error("Please specify topics to consume".into()));
         }
         info!("Creating consumer for topics [{}]", self.topics.join(", "));
         let consumer = self.app.create_consumer(&self.topics)?;

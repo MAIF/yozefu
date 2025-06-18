@@ -23,10 +23,9 @@ const BUFFER_SIZE: usize = 120;
 /// Wrapper around [CircularBuffer]
 pub(crate) struct RecordsBuffer {
     buffer: CircularBuffer<BUFFER_SIZE, KafkaRecord>,
-    read: usize,
+    stats: Stats,
     pub channels: (Sender<BufferAction>, Receiver<BufferAction>),
     last_time_sorted: usize,
-    matched: usize,
 }
 
 macro_rules! sort_records {
@@ -51,9 +50,8 @@ impl RecordsBuffer {
     pub fn new() -> Self {
         Self {
             buffer: CircularBuffer::<BUFFER_SIZE, KafkaRecord>::new(),
-            read: 0,
-            channels: watch::channel(BufferAction::Count((0, 0, 0))),
-            matched: 0,
+            stats: Stats::default(),
+            channels: watch::channel(BufferAction::Stats(Stats::default())),
             last_time_sorted: 0,
         }
     }
@@ -61,47 +59,51 @@ impl RecordsBuffer {
     /// Empty the buffer and reset metrics
     pub fn reset(&mut self) {
         self.buffer.clear();
-        self.read = 0;
-        self.matched = 0;
+        self.stats = Stats::default();
         self.dispatch_metrics();
     }
 
     /// Returns the metrics of the number of records matched and read.
-    pub fn matched_and_read(&self) -> (usize, usize, usize) {
-        (self.matched, self.read, self.buffer.len())
+    pub fn stats(&self) -> Stats {
+        Stats {
+            matched: self.stats.matched,
+            read: self.stats.read,
+            total_to_read: self.stats.total_to_read,
+            buffer_size: self.buffer.len(),
+        }
     }
 
     /// Updates the metric regarding the number of kafka records read
     pub fn new_record_read(&mut self) {
-        self.read += 1;
+        self.stats.read += 1;
     }
 
     pub fn get(&self, index: usize) -> Option<&KafkaRecord> {
         self.buffer.get(index)
     }
 
-    pub fn iter(&self) -> Iter<KafkaRecord> {
+    pub fn iter(&self) -> Iter<'_, KafkaRecord> {
         self.buffer.iter()
     }
 
     pub fn push(&mut self, kafka_record: KafkaRecord) -> usize {
         self.buffer.push_back(kafka_record);
-        self.matched += 1;
-        self.matched
+        self.stats.matched += 1;
+        self.stats.matched
     }
 
     /// Dispatches a new events about the metrics of the buffer
     pub fn dispatch_metrics(&mut self) {
         self.channels
             .0
-            .send(BufferAction::Count(self.matched_and_read()))
+            .send(BufferAction::Stats(self.stats()))
             .unwrap();
     }
 
     /// Sort the buffer by the given order
     pub fn sort(&mut self, order_by: &OrderBy) {
         let mut unsorted = self.buffer.to_vec();
-        if self.read == self.last_time_sorted {
+        if self.stats.read == self.last_time_sorted {
             return;
         }
         let reverse = order_by.is_descending();
@@ -136,7 +138,15 @@ impl RecordsBuffer {
 }
 
 #[allow(clippy::large_enum_variant)]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Clone)]
 pub enum BufferAction {
-    Count((usize, usize, usize)),
+    Stats(Stats),
+}
+
+#[derive(Default, Clone, Copy)]
+pub struct Stats {
+    pub matched: usize,
+    pub read: usize,
+    pub total_to_read: usize,
+    pub buffer_size: usize,
 }

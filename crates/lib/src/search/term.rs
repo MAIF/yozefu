@@ -39,15 +39,44 @@ impl Display for Term {
     }
 }
 
-//#[test]
-//fn test_parse() {
-//    use crate::search::symbol::Symbol;
-//    assert_eq!(
-//        parse_term(r#"!partition"#),
-//        Ok(("", Term::Not(Atom::Symbol(Symbol::Partition))))
-//    );
-//    assert_eq!(
-//        parse_term(r#"topic"#),
-//        Ok(("", Term::Atom(Atom::Symbol(Symbol::Topic))))
-//    );
-//}
+#[cfg(test)]
+use crate::search::compare::CompareExpression;
+#[cfg(test)]
+use crate::search::symbol::Symbol;
+
+#[test]
+fn test_parse() {
+    assert_eq!(
+        parse_term(r#"!partition == 1"#),
+        Ok((
+            "",
+            Term::Not(Atom::Compare(CompareExpression::Partition(
+                crate::search::compare::NumberOperator::Equal,
+                1
+            )))
+        ))
+    );
+    assert_eq!(
+        parse_term(r#"topic == 'hello'"#),
+        Ok((
+            "",
+            Term::Atom(Atom::Compare(CompareExpression::Topic(
+                crate::search::compare::StringOperator::Equal,
+                "hello".to_string()
+            )))
+        ))
+    );
+}
+
+#[test]
+fn test_fmt() {
+    assert_eq!(
+        Term::Atom(Atom::Symbol(Symbol::Timestamp)).to_string(),
+        "Timestamp".to_string()
+    );
+
+    assert_eq!(
+        Term::Not(Atom::Symbol(Symbol::Partition)).to_string(),
+        "!Partition".to_string()
+    )
+}

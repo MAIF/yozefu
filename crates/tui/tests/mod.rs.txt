@@ -1,0 +1,43 @@
+use app::{
+    App,
+    configuration::{ClusterConfig, GlobalConfig, InternalConfig, YozefuConfig},
+    search::ValidSearchQuery,
+};
+use indexmap::IndexMap;
+use yozefu_tui::{State, Theme, Ui};
+
+#[tokio::test]
+async fn pouet() {
+    let temp_dir = tempfile::tempdir().unwrap();
+    let temp_path = temp_dir.path().to_path_buf();
+
+    let global_config = GlobalConfig {
+        path: temp_path.clone(),
+        yozefu_directory: temp_path.clone(),
+        logs: None,
+        default_url_template: "".to_string(),
+        initial_query: "from begin".to_string(),
+        theme: "light".to_string(),
+        clusters: IndexMap::default(),
+        default_kafka_config: IndexMap::default(),
+        history: Default::default(),
+        show_shortcuts: false,
+        export_directory: temp_path.clone(),
+    };
+
+    let config = InternalConfig::new(
+        YozefuConfig::new(ClusterConfig::default()),
+        global_config.clone(),
+    );
+
+    let app = App::new(
+        "localhost".to_string(),
+        config,
+        ValidSearchQuery::from("from begin", &temp_path).unwrap(),
+    );
+
+    let state = State::new("test", Theme::light(), &global_config);
+    let mut ui = Ui::new(app, "from begin".to_string(), vec![], state.clone());
+
+    ui.run(vec![], state).await.unwrap();
+}

@@ -1,0 +1,7 @@
+---
+source: crates/tui/src/component/progress_bar_component.rs
+expression: terminal.backend()
+---
+"▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔                                   "
+"                                                  "
+"                                                  "
