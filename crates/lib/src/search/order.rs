@@ -111,7 +111,7 @@ impl std::fmt::Display for Order {
             Order::Size => "size",
             Order::Topic => "topic",
         };
-        write!(f, "{}", order)
+        write!(f, "{order}")
     }
 }
 
@@ -121,7 +121,7 @@ impl std::fmt::Display for OrderKeyword {
             OrderKeyword::Desc => "desc",
             OrderKeyword::Asc => "asc",
         };
-        write!(f, "{}", keyword)
+        write!(f, "{keyword}")
     }
 }
 

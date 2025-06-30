@@ -179,7 +179,7 @@ impl App {
             }
         }
         consumer.assign(&assignments)?;
-        info!("New Consumer created, about to consume {:?}", topics);
+        info!("New Consumer created, about to consume {topics:?}");
         Ok(consumer)
     }
 

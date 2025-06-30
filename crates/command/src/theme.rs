@@ -36,7 +36,7 @@ pub(crate) async fn init_themes_file() -> Result<PathBuf, Error> {
             }
         },
         Err(e) => {
-            warn!("Error while downloading theme file: {}", e);
+            warn!("Error while downloading theme file: {e}");
             serde_json::to_string_pretty(&default_themes).unwrap()
         }
     };
@@ -62,7 +62,7 @@ pub(crate) async fn update_themes() -> Result<PathBuf, Error> {
     let content = fs::read_to_string(&path)?;
     let mut local_themes: IndexMap<String, Theme> = serde_json::from_str(&content)?;
 
-    info!("Updating themes file from {}", THEMES_URL);
+    info!("Updating themes file from {THEMES_URL}");
     let content = match reqwest::get(THEMES_URL).await {
         Ok(response) => match response.status().is_success() {
             true => response.text().await.unwrap(),
@@ -72,7 +72,7 @@ pub(crate) async fn update_themes() -> Result<PathBuf, Error> {
             }
         },
         Err(e) => {
-            warn!("Error while downloading theme file: {}", e);
+            warn!("Error while downloading theme file: {e}");
             "{}".to_string()
         }
     };
@@ -81,7 +81,7 @@ pub(crate) async fn update_themes() -> Result<PathBuf, Error> {
 
     for (name, theme) in new_themes {
         if !local_themes.contains_key(&name) {
-            info!("Theme '{}' added", name);
+            info!("Theme '{name}' added");
             local_themes.insert(name, theme);
         }
     }

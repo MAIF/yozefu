@@ -61,8 +61,8 @@ pub enum Parameter {
 impl Display for Parameter {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Parameter::Number(i) => write!(f, "{}", i),
-            Parameter::String(i) => write!(f, "'{}'", i),
+            Parameter::Number(i) => write!(f, "{i}"),
+            Parameter::String(i) => write!(f, "'{i}'"),
         }
     }
 }

@@ -33,8 +33,8 @@ pub(crate) fn parse_term(input: &str) -> IResult<&str, Term> {
 impl Display for Term {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Term::Not(a) => write!(f, "!{}", a),
-            Term::Atom(a) => write!(f, "{}", a),
+            Term::Not(a) => write!(f, "!{a}"),
+            Term::Atom(a) => write!(f, "{a}"),
         }
     }
 }

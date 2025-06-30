@@ -78,7 +78,7 @@ impl Ui {
                     log::Level::Error,
                     e.to_string(),
                 )))?;
-                error!("Something went wrong when trying to consume topics: {}", e);
+                error!("Something went wrong when trying to consume topics: {e}");
                 Err(e.into())
             }
         }
@@ -164,7 +164,7 @@ impl Ui {
                 Ok(c) => c,
                 Err(e) => {
                     let _ = tx.send(Action::StopConsuming());
-                    warn!("I was not able to create a consumer: {}", e);
+                    warn!("I was not able to create a consumer: {e}");
                     return Err("I was not able to create a consumer after 5 attempts...");
                 }
             };
@@ -262,9 +262,9 @@ impl Ui {
                         )))
                         .is_err()
                     {
-                        error!("Cannot notify the TUI: {:?}", e);
+                        error!("Cannot notify the TUI: {e:?}");
                     }
-                    error!("Something went wrong when trying to list topics: {}", e)
+                    error!("Something went wrong when trying to list topics: {e}")
                 }
             }
         });
@@ -337,7 +337,7 @@ impl Ui {
                                 log::Level::Info,
                                 "this action is not available right now".to_string(),
                             )))?;
-                            warn!("Cannot open the URL '{}': {}", url, e)
+                            warn!("Cannot open the URL '{url}': {e}")
                         }
                     }
                     Action::Resize(w, h) => {

@@ -67,7 +67,7 @@ impl SearchComponent {
                 _ = tokio::time::sleep(Duration::from_millis(700)) => {
                     if input.len() > 5 {
                         if let Err(e) = ValidSearchQuery::from(&input, &filters_dir) {
-                            error!("{}", e);
+                            error!("{e}");
                             tt.as_ref().unwrap().send(Action::Notification(Notification::new(log::Level::Error, e.to_string()))).unwrap();
                         }
                     }
@@ -177,7 +177,7 @@ impl Component for SearchComponent {
                 if self.input.value().len() == self.input.cursor() {
                     if let Some(a) = &self.autocomplete {
                         let input = self.input.value().to_string();
-                        let autocompleted = format!("{}{}", input, a);
+                        let autocompleted = format!("{input}{a}");
                         self.input = self
                             .input
                             .clone()

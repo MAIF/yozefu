@@ -211,8 +211,8 @@ impl Component for TopicsComponent {
             .iter()
             .map(|i| {
                 let s = match self.selected.contains(i) {
-                    true => format!("[x] {}", i),
-                    false => format!("[ ] {}", i),
+                    true => format!("[x] {i}"),
+                    false => format!("[ ] {i}"),
                 };
                 ListItem::new(s).style(Style::default())
             })
