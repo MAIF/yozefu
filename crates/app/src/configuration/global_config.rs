@@ -59,7 +59,7 @@ fn default_url_template() -> String {
 }
 
 fn default_export_directory() -> PathBuf {
-    PathBuf::from(format!("./{}-exports", APPLICATION_NAME))
+    PathBuf::from(format!("./{APPLICATION_NAME}-exports"))
 }
 
 fn default_theme() -> String {

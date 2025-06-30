@@ -88,8 +88,7 @@ impl ValidSearchQuery {
                     Err(err) => {
                         error!("No such file '{}': {}", path.display(), err);
                         return Err(lib::Error::Error(format!(
-                            "Cannot find search filter '{}'",
-                            name
+                            "Cannot find search filter '{name}'"
                         )));
                     }
                 };
@@ -101,8 +100,7 @@ impl ValidSearchQuery {
                 &serde_json::to_string(&params.iter().map(|e| e.json()).collect_vec()).unwrap(),
             ) {
                 error!(
-                    "Error when calling '{}' from wasm module '{}': {:?}",
-                    PARSE_PARAMETERS_FUNCTION_NAME, name, e
+                    "Error when calling '{PARSE_PARAMETERS_FUNCTION_NAME}' from wasm module '{name}': {e:?}"
                 );
                 return Err(lib::Error::Error(format!("{}: {e}", &name)));
             };

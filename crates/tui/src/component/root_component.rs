@@ -320,7 +320,7 @@ impl Component for RootComponent {
                         self.focus_order
                             .first()
                             .unwrap_or_else(|| {
-                                panic!("I think you forgot to define focus order of '{}'", action)
+                                panic!("I think you forgot to define focus order of '{action}'")
                             })
                             .clone(),
                     ),
@@ -378,7 +378,7 @@ impl Component for RootComponent {
         let main_component = self
             .components
             .get(last_view)
-            .unwrap_or_else(|| panic!("Unable to find component '{}'", last_view));
+            .unwrap_or_else(|| panic!("Unable to find component '{last_view}'"));
 
         let chunks: std::rc::Rc<[Rect]> = Layout::default()
             .direction(Direction::Vertical)

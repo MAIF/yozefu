@@ -21,7 +21,7 @@ impl CliCommand for ConfigureGetCommand {
         let config = serde_json::from_str::<Value>(&content)?;
         let mut property_name = self.property.clone();
         if !self.property.starts_with('/') {
-            property_name = format!("/{}", property_name);
+            property_name = format!("/{property_name}");
         }
         match config.pointer(&property_name) {
             Some(p) => {
@@ -54,7 +54,7 @@ impl CliCommand for ConfigureGetCommand {
                     }
                     "log" | "logs" => println!("{:?}", config.logs_file().display()),
                     "configuration_file" | "configuration-file" | "config" | "conf" => {
-                        println!("{:?}", file)
+                        println!("{file:?}")
                     }
                     "directory" | "dir" => println!("{:?}", file.parent().unwrap()),
                     "themes" => {

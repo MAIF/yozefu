@@ -30,14 +30,14 @@ impl std::error::Error for Error {}
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
-            Error::IoError(e) => write!(f, "IO Error: {}", e),
-            Error::SerdeError(e) => write!(f, "Serde Error: {}", e),
-            Error::ThemeError(e) => write!(f, "Theme Error: {}", e),
-            Error::KafkaError(e) => write!(f, "Kafka Error: {}", e),
-            Error::Error(e) => write!(f, "{}", e),
-            Error::Tokio(e) => write!(f, "Tokio Error: {}", e),
-            Error::Search(e) => write!(f, "{}", e),
-            Error::SchemaRegistry(e) => write!(f, "Schema registry Error: {}", e),
+            Error::IoError(e) => write!(f, "IO Error: {e}"),
+            Error::SerdeError(e) => write!(f, "Serde Error: {e}"),
+            Error::ThemeError(e) => write!(f, "Theme Error: {e}"),
+            Error::KafkaError(e) => write!(f, "Kafka Error: {e}"),
+            Error::Error(e) => write!(f, "{e}"),
+            Error::Tokio(e) => write!(f, "Tokio Error: {e}"),
+            Error::Search(e) => write!(f, "{e}"),
+            Error::SchemaRegistry(e) => write!(f, "Schema registry Error: {e}"),
         }
     }
 }
@@ -45,7 +45,7 @@ impl Display for Error {
 impl Display for SearchError {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
-            SearchError::Parse(e) => write!(f, "Cannot parse the search query at '{}'", e),
+            SearchError::Parse(e) => write!(f, "Cannot parse the search query at '{e}'"),
         }
     }
 }

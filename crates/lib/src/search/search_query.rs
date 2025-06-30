@@ -39,11 +39,11 @@ impl std::fmt::Display for SearchQuery {
         let mut clauses = vec![];
 
         let from = match &self.from {
-            Some(f) => format!("from {}", f),
+            Some(f) => format!("from {f}"),
             None => "".to_string(),
         };
         let limit = match self.limit {
-            Some(i) => format!("limit {}", i),
+            Some(i) => format!("limit {i}"),
             None => "".to_string(),
         };
         clauses.push(from.to_string());

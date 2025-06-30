@@ -78,8 +78,7 @@ impl crate::command::Command for ConfigureCommand {
             }
             Err(e) => {
                 return Err(Error::Error(format!(
-                    "Your new config file is not valid. Please try again: {:?}",
-                    e
+                    "Your new config file is not valid. Please try again: {e:?}"
                 )));
             }
         };

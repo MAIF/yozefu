@@ -37,10 +37,10 @@ pub(crate) fn parse_atom(input: &str) -> IResult<&str, Atom> {
 impl Display for Atom {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Atom::Symbol(a) => write!(f, "{}", a),
-            Atom::Compare(a) => write!(f, "{}", a),
-            Atom::Parenthesis(a) => write!(f, "{}", a),
-            Atom::Filter(a) => write!(f, "{}", a),
+            Atom::Symbol(a) => write!(f, "{a}"),
+            Atom::Compare(a) => write!(f, "{a}"),
+            Atom::Parenthesis(a) => write!(f, "{a}"),
+            Atom::Filter(a) => write!(f, "{a}"),
         }
     }
 }

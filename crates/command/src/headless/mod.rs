@@ -104,7 +104,7 @@ impl Headless {
 
                     if current_time.elapsed() > Duration::from_secs(15) {
                         current_time = Instant::now();
-                        info!("Checkpoint: {}", timestamp);
+                        info!("Checkpoint: {timestamp}");
                     }
                     progress.inc(1);
                     futures::future::ok(())

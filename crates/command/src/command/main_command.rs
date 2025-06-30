@@ -119,8 +119,7 @@ where
                 }
                 None => {
                     return Err(TuiError::from(Error::Error(format!(
-                        "Invalid kafka property '{}', expected a '=' symbol to separate the property and its value.",
-                        property
+                        "Invalid kafka property '{property}', expected a '=' symbol to separate the property and its value."
                     ))));
                 }
             }
@@ -208,8 +207,7 @@ where
                 cmd.error(
                     ErrorKind::MissingRequiredArgument,
                     format!(
-                        "Argument '--cluster' was not provided. Possible clusters: [{}]",
-                        available_clusters
+                        "Argument '--cluster' was not provided. Possible clusters: [{available_clusters}]"
                     ),
                 )
                 .exit();
@@ -217,8 +215,7 @@ where
             false => {
                 if !config.clusters.contains_key(&cluster.to_string()) {
                     return Err(Error::Error(format!(
-                        "Unknown cluster '{}'. Possible clusters: [{}].",
-                        cluster, available_clusters
+                        "Unknown cluster '{cluster}'. Possible clusters: [{available_clusters}]."
                     ))
                     .into());
                 }
@@ -241,7 +238,7 @@ where
         let mut themes = Self::themes(file)?;
 
         if !themes.contains_key(name) {
-            info!("Theme '{}' not found. About to update theme file.", name);
+            info!("Theme '{name}' not found. About to update theme file.");
             let _ = update_themes().await;
             themes = Self::themes(file)?;
         }
@@ -296,7 +293,7 @@ where
 
     /// Creates the App
     fn app(&self, query: &str, yozefu_config: &YozefuConfig) -> Result<App, Error> {
-        debug!("{:?}", yozefu_config);
+        debug!("{yozefu_config:?}");
         let config = self.config(yozefu_config)?;
         let search_query = ValidSearchQuery::from(query, &config.filters_dir())?;
 

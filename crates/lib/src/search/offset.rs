@@ -36,8 +36,8 @@ impl Display for FromOffset {
         match self {
             FromOffset::Beginning => write!(f, "beginning"),
             FromOffset::End => write!(f, "end"),
-            FromOffset::Offset(o) => write!(f, "{}", o),
-            FromOffset::OffsetTail(o) => write!(f, "end - {}", o),
+            FromOffset::Offset(o) => write!(f, "{o}"),
+            FromOffset::OffsetTail(o) => write!(f, "end - {o}"),
             FromOffset::Timestamp(_) => write!(f, ""),
         }
     }

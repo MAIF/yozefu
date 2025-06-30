@@ -51,7 +51,7 @@ Timestamp: {}
                 .headers
                 .iter()
                 .sorted_by(|a, b| a.0.cmp(b.0))
-                .map(|(k, v)| format!("{}='{}'", k, v))
+                .map(|(k, v)| format!("{k}='{v}'"))
                 .join(", ")
         )
     }

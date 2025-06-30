@@ -39,11 +39,11 @@ pub enum CompareExpression {
 impl Display for CompareExpression {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            CompareExpression::Partition(op, r) => write!(f, "partition {} {}", op, r),
-            CompareExpression::OffsetTail(r) => write!(f, "offsetTail - {}", r),
-            CompareExpression::Offset(op, r) => write!(f, "offset {} {}", op, r),
-            CompareExpression::Topic(op, r) => write!(f, "topic {} {}", op, r),
-            CompareExpression::Key(op, r) => write!(f, "key {} {}", op, r),
+            CompareExpression::Partition(op, r) => write!(f, "partition {op} {r}"),
+            CompareExpression::OffsetTail(r) => write!(f, "offsetTail - {r}"),
+            CompareExpression::Offset(op, r) => write!(f, "offset {op} {r}"),
+            CompareExpression::Topic(op, r) => write!(f, "topic {op} {r}"),
+            CompareExpression::Key(op, r) => write!(f, "key {op} {r}"),
             CompareExpression::Value(left, op, r) => write!(
                 f,
                 "value{} {} {}",
@@ -54,7 +54,7 @@ impl Display for CompareExpression {
             CompareExpression::Header(left, op, r) => {
                 write!(f, "headers.{} {} {}", left.clone(), op, r)
             }
-            CompareExpression::Size(op, r) => write!(f, "size {} {}", op, r),
+            CompareExpression::Size(op, r) => write!(f, "size {op} {r}"),
             CompareExpression::Timestamp(op, r) => write!(
                 f,
                 r#"timestamp {} "{}""#,

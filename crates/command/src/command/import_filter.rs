@@ -44,7 +44,7 @@ impl Command for ImportFilterCommand {
         self.check_wasm_module(&self.file)?;
         fs::copy(&self.file, &destination)?;
         info!("'{}' has been imported successfully", destination.display());
-        info!("To use it: `from begin offset > 50 && {}(...)`", name);
+        info!("To use it: `from begin offset > 50 && {name}(...)`");
 
         Ok(())
     }
@@ -57,7 +57,7 @@ impl ImportFilterCommand {
         let config = GlobalConfig::read(&GlobalConfig::path()?)?;
         let dir = config.filters_dir();
         fs::create_dir_all(&dir)?;
-        Ok(dir.join(format!("{}.wasm", name)))
+        Ok(dir.join(format!("{name}.wasm")))
     }
 
     /// Returns the name of the search filter.
@@ -83,11 +83,10 @@ impl ImportFilterCommand {
 fn check_presence_of_functions(plugin: &mut Plugin) -> Result<(), Error> {
     for function_name in REQUIRED_WASM_FUNCTIONS.iter() {
         match plugin.function_exists(function_name) {
-            true => info!("'{}' found in the search filter", function_name),
+            true => info!("'{function_name}' found in the search filter"),
             false => {
                 return Err(Error::Error(format!(
-                    "'{}' is missing in the search filter. Make sure the wasm module exports a '{}' filter",
-                    function_name, function_name
+                    "'{function_name}' is missing in the search filter. Make sure the wasm module exports a '{function_name}' filter"
                 )));
             }
         }

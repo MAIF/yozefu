@@ -34,7 +34,7 @@ pub enum OrExpression {
 impl Display for AndExpression {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            AndExpression::AndTerm(t) => write!(f, "{}", t),
+            AndExpression::AndTerm(t) => write!(f, "{t}"),
             AndExpression::AndExpression(e) => write!(
                 f,
                 "{}",
@@ -50,7 +50,7 @@ impl Display for AndExpression {
 impl Display for OrExpression {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            OrExpression::OrTerm(t) => write!(f, "{}", t),
+            OrExpression::OrTerm(t) => write!(f, "{t}"),
             OrExpression::OrExpression(t) => write!(
                 f,
                 "{}",

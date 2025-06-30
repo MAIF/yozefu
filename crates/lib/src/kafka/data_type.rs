@@ -66,7 +66,7 @@ impl DataType {
 
                 match value.pointer(&path) {
                     Some(d) => {
-                        println!("{:?} {:?} {:?}", path, value, d);
+                        println!("{path:?} {value:?} {d:?}");
                         match d {
                             serde_json::Value::Null => "null".to_string(),
                             serde_json::Value::Bool(v) => v.to_string(),
@@ -129,7 +129,7 @@ impl Display for DataType {
             DataType::Json(value) => {
                 write!(f, "{}", serde_json::to_string(value).unwrap_or_default())
             }
-            DataType::String(s) => write!(f, "{}", s),
+            DataType::String(s) => write!(f, "{s}"),
         }
     }
 }
