@@ -108,3 +108,8 @@ pub fn parse_search_query(input: &str) -> Result<(&str, SearchQuery), SearchErro
 fn test_parse_search_query() {
     assert!(parse_search_query(r#"   from end - 10"#).is_ok());
 }
+
+#[test]
+fn test_parse_search_query_with_json_path() {
+    assert!(parse_search_query(r#"from end - 10 value.sequenceNum == "115568969""#).is_ok());
+}

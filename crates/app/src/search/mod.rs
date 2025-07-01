@@ -88,7 +88,9 @@ impl ValidSearchQuery {
                     Err(err) => {
                         error!("No such file '{}': {}", path.display(), err);
                         return Err(lib::Error::Error(format!(
-                            "Cannot find search filter '{name}'"
+                            "Cannot find search filter '{name}' in {}: {}",
+                            path.parent().unwrap().display(),
+                            err
                         )));
                     }
                 };
@@ -122,5 +124,106 @@ impl Search for ValidSearchQuery {
 
     fn filters(&self) -> Vec<Filter> {
         self.0.filters()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use lib::DataType;
+
+    use super::*;
+
+    #[test]
+    fn test_search_query_must_match() {
+        let filters_directory = PathBuf::from("tests/filters");
+        let input = "from begin";
+        let query = ValidSearchQuery::from(input, &filters_directory).unwrap();
+
+        let record = KafkaRecord {
+            key: DataType::String("".into()),
+            value: DataType::String("".into()),
+            ..Default::default()
+        };
+
+        let context = SearchContext::new(&record, &filters_directory);
+        assert!(query.matches(&context));
+    }
+
+    #[test]
+    fn unknown_search_filter() {
+        let filters_directory = PathBuf::from("tests/filters");
+        let input = "from begin my_filter()";
+        assert!(ValidSearchQuery::from(input, &filters_directory).is_err())
+    }
+
+    #[test]
+    #[ignore]
+    fn test_wasm_should_not_have_access_to_network() {
+        testing_logger::setup();
+
+        let filters_directory = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("tests")
+            .join("http_search_filter");
+        let input = "from begin module()";
+        let query = ValidSearchQuery::from(input, &filters_directory).unwrap();
+
+        let record = KafkaRecord {
+            key: DataType::String("".into()),
+            value: DataType::String("".into()),
+            ..Default::default()
+        };
+
+        let context = SearchContext::new(&record, &filters_directory);
+        assert!(!query.matches(&context));
+
+        testing_logger::validate(|captured_logs| {
+            let logs = captured_logs
+                .iter()
+                .filter(|c| c.level == log::Level::Error)
+                .collect::<Vec<&testing_logger::CapturedLog>>();
+            assert_eq!(2, logs.len());
+            assert!(
+                logs[0]
+                    .body
+                    .contains("HTTP request to https://mcdostone.github.io/ is not allowed")
+            );
+        });
+    }
+
+    #[test]
+    fn test_matches_with_fine_grained_filter_on_json_field() {
+        use crate::search::filter::CACHED_FILTERS;
+        use lib::kafka::KafkaRecord;
+        use serde_json::json;
+        use std::path::PathBuf;
+
+        let filters_directory = PathBuf::from(".");
+
+        let query = ValidSearchQuery::from(
+            r#"from end - 10 value.myInteger == "42""#,
+            &filters_directory,
+        )
+        .unwrap();
+        let record = KafkaRecord {
+            topic: "test-topic".to_string(),
+            partition: 0,
+            offset: 42,
+            key: lib::DataType::String("key".to_string()),
+            value: lib::DataType::Json(json!({"myInteger": 42})),
+            timestamp: None,
+            headers: std::collections::BTreeMap::new(),
+            key_schema: None,
+            value_schema: None,
+            size: 12,
+            key_as_string: "key".to_string(),
+            value_as_string: "value".to_string(),
+        };
+        let context = SearchContext {
+            record: &record,
+            filters: &CACHED_FILTERS,
+            filters_directory,
+        };
+
+        assert!(query.matches(&context))
     }
 }
