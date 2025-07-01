@@ -63,7 +63,6 @@ impl DataType {
         let v = match json_pointer {
             Some(path) => {
                 let path = path.replace(['.', '['], "/").replace(']', "");
-
                 match value.pointer(&path) {
                     Some(d) => {
                         println!("{path:?} {value:?} {d:?}");

@@ -9,6 +9,7 @@ use lib::{
     FilterResult,
     search::filter::{Filter, FilterInput},
 };
+use log::error;
 
 use super::{Search, SearchContext};
 
@@ -36,7 +37,13 @@ impl Search for Filter {
             .map(|e| e.0)
         {
             Ok(res) => res.r#match,
-            Err(_e) => true,
+            Err(e) => {
+                error!(
+                    "Error when calling '{MATCHES_FUNCTION_NAME}' from wasm module '{}': {e:?}",
+                    self.name
+                );
+                false
+            }
         }
     }
 

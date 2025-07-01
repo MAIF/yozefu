@@ -21,9 +21,7 @@ impl SchemaDetail {
         let (response, url) = match schema_registry {
             Some(s) => (s.schema(id).await.ok().flatten(), s.schema_url(id)),
             None => {
-                warn!(
-                    "No schema registry client configured to fetch schema {id}."
-                );
+                warn!("No schema registry client configured to fetch schema {id}.");
                 (None, "".to_string())
             }
         };
