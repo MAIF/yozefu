@@ -21,7 +21,7 @@ log = { workspace = true }
 tui-input = "0.12.1"
 chrono = "0.4.41"
 strum = { workspace = true, features = ["derive", "strum_macros"] }
-ratatui = { version = "0.30.0-alpha.4", features = [
+ratatui = { version = "0.30.0-alpha.5", features = [
     "serde",
     "unstable-rendered-line-info",
 ] }
@@ -39,7 +39,8 @@ copypasta = "0.10.2"
 rayon = "1.10.0"
 lib = { workspace = true }
 app = { workspace = true }
-rdkafka = { version = "0.37.0", features = ["cmake-build"] }
+rdkafka = { version = "0.38.0", features = ["cmake-build"] }
+timeago = "0.4.2"
 
 
 [features]
@@ -48,7 +49,7 @@ gssapi-vendored = ["rdkafka/gssapi-vendored"]
 
 
 [dev-dependencies]
-indexmap = "2.9.0"
+indexmap = "2.10.0"
 insta = { version = "1.43.1", features = ["filters"] }
 tempfile = "3.20.0"
 quickcheck = "1"

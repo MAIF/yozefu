@@ -21,16 +21,16 @@ itertools = "0.14.0"
 strum = { workspace = true, features = ["derive", "strum_macros"], optional = true }
 fuzzydate = {version = "0.2.3", optional = true }
 nom = "8.0.0"
-rdkafka = { version = "0.37.0", features = [], optional = true}
+rdkafka = { version = "0.38.0", features = [], optional = true}
 url = "2.5.4"
 apache-avro = "0.18.0"
-reqwest = { version = "0.12.20", features = ["json"] }
+reqwest = { version = "0.12.22", features = ["json"] }
 
 
 [dev-dependencies]
 insta = { version = "1.43.1", features = ["filters", "glob"] }
 protobuf = "3.7.2"
-tokio = { version = "1.45.1", features = ["rt", "macros"] }
+tokio = { version = "1.46.1", features = ["rt", "macros"] }
 
 [features]
 native = [

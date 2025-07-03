@@ -20,8 +20,8 @@ log = { workspace = true }
 lib = { workspace = true, features = ["native"] }
 itertools = "0.14.0"
 thousands = "0.2.0"
-indexmap = "2.9.0"
-rdkafka = { version = "0.37.0", features = ["cmake-build"] }
+indexmap = "2.10.0"
+rdkafka = { version = "0.38.0", features = ["cmake-build"] }
 extism = { version = "1.11.1", features = [] }
 url = { version = "2.5.4", features = ["serde"] }
 resolve-path = "0.1.0"
