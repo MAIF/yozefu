@@ -1,5 +1,8 @@
 //! Component showing all the details of a given kafka record.
+use core::time;
+
 use bytesize::ByteSize;
+use chrono::{DateTime, Utc};
 use crossterm::event::{KeyCode, KeyEvent};
 
 use itertools::Itertools;
@@ -72,16 +75,21 @@ impl RecordDetailsComponent<'_> {
         }
 
         let theme = self.theme.clone().unwrap_or(Theme::light());
-
         let record = self.record.as_ref().unwrap();
+        let ago_formatter = timeago::Formatter::new();
+        let timestamp_in_millis = record.timestamp.unwrap_or(0);
+
+        let published_at = DateTime::from_timestamp_millis(timestamp_in_millis).unwrap();
+        let duration = (Utc::now() - published_at)
+            .to_std()
+            .unwrap_or(time::Duration::ZERO);
+
         let mut to_render = vec![
             Line::default(),
             Self::generate_span("Topic", record.topic.clone().into()),
-            Self::generate_span(
-                "Timestamp",
-                record.timestamp.unwrap_or(0).to_string().into(),
-            ),
+            Self::generate_span("Timestamp", format!("{timestamp_in_millis} ms").into()),
             Self::generate_span("DateTime", styles::colorize_timestamp(record, &theme)),
+            Self::generate_span("Published", ago_formatter.convert(duration).into()),
             Self::generate_span("Offset", record.offset.to_string().into()),
             Self::generate_span(
                 "Partition",
