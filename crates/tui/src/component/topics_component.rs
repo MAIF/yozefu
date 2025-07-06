@@ -200,7 +200,6 @@ impl Component for TopicsComponent {
             _ => format!(" Topics [{}] ", self.selected.len()),
         };
         let outer_block = Block::default()
-            .padding(Padding::horizontal(1))
             .borders(Borders::ALL)
             .border_type(BorderType::Rounded)
             .title(title);
@@ -211,8 +210,8 @@ impl Component for TopicsComponent {
             .iter()
             .map(|i| {
                 let s = match self.selected.contains(i) {
-                    true => format!("[x] {i}"),
-                    false => format!("[ ] {i}"),
+                    true => format!(" [x] {i} "),
+                    false => format!(" [ ] {i} "),
                 };
                 ListItem::new(s).style(Style::default())
             })
