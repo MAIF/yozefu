@@ -2,7 +2,6 @@
 
 use clap::Subcommand;
 use lib::Error;
-use strum::{Display, EnumString};
 
 use crate::log::init_logging_stderr;
 
@@ -23,17 +22,6 @@ pub enum UtilityCommands {
     Configure(ConfigureCommand),
     /// Print the config to `stdout`
     Config(ConfigCommand),
-}
-
-#[derive(Debug, Clone, EnumString, Display)]
-#[strum(serialize_all = "lowercase")]
-pub enum KafkaFormatterOption {
-    Transpose,
-    Simple,
-    Plain,
-    Human,
-    Json,
-    Log,
 }
 
 impl Command for UtilityCommands {
