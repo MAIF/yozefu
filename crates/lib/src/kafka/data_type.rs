@@ -64,19 +64,15 @@ impl DataType {
             Some(path) => {
                 let path = path.replace(['.', '['], "/").replace(']', "");
                 match value.pointer(&path) {
-                    Some(d) => {
-                        println!("{path:?} {value:?} {d:?}");
-                        match d {
-                            serde_json::Value::Null => "null".to_string(),
-                            serde_json::Value::Bool(v) => v.to_string(),
-                            serde_json::Value::Number(v) => v.to_string(),
-                            serde_json::Value::String(v) => v.to_string(),
-                            serde_json::Value::Array(_) => return false,
-                            serde_json::Value::Object(_) => return false,
-                        }
-                    }
+                    Some(d) => match d {
+                        serde_json::Value::Null => "null".to_string(),
+                        serde_json::Value::Bool(v) => v.to_string(),
+                        serde_json::Value::Number(v) => v.to_string(),
+                        serde_json::Value::String(v) => v.to_string(),
+                        serde_json::Value::Array(_) => return false,
+                        serde_json::Value::Object(_) => return false,
+                    },
                     None => {
-                        println!("nope");
                         return false;
                     }
                 }

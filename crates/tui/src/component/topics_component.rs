@@ -42,6 +42,10 @@ impl TopicsComponent {
         }
     }
 
+    pub fn topics(&self) -> &[String] {
+        &self.topics
+    }
+
     fn next(&mut self) {
         if self.visible_topics.is_empty() {
             return;

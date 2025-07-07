@@ -1,6 +1,6 @@
 
 Sleep 3s
-Type@500ms "rando"
+Type@300ms "rando"
 Sleep 1.5s
 Enter
 Sleep 1.5s

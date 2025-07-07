@@ -6,18 +6,34 @@ use ratatui::{
 };
 use std::sync::{Arc, Mutex};
 
-use crate::error::TuiError;
+use crate::{Action, component::topics_component::TopicsComponent, error::TuiError};
 
 use super::{Component, ComponentName, State};
 
 pub(crate) struct TopicsAndRecordsComponent {
     records: Arc<Mutex<dyn Component>>,
-    topics: Arc<Mutex<dyn Component>>,
+    topics: Arc<Mutex<TopicsComponent>>,
+    longest_topic_size: u16,
 }
 
 impl TopicsAndRecordsComponent {
-    pub fn new(topics: Arc<Mutex<dyn Component>>, records: Arc<Mutex<dyn Component>>) -> Self {
-        Self { records, topics }
+    pub fn new(topics: Arc<Mutex<TopicsComponent>>, records: Arc<Mutex<dyn Component>>) -> Self {
+        let longest_topic_size = Self::longest_topics_length(topics.lock().unwrap().topics());
+        Self {
+            records,
+            topics,
+            longest_topic_size,
+        }
+    }
+
+    pub fn longest_topics_length(topics: &[String]) -> u16 {
+        topics
+            .iter()
+            .map(|s| s.len())
+            .max()
+            .unwrap_or(0)
+            .try_into()
+            .unwrap_or(62)
     }
 }
 
@@ -26,12 +42,22 @@ impl Component for TopicsAndRecordsComponent {
         ComponentName::TopicsAndRecords
     }
 
+    fn update(&mut self, action: Action) -> Result<Option<Action>, TuiError> {
+        if let Action::Topics(new_topics) = action {
+            self.longest_topic_size = Self::longest_topics_length(&new_topics)
+        };
+        Ok(None)
+    }
+
     fn draw(&mut self, f: &mut Frame<'_>, rect: Rect, state: &State) -> Result<(), TuiError> {
         f.render_widget(Clear, rect);
 
         let chunks: std::rc::Rc<[Rect]> = Layout::default()
             .direction(Direction::Horizontal)
-            .constraints([Constraint::Min(62), Constraint::Percentage(100)])
+            .constraints([
+                Constraint::Min(self.longest_topic_size + 10),
+                Constraint::Percentage(100),
+            ])
             .spacing(1)
             .split(rect);
 

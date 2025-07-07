@@ -11,12 +11,16 @@ Set Height 900
 Set CursorBlink false
 Set Padding 0
 # Set Theme "Builtin Dark"
-Set Framerate 24
+# Set Framerate 24
 
-Hide
 Ctrl+L
 
+Hide
+
+Ctrl+L
 Type@0ms "yozf  --cluster localhost --theme solarized-dark"
 Enter
+Ctrl+L
 Show
+
 Source ./demo.tape

@@ -51,8 +51,10 @@ impl RootComponent {
         let mut footer = FooterComponent::default();
         footer.show_shortcuts(config.show_shortcuts);
 
+        let topics_component = Arc::new(Mutex::new(TopicsComponent::new(selected_topics)));
+
         let mut components: [Arc<Mutex<dyn Component>>; 10] = [
-            Arc::new(Mutex::new(TopicsComponent::new(selected_topics))),
+            topics_component.clone(),
             Arc::new(Mutex::new(RecordsComponent::new(records))),
             Arc::new(Mutex::new(TopicDetailsComponent::default())),
             Arc::new(Mutex::new(RecordDetailsComponent::new(&state))),
@@ -69,7 +71,7 @@ impl RootComponent {
         ];
 
         components[components.len() - 1] = Arc::new(Mutex::new(TopicsAndRecordsComponent::new(
-            components[0].clone(),
+            topics_component.clone(),
             components[1].clone(),
         )));
 
@@ -386,14 +388,9 @@ impl Component for RootComponent {
                 Constraint::Min(2),
                 Constraint::Percentage(100),
                 Constraint::Min(3),
-                Constraint::Min(3),
+                Constraint::Min(1),
             ])
-            .split(Rect::new(
-                rect.x + 2,
-                rect.y + 1,
-                rect.width.saturating_sub(2),
-                rect.height.saturating_sub(0),
-            ));
+            .split(rect.inner(Margin::new(1, 1)));
 
         main_component
             .lock()
