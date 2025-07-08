@@ -1,3 +1,30 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## What's Changed in v0.0.11
+* build: rollback to ratatui 0.29.0
+* ci: fix CI about changelog, something went wrong during publishing the crates
+* chore: Release version v0.0.11
+* style: remove padding in topics component
+* refactor: remove unused enum
+* build(deps): bump raven-actions/actionlint from 2.0.0 to 2.0.1
+* feat: show how long ago the record was published
+* test: tests that wasm filters don't have access to network
+* feat: update to rust 1.88.0
+* feat: disable IO interactions for wasm filters
+* style: design improvements based on https://github.com/ratatui/ratatui-website/pull/868
+* build: update dependencies
+* ci: remove hardcoded URLs for `cargo-semver-checks`
+* ci: enable some clippy lints
+* refactor: format, removed unused deps
+* docs: fix URLs
+* chore: Update changelog
+* ci: rollback temporary change in github action
+* fix: rollback regarding commit and branch
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.10...v0.0.11
+
 ## What's Changed in v0.0.10
 * fix: rollback regarding commit and branch by @Mcdostone
 * Develop by @Mcdostone in [#66](https://github.com/MAIF/yozefu/pull/66)
