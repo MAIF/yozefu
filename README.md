@@ -29,7 +29,7 @@ By default, [the kafka consumer is configured](https://github.com/MAIF/yozefu/bl
 
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://vhs.charm.sh/vhs-UpIJD2h92vKkj01XSS0r0.gif)">
+  <source media="(prefers-color-scheme: dark)" srcset="https://vhs.charm.sh/vhs-UpIJD2h92vKkj01XSS0r0.gif">
   <img alt="Demo of Yozefu: The user selects a topic and sees and real time new records published to Kafka." src="https://vhs.charm.sh/vhs-1oh0ovd0DaUfvKLTx4iZTo.gif">
 </picture>
 
