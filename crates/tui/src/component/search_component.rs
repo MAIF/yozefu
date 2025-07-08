@@ -10,6 +10,7 @@ use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers};
 use itertools::Itertools;
 use lib::{Error, error::SearchError};
 use log::error;
+use ratatui::prelude::Stylize;
 use ratatui::{
     Frame,
     layout::{Position, Rect},

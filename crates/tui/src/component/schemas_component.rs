@@ -3,7 +3,13 @@
 //!  - all queries are stored into a history.
 //!  - The component suggests queries based on your history.
 
+use crate::{
+    Action,
+    error::TuiError,
+    schema_detail::{ExportedSchemasDetails, SchemaDetail},
+};
 use crossterm::event::{KeyCode, KeyEvent};
+use ratatui::prelude::Stylize;
 use ratatui::{
     Frame,
     layout::Rect,
@@ -12,12 +18,6 @@ use ratatui::{
     widgets::{Block, Borders, Clear, Padding, Paragraph, Wrap},
 };
 use tokio::sync::mpsc::UnboundedSender;
-
-use crate::{
-    Action,
-    error::TuiError,
-    schema_detail::{ExportedSchemasDetails, SchemaDetail},
-};
 
 use super::{Component, ComponentName, Shortcut, State, scroll_state::ScrollState};
 

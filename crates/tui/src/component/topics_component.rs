@@ -3,6 +3,7 @@ use std::collections::HashSet;
 
 use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers};
 use itertools::Itertools;
+use ratatui::prelude::Stylize;
 use ratatui::{
     Frame,
     layout::{Constraint, Direction, Layout, Position, Rect},
