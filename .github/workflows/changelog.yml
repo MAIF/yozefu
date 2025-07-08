@@ -55,6 +55,7 @@ jobs:
           git push origin "changelog/${VERSION}" --force
         env:
           VERSION: ${{ steps.release.outputs.version }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check out repository
         uses: actions/checkout@v4

@@ -249,9 +249,9 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Publish the crates
         run: |
-          cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }} -p yozefu-lib
-          cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }} -p yozefu-wasm-types
-          cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }} -p yozefu-app
+          cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }} -p yozefu-lib || true
+          cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }} -p yozefu-wasm-types || true
+          cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }} -p yozefu-app || true
           cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }} -p yozefu-tui
           cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }} -p yozefu-command
           cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }} -p yozefu
