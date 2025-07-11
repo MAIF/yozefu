@@ -38,8 +38,10 @@ macro_rules! assert_draw {
             .draw(|frame| $component.draw(frame, frame.area(), &state).unwrap())
             .unwrap();
 
+
         insta::with_settings!({filters => vec![
             (format!("{}[a-z0-9\\/\\.+\\s']*", temp_path.display().to_string()).as_str(), "[PATH]"),
+            (&format!("v{}", env!("CARGO_PKG_VERSION")), "[VERSION]"),
         ]}, {
             assert_snapshot!(terminal.backend());
         });
