@@ -36,7 +36,6 @@ impl TopicsAndRecordsComponent {
             .unwrap_or(32)
             .max(24)
     }
-
 }
 
 impl Component for TopicsAndRecordsComponent {
@@ -58,7 +57,7 @@ impl Component for TopicsAndRecordsComponent {
             .direction(Direction::Horizontal)
             .constraints([
                 Constraint::Length(self.longest_topic_size + 10),
-                Constraint::Percentage(100)
+                Constraint::Percentage(100),
             ])
             .spacing(1)
             .split(rect);

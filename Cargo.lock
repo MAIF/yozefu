@@ -5975,7 +5975,7 @@ dependencies = [
 
 [[package]]
 name = "yozefu"
-version = "0.0.11"
+version = "0.0.12"
 dependencies = [
  "tokio",
  "yozefu-command",
@@ -5983,7 +5983,7 @@ dependencies = [
 
 [[package]]
 name = "yozefu-app"
-version = "0.0.11"
+version = "0.0.12"
 dependencies = [
  "chrono",
  "directories",
@@ -6004,7 +6004,7 @@ dependencies = [
 
 [[package]]
 name = "yozefu-command"
-version = "0.0.11"
+version = "0.0.12"
 dependencies = [
  "chrono",
  "clap",
@@ -6030,7 +6030,7 @@ dependencies = [
 
 [[package]]
 name = "yozefu-lib"
-version = "0.0.11"
+version = "0.0.12"
 dependencies = [
  "apache-avro",
  "chrono",
@@ -6050,7 +6050,7 @@ dependencies = [
 
 [[package]]
 name = "yozefu-tui"
-version = "0.0.11"
+version = "0.0.12"
 dependencies = [
  "bytesize",
  "chrono",
@@ -6085,7 +6085,7 @@ dependencies = [
 
 [[package]]
 name = "yozefu-wasm-types"
-version = "0.0.11"
+version = "0.0.12"
 dependencies = [
  "serde",
  "serde_json",
