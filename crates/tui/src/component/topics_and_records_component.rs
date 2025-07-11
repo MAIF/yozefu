@@ -26,15 +26,17 @@ impl TopicsAndRecordsComponent {
         }
     }
 
-    pub fn longest_topics_length(topics: &[String]) -> u16 {
+    fn longest_topics_length(topics: &[String]) -> u16 {
         topics
             .iter()
             .map(|s| s.len())
             .max()
-            .unwrap_or(0)
+            .unwrap_or(32)
             .try_into()
-            .unwrap_or(62)
+            .unwrap_or(32)
+            .max(24)
     }
+
 }
 
 impl Component for TopicsAndRecordsComponent {
@@ -44,7 +46,7 @@ impl Component for TopicsAndRecordsComponent {
 
     fn update(&mut self, action: Action) -> Result<Option<Action>, TuiError> {
         if let Action::Topics(new_topics) = action {
-            self.longest_topic_size = Self::longest_topics_length(&new_topics)
+            self.longest_topic_size = Self::longest_topics_length(&new_topics);
         };
         Ok(None)
     }
@@ -55,8 +57,8 @@ impl Component for TopicsAndRecordsComponent {
         let chunks: std::rc::Rc<[Rect]> = Layout::default()
             .direction(Direction::Horizontal)
             .constraints([
-                Constraint::Min(self.longest_topic_size + 10),
-                Constraint::Percentage(100),
+                Constraint::Length(self.longest_topic_size + 10),
+                Constraint::Percentage(100)
             ])
             .spacing(1)
             .split(rect);
