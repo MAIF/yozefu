@@ -23,7 +23,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
-          persist-credentials: false
+          persist-credentials: 'true' # needed to push the new changelog
           fetch-tags: 'true'
           fetch-depth: 0
       - name: Install Rust
@@ -60,8 +60,10 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
-          ref: "changelog/${{ steps.release.outputs.version }}"
+          ref: "changelog/${{ env.VERSION }}"
           persist-credentials: false
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
       - name: Create pull request for changelog
         run: |
           alreadyExists=$(gh pr list --json headRefName | jq '.[] | select(.headRefName == "changelog/${VERSION}") | any')
