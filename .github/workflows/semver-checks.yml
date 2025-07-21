@@ -154,7 +154,7 @@ jobs:
           toolchain: stable
       - uses: Swatinem/rust-cache@v2
       - name: Install cargo-semver-checks
-        run: cargo install cargo-semver-checks
+        run: cargo install --locked cargo-semver-checks
       - name: Determine the next version
         id: bump
         continue-on-error: true
