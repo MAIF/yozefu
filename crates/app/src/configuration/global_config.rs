@@ -24,6 +24,7 @@ const EXAMPLE_PROMPTS: &[&str] = &[
 
 /// Configuration of the application
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone)]
+#[cfg_attr(test, derive(schemars::JsonSchema))]
 pub struct GlobalConfig {
     /// Path of this config
     #[serde(skip)]
@@ -174,4 +175,22 @@ impl GlobalConfig {
             .get(cluster.trim())
             .and_then(|config| config.schema_registry.clone())
     }
+}
+
+#[test]
+fn generate_json_schema_for_global_config() {
+    use schemars::schema_for;
+    let schema = schema_for!(GlobalConfig);
+    fs::write(
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("docs")
+            .join("configuration")
+            .join("json-schema.json"),
+        serde_json::to_string_pretty(&schema).unwrap(),
+    )
+    .unwrap();
 }

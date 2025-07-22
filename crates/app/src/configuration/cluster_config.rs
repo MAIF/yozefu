@@ -30,6 +30,7 @@ impl Default for ClusterConfig {
 
 /// Specific configuration for a cluster
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone)]
+#[cfg_attr(test, derive(schemars::JsonSchema))]
 pub struct ClusterConfig {
     /// A placeholder url that will be used when you want to open a kafka record in the browser
     pub url_template: Option<String>,
@@ -61,11 +62,12 @@ impl ClusterConfig {
 
 /// Schema registry configuration of a given cluster
 #[derive(Debug, Deserialize, PartialEq, Eq, Serialize, Clone)]
+#[cfg_attr(test, derive(schemars::JsonSchema))]
 pub struct SchemaRegistryConfig {
     /// Url of the schema registry
     pub url: Url,
     /// HTTP headers to be used when communicating with the schema registry
-    #[serde(default = "HashMap::default")]
+    #[serde(default)]
     pub headers: HashMap<String, String>,
 }
 

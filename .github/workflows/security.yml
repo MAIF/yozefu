@@ -34,7 +34,7 @@ jobs:
         with:
           toolchain: stable
       - name: Install cargo-edit
-        run: cargo install cargo-edit
+        run: cargo install --locked cargo-edit
       - name: Check for outdated dependencies
         run: cargo upgrade --dry-run --locked
 
@@ -51,6 +51,6 @@ jobs:
         with:
           toolchain: stable
       - name: Install cargo-outdated
-        run: cargo install cargo-audit
+        run: cargo install --locked cargo-audit
       - name: Cargo audit
         run: cargo audit

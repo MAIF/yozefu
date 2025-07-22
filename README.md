@@ -50,7 +50,7 @@ By default, [the kafka consumer is configured](https://github.com/MAIF/yozefu/bl
 > -->
 
 ```bash
-cargo install yozefu
+cargo install --locked yozefu
 
 # By default, it starts the TUI. 
 # The default registered cluster is localhost
