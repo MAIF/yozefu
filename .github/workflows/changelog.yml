@@ -32,7 +32,7 @@ jobs:
       - id: release
         run: echo "version=v$(cargo pkgid --manifest-path crates/bin/Cargo.toml | cut -d '@' -f2)" >> "$GITHUB_OUTPUT"
       - name: Install git-cliff
-        run: cargo install git-cliff
+        run: cargo install --locked git-cliff
       - name: Generate a changelog
         run: |
           if [ -f CHANGELOG.md ]; then

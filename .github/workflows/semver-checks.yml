@@ -100,7 +100,7 @@ jobs:
           toolchain: stable
       - uses: Swatinem/rust-cache@v2
       - name: Install cargo-semver-checks
-        run: cargo install cargo-semver-checks
+        run: cargo install --locked cargo-semver-checks
       - name: Show release type
         id: semver
         run: |

@@ -34,7 +34,7 @@ jobs:
           toolchain: stable
       - uses: Swatinem/rust-cache@v2
       - name: Install cargo-tarpaulin
-        run: cargo install cargo-tarpaulin
+        run: cargo install --locked cargo-tarpaulin
       - name: Run cargo tarpaulin
         run: cargo tarpaulin --all-features --out Xml
       - name: Upload coverage reports to Codecov

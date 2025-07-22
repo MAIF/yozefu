@@ -159,7 +159,7 @@ jobs:
         run: rm -f "dist/${{ steps.variables.outputs.binaryName }}"
 
       - name: cargo install cargo-cyclonedx
-        run: cargo install cargo-cyclonedx
+        run: cargo install --locked cargo-cyclonedx
 
       - name: Generate SBOM
         run: cargo cyclonedx --describe binaries --format json ${{ matrix.platforms.features }} --target ${{ matrix.platforms.target }}

@@ -149,7 +149,7 @@ jobs:
           toolchain: stable
       - uses: Swatinem/rust-cache@v2
       - name: Install git-cliff
-        run: cargo install cargo-deny
+        run: cargo install --locked cargo-deny
       - name: Run cargo deny
         run: cargo deny check licenses
 
