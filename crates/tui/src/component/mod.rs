@@ -46,14 +46,6 @@ pub(crate) type ConcurrentRecordsBuffer = LazyLock<Arc<Mutex<RecordsBuffer>>>;
 static BUFFER: ConcurrentRecordsBuffer =
     LazyLock::new(|| Arc::new(Mutex::new(RecordsBuffer::new())));
 
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
-pub(crate) enum FocusDirection {
-    Top,
-    Left,
-    Right,
-    Bottom,
-}
-
 #[derive(Debug, Clone, Display, Hash, PartialEq, Eq, Deserialize, PartialOrd, Ord)]
 pub(crate) enum ComponentName {
     Records,
