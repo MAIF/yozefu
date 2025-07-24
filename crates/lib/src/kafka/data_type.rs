@@ -9,6 +9,7 @@ use serde::Serialize;
 use crate::search::compare::StringOperator;
 
 #[derive(Clone, Debug, Deserialize, Serialize, Hash, PartialEq, Eq)]
+#[cfg_attr(test, derive(schemars::JsonSchema))]
 #[serde(untagged)]
 pub enum DataType {
     Json(serde_json::Value),

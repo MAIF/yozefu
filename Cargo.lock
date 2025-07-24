@@ -6156,6 +6156,7 @@ dependencies = [
  "protobuf",
  "rdkafka",
  "reqwest",
+ "schemars",
  "serde",
  "serde_json",
  "strum 0.27.2",

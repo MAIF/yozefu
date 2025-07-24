@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, fs, path::PathBuf};
 
 use rdkafka::message::OwnedMessage;
 
@@ -40,4 +40,21 @@ fn test_has_schema() {
         value: DataType::String("".into()),
     };
     assert!(record.has_schemas())
+}
+
+#[test]
+fn generate_json_schema_for_kafka_record() {
+    use schemars::schema_for;
+    let schema = schema_for!(KafkaRecord);
+    let output_file = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .join("docs")
+        .join("record")
+        .join("json-schema.json");
+
+    fs::create_dir_all(output_file.parent().unwrap()).unwrap();
+    fs::write(output_file, serde_json::to_string_pretty(&schema).unwrap()).unwrap();
 }
