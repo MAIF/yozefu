@@ -10,6 +10,7 @@ use std::collections::BTreeMap;
 /// Currently, we only support utf-8 string keys/values/headers.
 #[derive(Clone, Debug, Deserialize, Serialize, Hash, PartialEq, Eq, Default)]
 #[serde(rename_all = "lowercase")]
+#[cfg_attr(test, derive(schemars::JsonSchema))]
 pub struct KafkaRecord {
     pub topic: String,
     pub timestamp: Option<i64>,

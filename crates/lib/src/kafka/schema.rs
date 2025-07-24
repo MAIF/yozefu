@@ -5,10 +5,12 @@ use std::{fmt::Display, io::Read};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize, Serialize, Hash, PartialEq, Eq, Default)]
+#[cfg_attr(test, derive(schemars::JsonSchema))]
 pub struct SchemaId(pub u32);
 
 #[derive(Clone, Debug, Deserialize, Serialize, Hash, PartialEq, Eq)]
 #[serde(rename_all = "UPPERCASE")]
+#[cfg_attr(test, derive(schemars::JsonSchema))]
 pub enum SchemaType {
     Json,
     Avro,
@@ -16,6 +18,7 @@ pub enum SchemaType {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, Hash, PartialEq, Eq)]
+#[cfg_attr(test, derive(schemars::JsonSchema))]
 pub struct Schema {
     pub id: SchemaId,
     #[serde(skip_serializing_if = "Option::is_none")]

@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KafkaRecord",
+  "description": "Inspired of the `[rdkafka::Message]` struct.\nCurrently, we only support utf-8 string keys/values/headers.",
+  "type": "object",
+  "properties": {
+    "topic": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int64"
+    },
+    "partition": {
+      "type": "integer",
+      "format": "int32"
+    },
+    "offset": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "headers": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "key_schema": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Schema"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "value_schema": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Schema"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "size": {
+      "description": "Number of bytes in the key + the value",
+      "type": "integer",
+      "format": "uint",
+      "minimum": 0,
+      "default": 0
+    },
+    "key": {
+      "description": "A human readable representation of the key",
+      "$ref": "#/$defs/DataType"
+    },
+    "key_as_string": {
+      "type": "string",
+      "writeOnly": true
+    },
+    "value": {
+      "description": "A human readable representation of the value",
+      "$ref": "#/$defs/DataType"
+    },
+    "value_as_string": {
+      "description": "The value as a string. needed to be displayed in the TUI",
+      "type": "string",
+      "writeOnly": true
+    }
+  },
+  "required": [
+    "topic",
+    "partition",
+    "offset",
+    "headers",
+    "key",
+    "value"
+  ],
+  "$defs": {
+    "Schema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/SchemaId"
+        },
+        "schema_type": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SchemaType"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "SchemaId": {
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "SchemaType": {
+      "type": "string",
+      "enum": [
+        "JSON",
+        "AVRO",
+        "PROTOBUF"
+      ]
+    },
+    "DataType": {
+      "anyOf": [
+        true,
+        {
+          "type": "string"
+        }
+      ]
+    }
+  }
+}
