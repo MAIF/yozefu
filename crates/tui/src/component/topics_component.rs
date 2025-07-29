@@ -19,9 +19,7 @@ use super::{Component, ComponentName, Shortcut, State};
 
 #[derive(Default)]
 pub(crate) struct TopicsComponent {
-    topics: Vec<String>,
-    visible_topics: Vec<String>,
-    selected: HashSet<String>,
+    topics: TopicList,
     state: ListState,
     action_tx: Option<UnboundedSender<Action>>,
     input: Input,
@@ -34,9 +32,7 @@ impl TopicsComponent {
         let topics = selected_topics.clone();
         let index = if loading { None } else { Some(1) };
         Self {
-            selected: HashSet::from_iter(selected_topics),
-            visible_topics: topics.clone(),
-            topics,
+            topics: TopicList::new(topics.clone(), selected_topics.clone()),
             state: ListState::default().with_selected(index),
             loading,
             ..Default::default()
@@ -44,17 +40,17 @@ impl TopicsComponent {
     }
 
     pub fn topics(&self) -> &[String] {
-        &self.topics
+        self.topics.all()
     }
 
     fn next(&mut self) {
-        if self.visible_topics.is_empty() {
+        if self.topics.get().is_empty() {
             return;
         }
 
         match self.state.selected() {
             Some(i) => {
-                if i >= self.visible_topics.len() - 1 {
+                if i >= self.topics.get().len() - 1 {
                     self.state.select(Some(0));
                 } else {
                     self.state.select(Some(i + 1));
@@ -65,13 +61,14 @@ impl TopicsComponent {
     }
 
     fn previous(&mut self) {
-        if self.visible_topics.is_empty() {
+        let topics = self.topics.get();
+        if topics.is_empty() {
             return;
         }
         match self.state.selected() {
             Some(i) => {
                 if i == 0 {
-                    self.state.select(Some(self.visible_topics.len() - 1));
+                    self.state.select(Some(topics.len() - 1));
                 } else {
                     self.state.select(Some(i - 1));
                 }
@@ -81,16 +78,8 @@ impl TopicsComponent {
     }
 
     fn filter_topics(&mut self) {
-        self.visible_topics = match self.input.value().trim().is_empty() {
-            true => self.topics.clone(),
-            false => self
-                .topics
-                .clone()
-                .into_iter()
-                .filter(|t| t.contains(self.input.value()))
-                .collect_vec(),
-        };
-        if self.visible_topics.is_empty() {
+        self.topics.set_filter(self.input.value().trim());
+        if self.topics.get().is_empty() {
             self.state.select(Some(0));
         }
     }
@@ -115,7 +104,7 @@ impl Component for TopicsComponent {
                         .send(Action::NewView(ComponentName::TopicDetails))?;
 
                     let mut h = HashSet::default();
-                    h.insert(self.visible_topics.get(selected).unwrap().clone());
+                    h.insert(self.topics.get().get(selected).unwrap().to_string());
                     self.action_tx
                         .as_ref()
                         .unwrap()
@@ -123,8 +112,7 @@ impl Component for TopicsComponent {
                 }
             }
             KeyCode::Char('u') if key.modifiers.contains(KeyModifiers::CONTROL) => {
-                self.visible_topics = self.topics.clone();
-                self.selected.clear();
+                self.topics.clear_selected();
                 self.action_tx
                     .clone()
                     .unwrap()
@@ -142,21 +130,23 @@ impl Component for TopicsComponent {
                 if self.state.selected().is_none() {
                     return Ok(None);
                 }
-                let topic = self.visible_topics.get(self.state.selected().unwrap());
+
+                let topic = self
+                    .topics
+                    .get()
+                    .get(self.state.selected().unwrap())
+                    .cloned();
                 if topic.is_none() {
                     return Ok(None);
                 }
-                let topic = topic.unwrap();
-                if self.selected.contains(topic) {
-                    self.selected.remove(topic);
-                } else {
-                    self.selected.insert(topic.to_string());
-                }
+                let topic = topic.unwrap().to_string();
+                self.topics.toggle_topics(&topic);
+
                 self.action_tx
                     .clone()
                     .unwrap()
                     .send(Action::SelectedTopics(
-                        self.selected.clone().into_iter().collect_vec(),
+                        self.topics.selected().iter().cloned().collect_vec(),
                     ))?;
                 self.action_tx
                     .clone()
@@ -175,23 +165,14 @@ impl Component for TopicsComponent {
     }
 
     fn update(&mut self, action: Action) -> Result<Option<Action>, TuiError> {
-        if let Action::Topics(mut new_topics) = action {
+        if let Action::Topics(new_topics) = action {
+            self.topics.refresh_topics(new_topics);
             self.loading = false;
-            new_topics.dedup();
-            new_topics.sort();
-            self.topics = new_topics;
-            if !self.topics.is_empty() {
+            if !self.topics.get().is_empty() {
                 let selected = self.state.selected().unwrap_or(0);
-                match selected < self.topics.len() {
+                match selected < self.topics.get().len() {
                     true => self.state.select(Some(selected)),
                     false => self.state.select(Some(0)),
-                }
-            }
-            self.visible_topics.clone_from(&self.topics);
-
-            for topic in self.selected.clone() {
-                if !self.topics.contains(&topic) {
-                    self.selected.remove(&topic);
                 }
             }
         };
@@ -200,9 +181,9 @@ impl Component for TopicsComponent {
 
     fn draw(&mut self, f: &mut Frame<'_>, rect: Rect, state: &State) -> Result<(), TuiError> {
         let is_focused = state.is_focused(self.id());
-        let title = match self.selected.len() {
+        let title = match self.topics.selected().len() {
             0 => " Topics ".to_string(),
-            _ => format!(" Topics [{}] ", self.selected.len()),
+            selected => format!(" Topics [{selected}] "),
         };
         let outer_block = Block::default()
             .borders(Borders::ALL)
@@ -211,14 +192,12 @@ impl Component for TopicsComponent {
         let outer_block = self.make_block_focused_with_state(state, outer_block);
 
         let items: Vec<ListItem> = self
-            .visible_topics
+            .topics
+            .get_with_selection()
             .iter()
-            .map(|i| {
-                let s = match self.selected.contains(i) {
-                    true => format!(" [x] {i} "),
-                    false => format!(" [ ] {i} "),
-                };
-                ListItem::new(s).style(Style::default())
+            .map(|t| match t.1 {
+                true => ListItem::new(format!(" [x] {} ", t.0)).style(Style::default().bold()),
+                false => ListItem::new(format!(" [ ] {} ", t.0)).style(Style::default()),
             })
             .collect();
 
@@ -287,7 +266,7 @@ impl Component for TopicsComponent {
             Shortcut::new("CTRL + P", "Show details"),
         ];
 
-        if !self.selected.is_empty() {
+        if !self.topics.any_selected() {
             shortcuts.push(Shortcut::new("CTRL + U", "Unselect topics"));
         }
         shortcuts
@@ -308,4 +287,94 @@ fn test_draw() {
         ]))
         .unwrap();
     assert_draw!(component, 60, 5)
+}
+
+#[derive(Default)]
+struct TopicList {
+    topics: Vec<String>,
+    selected: Vec<String>,
+    filter: String,
+}
+
+impl TopicList {
+    pub fn new(topics: Vec<String>, selected: Vec<String>) -> Self {
+        let filtered_topics = topics
+            .into_iter()
+            .filter(|t| !selected.contains(t))
+            .collect::<Vec<_>>();
+        Self {
+            topics: filtered_topics,
+            selected: selected.into_iter().collect(),
+            filter: String::new(),
+        }
+    }
+
+    pub fn selected(&self) -> &[String] {
+        &self.selected
+    }
+
+    pub fn any_selected(&self) -> bool {
+        !&self.selected.is_empty()
+    }
+
+    pub fn set_filter(&mut self, filter: &str) {
+        self.filter = filter.to_string();
+    }
+
+    pub fn get_with_selection(&self) -> Vec<(&String, bool)> {
+        let mut list = self.selected().iter().map(|t| (t, true)).collect_vec();
+        match self.filter.is_empty() {
+            true => {
+                list.extend(self.topics.iter().map(|t| (t, self.selected.contains(t))));
+            }
+            false => {
+                list.extend(
+                    self.topics
+                        .iter()
+                        .filter(|t| t.contains(&self.filter))
+                        .map(|t| (t, self.selected.contains(t))),
+                );
+            }
+        }
+
+        list
+    }
+
+    pub fn all(&self) -> &[String] {
+        &self.topics
+    }
+
+    pub fn get(&self) -> Vec<&String> {
+        self.get_with_selection()
+            .iter()
+            .map(|(t, _)| *t)
+            .collect::<Vec<_>>()
+    }
+
+    pub fn refresh_topics(&mut self, mut new_topics: Vec<String>) {
+        new_topics.dedup();
+        new_topics.sort();
+        self.topics = new_topics;
+
+        self.selected.retain(|topic| self.topics.contains(topic));
+    }
+
+    fn clear_selected(&mut self) {
+        self.topics.extend(self.selected.iter().cloned());
+        self.topics.dedup();
+        self.topics.sort();
+        self.selected.clear();
+    }
+
+    fn toggle_topics(&mut self, topic: &str) {
+        if self.selected.contains(&topic.to_string()) {
+            self.selected.retain(|t| t != topic);
+            self.topics.push(topic.to_string());
+        } else {
+            self.selected.push(topic.to_string());
+            self.topics.retain(|e| e != topic);
+        }
+
+        self.topics.sort();
+    }
 }
