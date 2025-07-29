@@ -7,11 +7,7 @@ use yozefu_lib::{ExportedKafkaRecord, KafkaRecord, parse_search_query};
 
 #[test]
 fn test_inputs() {
-    unsafe {
-        use std::env;
-        // Set the timezone to Paris to have a fixed timezone for the tests
-        env::set_var("TZ", "Europe/Paris");
-    }
+    fix_timezone();
     glob!("inputs/search-queries/*.sql", |path| {
         let input = fs::read_to_string(path).unwrap();
         let input = input.trim();
@@ -27,6 +23,7 @@ fn test_inputs() {
 
 #[test]
 fn test_exported_record() {
+    fix_timezone();
     glob!("inputs/parsed-records/record*.json", |path| {
         let input = fs::read_to_string(path).unwrap();
         let record: KafkaRecord = serde_json::from_str(&input).unwrap();
@@ -60,4 +57,13 @@ fn test_parse_records() {
 struct KeyValue {
     pub key: Option<Vec<u8>>,
     pub value: Option<Vec<u8>>,
+}
+
+/** Fix the timezone to a specific value for testing purposes */
+fn fix_timezone() {
+    unsafe {
+        use std::env;
+        // Set the timezone to Paris to have a fixed timezone for the tests
+        env::set_var("TZ", "Europe/Paris");
+    }
 }
