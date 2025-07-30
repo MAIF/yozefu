@@ -8,8 +8,8 @@ use std::{fs, process::Command};
 use app::configuration::GlobalConfig;
 use clap::{Args, Subcommand};
 use lib::Error;
-use log::info;
 use tempfile::tempdir;
+use tracing::info;
 
 mod get_command;
 mod set_command;

@@ -8,7 +8,7 @@ use app::{
 use clap::Args;
 use extism::{Manifest, Plugin, Wasm};
 use lib::Error;
-use log::info;
+use tracing::info;
 
 use crate::command::Command;
 

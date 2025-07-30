@@ -72,7 +72,7 @@ impl Component for TopicDetailsComponent {
                     .as_ref()
                     .unwrap()
                     .send(Action::Notification(Notification::new(
-                        log::Level::Info,
+                        tracing::Level::INFO,
                         "Refreshing data".to_string(),
                     )))
                     .unwrap();

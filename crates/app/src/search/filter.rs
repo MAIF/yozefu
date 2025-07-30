@@ -9,7 +9,7 @@ use lib::{
     FilterResult,
     search::filter::{Filter, FilterInput},
 };
-use log::error;
+use tracing::error;
 
 use super::{Search, SearchContext};
 

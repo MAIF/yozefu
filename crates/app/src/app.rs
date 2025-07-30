@@ -3,12 +3,12 @@ use lib::{
     ConsumerGroupDetail, Error, ExportedKafkaRecord, KafkaRecord, TopicDetail,
     kafka::SchemaRegistryClient, search::offset::FromOffset,
 };
-use log::{info, warn};
 use rdkafka::{
     Offset, TopicPartitionList,
     consumer::{BaseConsumer, Consumer, StreamConsumer},
 };
 use thousands::Separable;
+use tracing::{info, warn};
 
 use std::{collections::HashSet, fs, time::Duration};
 

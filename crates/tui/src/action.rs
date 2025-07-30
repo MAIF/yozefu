@@ -66,12 +66,12 @@ pub(crate) enum Action {
 /// A notification is a message displayed at the bottom-right corner of the TUI.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Notification {
-    pub level: log::Level,
+    pub level: tracing::Level,
     pub message: String,
 }
 
 impl Notification {
-    pub fn new(level: log::Level, message: String) -> Self {
+    pub fn new(level: tracing::Level, message: String) -> Self {
         Self { level, message }
     }
 }
