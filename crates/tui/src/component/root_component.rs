@@ -2,11 +2,11 @@
 //! and renders components based on the current context.
 use app::configuration::GlobalConfig;
 use copypasta::{ClipboardContext, ClipboardProvider};
-use log::warn;
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
 };
+use tracing::warn;
 
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use ratatui::{
@@ -341,7 +341,7 @@ impl Component for RootComponent {
                     .as_ref()
                     .unwrap()
                     .send(Action::Notification(Notification::new(
-                        log::Level::Info,
+                        tracing::Level::INFO,
                         "Copied to clipboard".to_string(),
                     )))?;
                 ctx.set_contents(content.to_string()).unwrap();

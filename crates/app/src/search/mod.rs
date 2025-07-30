@@ -1,11 +1,5 @@
 //! Module implementing the search logic
 
-use std::{
-    collections::HashMap,
-    path::{Path, PathBuf},
-    sync::{LazyLock, Mutex},
-};
-
 use extism::{Manifest, Plugin, Wasm};
 use filter::{CACHED_FILTERS, PARSE_PARAMETERS_FUNCTION_NAME};
 use itertools::Itertools;
@@ -13,7 +7,12 @@ use lib::{
     KafkaRecord, SearchQuery, parse_search_query,
     search::{filter::Filter, offset::FromOffset},
 };
-use log::error;
+use std::{
+    collections::HashMap,
+    path::{Path, PathBuf},
+    sync::{LazyLock, Mutex},
+};
+use tracing::error;
 
 pub mod atom;
 pub mod compare;
@@ -159,6 +158,7 @@ mod tests {
     #[test]
     #[ignore]
     fn test_wasm_should_not_have_access_to_network() {
+        use tracing::Level;
         testing_logger::setup();
 
         let filters_directory = Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -179,7 +179,7 @@ mod tests {
         testing_logger::validate(|captured_logs| {
             let logs = captured_logs
                 .iter()
-                .filter(|c| c.level == log::Level::Error)
+                .filter(|c| c.level.to_string() == Level::ERROR.to_string())
                 .collect::<Vec<&testing_logger::CapturedLog>>();
             assert_eq!(2, logs.len());
             assert!(

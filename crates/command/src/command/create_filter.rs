@@ -7,8 +7,8 @@ use std::{
 use chrono::Local;
 use clap::Args;
 use lib::Error;
-use log::{info, warn};
 use strum::{Display, EnumIter, EnumString};
+use tracing::{info, warn};
 
 use crate::{
     APPLICATION_NAME,

@@ -7,7 +7,7 @@
 use app::configuration::GlobalConfig;
 use clap::Args;
 use lib::Error;
-use log::info;
+use tracing::info;
 
 use crate::command::Command;
 

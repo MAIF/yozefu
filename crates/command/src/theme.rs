@@ -3,7 +3,7 @@ use std::{fs, path::PathBuf};
 use app::configuration::GlobalConfig;
 use indexmap::IndexMap;
 use lib::Error;
-use log::{info, warn};
+use tracing::{info, warn};
 use tui::Theme;
 
 const THEMES_URL: &str =

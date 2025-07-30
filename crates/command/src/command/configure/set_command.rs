@@ -6,8 +6,8 @@ use crate::command::Command as CliCommand;
 use app::configuration::GlobalConfig;
 use clap::Args;
 use lib::Error;
-use log::info;
 use serde_json::Value;
+use tracing::info;
 
 #[derive(Debug, Args, Clone)]
 pub struct ConfigureSetCommand {

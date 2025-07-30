@@ -42,6 +42,7 @@ serde_json = { version = "1.0.141", features = ["preserve_order"] }
 serde = { version = "1.0.219", features = ["derive"] }
 log = {version = "0.4.27" }
 strum = {version = "0.27.2" }
+tracing = "0.1.41"
 
 [profile.release]
 opt-level = 3

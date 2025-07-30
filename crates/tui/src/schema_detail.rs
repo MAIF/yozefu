@@ -1,6 +1,6 @@
 use lib::kafka::{SchemaId, SchemaRegistryClient, SchemaResponse};
-use log::warn;
 use serde::Serialize;
+use tracing::warn;
 
 #[derive(Clone, Debug, Serialize, Hash, PartialEq, Eq, Default)]
 pub struct SchemaDetail {

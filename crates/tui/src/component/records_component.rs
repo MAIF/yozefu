@@ -225,7 +225,7 @@ impl Component for RecordsComponent<'_> {
                     let mut ctx = ClipboardContext::new().unwrap();
                     let exported_record: ExportedKafkaRecord = record.into();
                     self.action_tx.as_ref().unwrap().send(Action::Notification(
-                        Notification::new(log::Level::Info, "Copied to clipboard".to_string()),
+                        Notification::new(tracing::Level::INFO, "Copied to clipboard".to_string()),
                     ))?;
                     ctx.set_contents(serde_json::to_string_pretty(&exported_record)?)
                         .unwrap();

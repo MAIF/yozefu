@@ -9,12 +9,12 @@ use std::time::Duration;
 use std::time::Instant;
 use tokio::select;
 use tokio::sync::mpsc;
+use tracing::info;
 
 use futures::{StreamExt, TryStreamExt};
 use indicatif::ProgressBar;
 use lib::Error;
 use lib::KafkaRecord;
-use log::info;
 use rdkafka::consumer::Consumer;
 use tokio_util::sync::CancellationToken;
 

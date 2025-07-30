@@ -9,7 +9,6 @@ use app::search::ValidSearchQuery;
 use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers};
 use itertools::Itertools;
 use lib::{Error, error::SearchError};
-use log::error;
 use ratatui::prelude::Stylize;
 use ratatui::{
     Frame,
@@ -20,6 +19,7 @@ use ratatui::{
 };
 use tokio::{select, sync::mpsc::UnboundedSender, time::Instant};
 use tokio_util::sync::CancellationToken;
+use tracing::error;
 use tui_input::{Input, backend::crossterm::EventHandler};
 
 use crate::{
@@ -69,7 +69,7 @@ impl SearchComponent {
                     if input.len() > 5 {
                         if let Err(e) = ValidSearchQuery::from(&input, &filters_dir) {
                             error!("{e}");
-                            tt.as_ref().unwrap().send(Action::Notification(Notification::new(log::Level::Error, e.to_string()))).unwrap();
+                            tt.as_ref().unwrap().send(Action::Notification(Notification::new(tracing::Level::ERROR, e.to_string()))).unwrap();
                         }
                     }
                  }
@@ -144,7 +144,7 @@ impl SearchComponent {
                     .as_ref()
                     .unwrap()
                     .send(Action::Notification(Notification::new(
-                        log::Level::Error,
+                        tracing::Level::ERROR,
                         e.to_string(),
                     )))?;
             }

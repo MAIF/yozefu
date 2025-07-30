@@ -7,7 +7,6 @@ use crossterm::event::KeyEvent;
 use futures::{StreamExt, TryStreamExt};
 use itertools::Itertools;
 use lib::KafkaRecord;
-use log::{error, info, warn};
 use ratatui::prelude::Rect;
 use rdkafka::Message;
 use rdkafka::consumer::{Consumer, StreamConsumer};
@@ -19,6 +18,7 @@ use tokio::sync::mpsc::{self, UnboundedSender};
 use tokio::time::Instant;
 use tokio::{select, time};
 use tokio_util::sync::CancellationToken;
+use tracing::{Level, error, info, span, warn};
 
 use crate::action::{Action, Notification};
 use crate::component::{Component, RootComponent};
@@ -75,7 +75,7 @@ impl Ui {
             Ok(c) => Ok(c),
             Err(e) => {
                 tx.send(Action::Notification(Notification::new(
-                    log::Level::Error,
+                    tracing::Level::ERROR,
                     e.to_string(),
                 )))?;
                 error!("Something went wrong when trying to consume topics: {e}");
@@ -101,7 +101,7 @@ impl Ui {
         };
 
         tx.send(Action::Notification(Notification::new(
-            log::Level::Info,
+            tracing::Level::INFO,
             message,
         )))?;
         self.worker = CancellationToken::new();
@@ -140,6 +140,8 @@ impl Ui {
                         return;
                      },
                     Some(message) = rx_dd.recv() => {
+                        let span = span!(Level::TRACE, "my span");
+                        let _enter = span.enter();
                         let record = KafkaRecord::parse(message, &mut schema_registry).await;
                         let context = SearchContext::new(&record, &filters_directory);
                         let mut ll = r.lock().unwrap();
@@ -189,7 +191,7 @@ impl Ui {
                         current_time = Instant::now();
 
                         tx.send(Action::Notification(Notification::new(
-                            log::Level::Info,
+                            tracing::Level::INFO,
                             format!(
                                 "Checkpoint: {}",
                                 DateTime::from_timestamp_millis(timestamp).unwrap()
@@ -221,7 +223,7 @@ impl Ui {
                 Ok(details) => action_tx.send(Action::TopicDetails(details)).unwrap(),
                 Err(e) => action_tx
                     .send(Action::Notification(Notification::new(
-                        log::Level::Error,
+                        tracing::Level::ERROR,
                         e.to_string(),
                     )))
                     .unwrap(),
@@ -237,7 +239,7 @@ impl Ui {
     ) -> Result<(), TuiError> {
         self.app.export_record(record)?;
         action_tx.send(Action::Notification(Notification::new(
-            log::Level::Info,
+            tracing::Level::INFO,
             "Record exported to the file".to_string(),
         )))?;
         Ok(())
@@ -257,7 +259,7 @@ impl Ui {
                 Err(e) => {
                     if action_tx
                         .send(Action::Notification(Notification::new(
-                            log::Level::Error,
+                            tracing::Level::ERROR,
                             e.to_string(),
                         )))
                         .is_err()
@@ -315,7 +317,7 @@ impl Ui {
                     Action::Refresh => {
                         self.load_topics(action_tx.clone())?;
                         action_tx.send(Action::Notification(Notification::new(
-                            log::Level::Info,
+                            tracing::Level::INFO,
                             "Refreshing topics".to_string(),
                         )))?;
                     }
@@ -334,7 +336,7 @@ impl Ui {
 
                         if let Err(e) = open::that(&url) {
                             action_tx.send(Action::Notification(Notification::new(
-                                log::Level::Info,
+                                tracing::Level::INFO,
                                 "this action is not available right now".to_string(),
                             )))?;
                             warn!("Cannot open the URL '{url}': {e}")
@@ -367,7 +369,7 @@ impl Ui {
                     Action::Search(ref search) => {
                         if self.topics.is_empty() {
                             action_tx.send(Action::Notification(Notification::new(
-                                log::Level::Info,
+                                tracing::Level::INFO,
                                 "No topics selected".to_string(),
                             )))?;
                         }

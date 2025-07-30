@@ -114,8 +114,8 @@ impl Component for HeaderComponent {
                 1,
             );
             let notification = match n.level {
-                log::Level::Error => notification.fg(state.theme.red).underlined(),
-                log::Level::Warn => notification.fg(state.theme.yellow),
+                tracing::Level::ERROR => notification.fg(state.theme.red).underlined(),
+                tracing::Level::WARN => notification.fg(state.theme.yellow),
                 _ => notification,
             };
             f.render_widget(notification, r);
