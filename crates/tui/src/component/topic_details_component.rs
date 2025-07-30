@@ -17,7 +17,7 @@ use ratatui::{
 use thousands::Separable;
 use tokio::sync::mpsc::UnboundedSender;
 
-use crate::{Action, Notification, error::TuiError};
+use crate::{Action, Notification, action::Level, error::TuiError};
 
 use super::{Component, ComponentName, State, WithHeight};
 
@@ -72,7 +72,7 @@ impl Component for TopicDetailsComponent {
                     .as_ref()
                     .unwrap()
                     .send(Action::Notification(Notification::new(
-                        tracing::Level::INFO,
+                        Level::Info,
                         "Refreshing data".to_string(),
                     )))
                     .unwrap();

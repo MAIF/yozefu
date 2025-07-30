@@ -67,52 +67,58 @@ impl Headless {
         let token_cloned = token.clone();
 
         let filters_directory = self.app.config.global.filters_dir();
-        tokio::spawn(async move {
-            loop {
-                let mut limit = 0;
-                select! {
-                    _ = token_cloned.cancelled() => {
-                        info!("Consumer is about to be cancelled");
-                        return;
-                     },
-                    Some(message) = rx_dd.recv() => {
-                        let record = KafkaRecord::parse(message, &mut schema_registry).await;
-                        let context = SearchContext::new(&record, &filters_directory);
-                        if search_query.matches(&context) {
-                            records_channel.0.send(record).unwrap();
-                            limit += 1;
-                        }
-                        if let Some(query_limit) = search_query.limit() {
-                            if limit >= query_limit {
-                                token_cloned.cancel();
+        tokio::task::Builder::new()
+            .name("headless-search-engine")
+            .spawn(async move {
+                loop {
+                    let mut limit = 0;
+                    select! {
+                        _ = token_cloned.cancelled() => {
+                            info!("Consumer is about to be cancelled");
+                            return;
+                         },
+                        Some(message) = rx_dd.recv() => {
+                            let record = KafkaRecord::parse(message, &mut schema_registry).await;
+                            let context = SearchContext::new(&record, &filters_directory);
+                            if search_query.matches(&context) {
+                                records_channel.0.send(record).unwrap();
+                                limit += 1;
+                            }
+                            if let Some(query_limit) = search_query.limit() {
+                                if limit >= query_limit {
+                                    token_cloned.cancel();
+                                }
                             }
                         }
                     }
                 }
-            }
-        });
+            })
+            .unwrap();
 
-        tokio::spawn(async move {
-            let mut current_time = Instant::now();
-            let task = consumer
-                .stream()
-                .take_until(token.cancelled())
-                .try_for_each(|message| {
-                    let message = message.detach();
-                    let timestamp = message.timestamp().to_millis().unwrap_or_default();
-                    tx_dd.send(message).unwrap();
+        tokio::task::Builder::new()
+            .name("headless-kafka-consumer")
+            .spawn(async move {
+                let mut current_time = Instant::now();
+                let task = consumer
+                    .stream()
+                    .take_until(token.cancelled())
+                    .try_for_each(|message| {
+                        let message = message.detach();
+                        let timestamp = message.timestamp().to_millis().unwrap_or_default();
+                        tx_dd.send(message).unwrap();
 
-                    if current_time.elapsed() > Duration::from_secs(15) {
-                        current_time = Instant::now();
-                        info!("Checkpoint: {timestamp}");
-                    }
-                    progress.inc(1);
-                    futures::future::ok(())
-                })
-                .await;
-            info!("Consumer is terminated");
-            task
-        });
+                        if current_time.elapsed() > Duration::from_secs(15) {
+                            current_time = Instant::now();
+                            info!("Checkpoint: {timestamp}");
+                        }
+                        progress.inc(1);
+                        futures::future::ok(())
+                    })
+                    .await;
+                info!("Consumer is terminated");
+                task
+            })
+            .unwrap();
 
         while let Some(record) = records_channel.1.recv().await {
             println!("{}", self.formatter.fmt(&record));

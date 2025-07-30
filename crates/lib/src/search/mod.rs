@@ -78,6 +78,7 @@ pub mod number_test;
 pub mod offset_test;
 
 #[derive(Debug, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[cfg_attr(test, derive(schemars::JsonSchema))]
 pub struct FilterResult {
     pub r#match: bool,
 }
@@ -92,4 +93,22 @@ impl From<bool> for FilterResult {
     fn from(r#match: bool) -> Self {
         Self { r#match }
     }
+}
+
+#[test]
+fn generate_json_schema_filter_result() {
+    use schemars::schema_for;
+    let schema = schema_for!(FilterResult);
+    std::fs::write(
+        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("docs")
+            .join("json-schemas")
+            .join("filter-result.json"),
+        serde_json::to_string_pretty(&schema).unwrap(),
+    )
+    .unwrap();
 }

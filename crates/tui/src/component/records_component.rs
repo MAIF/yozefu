@@ -18,7 +18,7 @@ use tokio::sync::watch::Receiver;
 
 use crate::{
     Action,
-    action::Notification,
+    action::{Level, Notification},
     error::TuiError,
     records_buffer::{BufferAction, Stats},
 };
@@ -225,7 +225,7 @@ impl Component for RecordsComponent<'_> {
                     let mut ctx = ClipboardContext::new().unwrap();
                     let exported_record: ExportedKafkaRecord = record.into();
                     self.action_tx.as_ref().unwrap().send(Action::Notification(
-                        Notification::new(tracing::Level::INFO, "Copied to clipboard".to_string()),
+                        Notification::new(Level::Info, "Copied to clipboard".to_string()),
                     ))?;
                     ctx.set_contents(serde_json::to_string_pretty(&exported_record)?)
                         .unwrap();

@@ -12,7 +12,7 @@
 # bash docs/try-it.sh "Nancy" "text" "public-french-addresses-text"
 # bash docs/try-it.sh "Nimes" "malformed" "public-french-addresses-malformed"
 # 
-# jbang run ./docs/schemas/MyConsumer.java public-french-addresses
+# jbang run ./docs/demo/MyConsumer.java public-french-addresses
 
 
 set -eo pipefail
@@ -176,8 +176,8 @@ if [ "$ready" = "0" ]; then
       --topic "${topic}"
 
     if jbang --version &> /dev/null; then
-        echo " 🤖 jbang run ${repo}/docs/schemas/MyProducer.java --type $type --topic $topic $query"
-        jbang run "${repo}/docs/schemas/MyProducer.java" --type "$type" --topic "$topic" "$query"
+        echo " 🤖 jbang run ${repo}/docs/demo/MyProducer.java --type $type --topic $topic $query"
+        jbang run "${repo}/docs/demo/MyProducer.java" --type "$type" --topic "$topic" "$query"
     else
         echo " ℹ️ About to use the default producer 'kafka-console-producer.sh'. Install jbang to create a kafka producer using the schema registry."
         echo " 🏡 Searching french addresses matching the query '${query}'"
