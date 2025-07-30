@@ -1,7 +1,10 @@
 //! Logging utilities.
 
 use std::{fs::OpenOptions, path::PathBuf};
-use tracing_subscriber::filter::LevelFilter;
+use tracing_subscriber::{
+    filter::LevelFilter,
+    fmt::{SubscriberBuilder, format::FmtSpan},
+};
 
 /// Returns the log level based on the debug flag.
 fn log_level(is_debug: bool) -> LevelFilter {
@@ -15,13 +18,10 @@ fn log_level(is_debug: bool) -> LevelFilter {
 pub(crate) fn init_logging_stderr(
     is_debug: bool,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>> {
-    let level = log_level(is_debug);
-    tracing_subscriber::fmt()
-        .with_max_level(level)
+    tracing_subscriber_builder(is_debug)
         .with_writer(std::io::stderr)
         .with_ansi(true)
-        .try_init()?;
-    Ok(())
+        .try_init()
 }
 
 /// When the user starts the TUI, it writes logs to a file.
@@ -29,9 +29,17 @@ pub(crate) fn init_logging_file(
     is_debug: bool,
     path: &PathBuf,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>> {
-    let level = log_level(is_debug);
-    tracing_subscriber::fmt()
-        .with_max_level(level)
+    tracing_subscriber_builder(is_debug)
         .with_writer(OpenOptions::new().append(true).create(true).open(path)?)
         .try_init()
+}
+
+/// When the user starts the TUI, it writes logs to a file.
+fn tracing_subscriber_builder(is_debug: bool) -> SubscriberBuilder {
+    let level = log_level(is_debug);
+    let mut builder = tracing_subscriber::fmt().with_max_level(level);
+    if is_debug {
+        builder = builder.with_span_events(FmtSpan::CLOSE);
+    }
+    builder
 }

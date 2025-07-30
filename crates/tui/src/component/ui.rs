@@ -140,7 +140,7 @@ impl Ui {
                         return;
                      },
                     Some(message) = rx_dd.recv() => {
-                        let span = span!(Level::TRACE, "my span");
+                        let span = span!(Level::INFO, "my span");
                         let _enter = span.enter();
                         let record = KafkaRecord::parse(message, &mut schema_registry).await;
                         let context = SearchContext::new(&record, &filters_directory);
