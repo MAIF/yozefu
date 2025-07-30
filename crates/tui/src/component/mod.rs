@@ -15,6 +15,7 @@ mod styles;
 mod topic_details_component;
 mod topics_and_records_component;
 mod topics_component;
+mod topics_list;
 pub mod ui;
 mod vertical_scrollable_block;
 
