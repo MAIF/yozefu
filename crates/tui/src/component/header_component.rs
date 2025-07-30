@@ -10,7 +10,7 @@ use ratatui::{
 use tokio::sync::mpsc::UnboundedSender;
 
 use crate::{
-    action::{Action, Notification},
+    action::{Action, Level, Notification},
     error::TuiError,
 };
 
@@ -114,8 +114,8 @@ impl Component for HeaderComponent {
                 1,
             );
             let notification = match n.level {
-                tracing::Level::ERROR => notification.fg(state.theme.red).underlined(),
-                tracing::Level::WARN => notification.fg(state.theme.yellow),
+                Level::Error => notification.fg(state.theme.red).underlined(),
+                Level::Warn => notification.fg(state.theme.yellow),
                 _ => notification,
             };
             f.render_widget(notification, r);

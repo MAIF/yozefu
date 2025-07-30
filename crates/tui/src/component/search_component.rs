@@ -22,6 +22,7 @@ use tokio_util::sync::CancellationToken;
 use tracing::error;
 use tui_input::{Input, backend::crossterm::EventHandler};
 
+use crate::action::Level;
 use crate::{
     error::TuiError,
     {Action, Notification},
@@ -62,19 +63,22 @@ impl SearchComponent {
         self.compiler_worker.cancel();
         self.compiler_worker = CancellationToken::new();
         let token = self.compiler_worker.clone();
-        tokio::spawn(async move {
+
+        tokio::task::Builder::new()
+            .name("search-parser")
+            .spawn(async move {
             select! {
                 _ = token.cancelled() => {  },
                 _ = tokio::time::sleep(Duration::from_millis(700)) => {
                     if input.len() > 5 {
                         if let Err(e) = ValidSearchQuery::from(&input, &filters_dir) {
                             error!("{e}");
-                            tt.as_ref().unwrap().send(Action::Notification(Notification::new(tracing::Level::ERROR, e.to_string()))).unwrap();
+                            tt.as_ref().unwrap().send(Action::Notification(Notification::new(Level::Error, e.to_string()))).unwrap();
                         }
                     }
                  }
             }
-        });
+        }).unwrap();
     }
 
     fn autocomplete(&mut self, keycode: KeyCode) {
@@ -144,7 +148,7 @@ impl SearchComponent {
                     .as_ref()
                     .unwrap()
                     .send(Action::Notification(Notification::new(
-                        tracing::Level::ERROR,
+                        Level::Error,
                         e.to_string(),
                     )))?;
             }

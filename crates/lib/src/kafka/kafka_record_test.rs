@@ -52,8 +52,8 @@ fn generate_json_schema_for_kafka_record() {
         .parent()
         .unwrap()
         .join("docs")
-        .join("record")
-        .join("json-schema.json");
+        .join("json-schemas")
+        .join("kafka-record.json");
 
     fs::create_dir_all(output_file.parent().unwrap()).unwrap();
     fs::write(output_file, serde_json::to_string_pretty(&schema).unwrap()).unwrap();

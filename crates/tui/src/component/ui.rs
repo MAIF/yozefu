@@ -18,9 +18,9 @@ use tokio::sync::mpsc::{self, UnboundedSender};
 use tokio::time::Instant;
 use tokio::{select, time};
 use tokio_util::sync::CancellationToken;
-use tracing::{Level, error, info, span, warn};
+use tracing::{error, info, info_span, warn};
 
-use crate::action::{Action, Notification};
+use crate::action::{Action, Level, Notification};
 use crate::component::{Component, RootComponent};
 use crate::error::TuiError;
 use crate::schema_detail::SchemaDetail;
@@ -75,7 +75,7 @@ impl Ui {
             Ok(c) => Ok(c),
             Err(e) => {
                 tx.send(Action::Notification(Notification::new(
-                    tracing::Level::ERROR,
+                    Level::Error,
                     e.to_string(),
                 )))?;
                 error!("Something went wrong when trying to consume topics: {e}");
@@ -101,7 +101,7 @@ impl Ui {
         };
 
         tx.send(Action::Notification(Notification::new(
-            tracing::Level::INFO,
+            Level::Info,
             message,
         )))?;
         self.worker = CancellationToken::new();
@@ -113,13 +113,16 @@ impl Ui {
         tx.send(Action::Consuming)?;
         let r = self.records;
         let token = self.worker.clone();
-        tokio::spawn(async move {
-            while !token.is_cancelled() {
-                r.lock().unwrap().sort(&order_by);
-                let mut interval = time::interval(Duration::from_secs(1));
-                interval.tick().await;
-            }
-        });
+        tokio::task::Builder::new()
+            .name("kafka-records-sorter")
+            .spawn(async move {
+                while !token.is_cancelled() {
+                    r.lock().unwrap().sort(&order_by);
+                    let mut interval = time::interval(Duration::from_secs(1));
+                    interval.tick().await;
+                }
+            })
+            .unwrap();
         let r = self.records;
         let token = self.worker.clone();
         let search_query = self.app.search_query.query().clone();
@@ -132,7 +135,9 @@ impl Ui {
         let token_cloned = token.clone();
 
         let filters_directory = self.app.config.global.filters_dir();
-        tokio::spawn(async move {
+        tokio::task::Builder::new()
+            .name("search-engine")
+        .spawn(async move {
             loop {
                 select! {
                     _ = token_cloned.cancelled() => {
@@ -140,15 +145,16 @@ impl Ui {
                         return;
                      },
                     Some(message) = rx_dd.recv() => {
-                        let span = span!(Level::INFO, "my span");
-                        let _enter = span.enter();
                         let record = KafkaRecord::parse(message, &mut schema_registry).await;
                         let context = SearchContext::new(&record, &filters_directory);
                         let mut ll = r.lock().unwrap();
                         ll.new_record_read();
+                        let span = info_span!("matching", offset = %record.offset, partition = %record.partition, topic = %record.topic);
+                        let e = span.enter();
                         if search_query.matches(&context) {
                             ll.push(record);
                         }
+                        drop(e);
                         ll.dispatch_metrics();
                         if let Some(limit) = query.limit {
                             if Some(ll.stats().matched) >= Some(limit) {
@@ -158,57 +164,64 @@ impl Ui {
                     }
                 }
             }
-        });
+        }).unwrap();
 
-        tokio::spawn(async move {
-            let _ = tx.send(Action::Consuming);
-            let consumer = match Self::create_consumer(&app, topics.clone(), txx.clone()).await {
-                Ok(c) => c,
-                Err(e) => {
-                    let _ = tx.send(Action::StopConsuming());
-                    warn!("I was not able to create a consumer: {e}");
-                    return Err("I was not able to create a consumer after 5 attempts...");
-                }
-            };
-            let _ = tx.send(Action::Consuming);
-            let assignments = consumer.assignment().unwrap();
-            let txx = tx.clone();
-            tokio::spawn(async move {
-                let count = app
-                    .estimate_number_of_records_to_read(assignments)
-                    .unwrap_or(0);
-                let _ = txx.send(Action::RecordsToRead(count as usize));
-            });
-            let mut current_time = Instant::now();
-            let _ = consumer
-                .stream()
-                .take_until(token.cancelled())
-                .try_for_each(|message| {
-                    let message = message.detach();
-                    let timestamp = message.timestamp().to_millis().unwrap_or_default();
-                    tx_dd.send(message).unwrap();
-                    if current_time.elapsed() > Duration::from_secs(13) {
-                        current_time = Instant::now();
-
-                        tx.send(Action::Notification(Notification::new(
-                            tracing::Level::INFO,
-                            format!(
-                                "Checkpoint: {}",
-                                DateTime::from_timestamp_millis(timestamp).unwrap()
-                            ),
-                        )))
-                        .unwrap();
+        tokio::task::Builder::new()
+            .name("kafka-consumer")
+            .spawn(async move {
+                let _ = tx.send(Action::Consuming);
+                let consumer = match Self::create_consumer(&app, topics.clone(), txx.clone()).await
+                {
+                    Ok(c) => c,
+                    Err(e) => {
+                        let _ = tx.send(Action::StopConsuming());
+                        warn!("I was not able to create a consumer: {e}");
+                        return Err("I was not able to create a consumer after 5 attempts...");
                     }
-                    futures::future::ok(())
-                })
-                .await;
-            consumer.unassign().unwrap();
-            info!("Consumer is terminated");
-            token.cancel();
-            r.lock().unwrap().sort(&query.order_by);
-            let _ = tx.send(Action::StopConsuming());
-            Ok(())
-        });
+                };
+                let _ = tx.send(Action::Consuming);
+                let assignments = consumer.assignment().unwrap();
+                let txx = tx.clone();
+                tokio::task::Builder::new()
+                    .name("records-to-read")
+                    .spawn(async move {
+                        let count = app
+                            .estimate_number_of_records_to_read(assignments)
+                            .unwrap_or(0);
+                        let _ = txx.send(Action::RecordsToRead(count as usize));
+                    })
+                    .unwrap();
+                let mut current_time = Instant::now();
+                let _ = consumer
+                    .stream()
+                    .take_until(token.cancelled())
+                    .try_for_each(|message| {
+                        let message = message.detach();
+                        let timestamp = message.timestamp().to_millis().unwrap_or_default();
+                        tx_dd.send(message).unwrap();
+                        if current_time.elapsed() > Duration::from_secs(13) {
+                            current_time = Instant::now();
+
+                            tx.send(Action::Notification(Notification::new(
+                                Level::Info,
+                                format!(
+                                    "Checkpoint: {}",
+                                    DateTime::from_timestamp_millis(timestamp).unwrap()
+                                ),
+                            )))
+                            .unwrap();
+                        }
+                        futures::future::ok(())
+                    })
+                    .await;
+                consumer.unassign().unwrap();
+                info!("Consumer is terminated");
+                token.cancel();
+                r.lock().unwrap().sort(&query.order_by);
+                let _ = tx.send(Action::StopConsuming());
+                Ok(())
+            })
+            .unwrap();
         Ok(())
     }
 
@@ -218,17 +231,20 @@ impl Ui {
         action_tx: UnboundedSender<Action>,
     ) -> Result<(), TuiError> {
         let app = self.app.clone();
-        tokio::spawn(async move {
-            match app.topic_details(topics) {
-                Ok(details) => action_tx.send(Action::TopicDetails(details)).unwrap(),
-                Err(e) => action_tx
-                    .send(Action::Notification(Notification::new(
-                        tracing::Level::ERROR,
-                        e.to_string(),
-                    )))
-                    .unwrap(),
-            }
-        });
+        tokio::task::Builder::new()
+            .name("topics-details")
+            .spawn(async move {
+                match app.topic_details(topics) {
+                    Ok(details) => action_tx.send(Action::TopicDetails(details)).unwrap(),
+                    Err(e) => action_tx
+                        .send(Action::Notification(Notification::new(
+                            Level::Error,
+                            e.to_string(),
+                        )))
+                        .unwrap(),
+                }
+            })
+            .unwrap();
         Ok(())
     }
 
@@ -239,7 +255,7 @@ impl Ui {
     ) -> Result<(), TuiError> {
         self.app.export_record(record)?;
         action_tx.send(Action::Notification(Notification::new(
-            tracing::Level::INFO,
+            Level::Info,
             "Record exported to the file".to_string(),
         )))?;
         Ok(())
@@ -250,26 +266,29 @@ impl Ui {
         action_tx: UnboundedSender<Action>,
     ) -> Result<(), TuiError> {
         let app = self.app.clone();
-        tokio::spawn(async move {
-            info!("Loading topics");
-            match app.list_topics() {
-                Ok(topics) => {
-                    action_tx.send(Action::Topics(topics)).unwrap();
-                }
-                Err(e) => {
-                    if action_tx
-                        .send(Action::Notification(Notification::new(
-                            tracing::Level::ERROR,
-                            e.to_string(),
-                        )))
-                        .is_err()
-                    {
-                        error!("Cannot notify the TUI: {e:?}");
+        tokio::task::Builder::new()
+            .name("topics-loader")
+            .spawn(async move {
+                info!("Loading topics");
+                match app.list_topics() {
+                    Ok(topics) => {
+                        action_tx.send(Action::Topics(topics)).unwrap();
                     }
-                    error!("Something went wrong when trying to list topics: {e}")
+                    Err(e) => {
+                        if action_tx
+                            .send(Action::Notification(Notification::new(
+                                Level::Error,
+                                e.to_string(),
+                            )))
+                            .is_err()
+                        {
+                            error!("Cannot notify the TUI: {e:?}");
+                        }
+                        error!("Something went wrong when trying to list topics: {e}")
+                    }
                 }
-            }
-        });
+            })
+            .unwrap();
         Ok(())
     }
 
@@ -317,7 +336,7 @@ impl Ui {
                     Action::Refresh => {
                         self.load_topics(action_tx.clone())?;
                         action_tx.send(Action::Notification(Notification::new(
-                            tracing::Level::INFO,
+                            Level::Info,
                             "Refreshing topics".to_string(),
                         )))?;
                     }
@@ -336,7 +355,7 @@ impl Ui {
 
                         if let Err(e) = open::that(&url) {
                             action_tx.send(Action::Notification(Notification::new(
-                                tracing::Level::INFO,
+                                Level::Info,
                                 "this action is not available right now".to_string(),
                             )))?;
                             warn!("Cannot open the URL '{url}': {e}")
@@ -369,7 +388,7 @@ impl Ui {
                     Action::Search(ref search) => {
                         if self.topics.is_empty() {
                             action_tx.send(Action::Notification(Notification::new(
-                                tracing::Level::INFO,
+                                Level::Info,
                                 "No topics selected".to_string(),
                             )))?;
                         }

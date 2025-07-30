@@ -188,8 +188,8 @@ fn generate_json_schema_for_global_config() {
             .parent()
             .unwrap()
             .join("docs")
-            .join("configuration")
-            .join("json-schema.json"),
+            .join("json-schemas")
+            .join("global-config.json"),
         serde_json::to_string_pretty(&schema).unwrap(),
     )
     .unwrap();

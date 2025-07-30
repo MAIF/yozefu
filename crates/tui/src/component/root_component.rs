@@ -16,7 +16,7 @@ use ratatui::{
 };
 use tokio::sync::{mpsc::UnboundedSender, watch::Receiver};
 
-use crate::{Action, Notification, error::TuiError, records_buffer::BufferAction};
+use crate::{Action, Notification, action::Level, error::TuiError, records_buffer::BufferAction};
 
 use super::{
     Component, ComponentName, ConcurrentRecordsBuffer, State, footer_component::FooterComponent,
@@ -341,7 +341,7 @@ impl Component for RootComponent {
                     .as_ref()
                     .unwrap()
                     .send(Action::Notification(Notification::new(
-                        tracing::Level::INFO,
+                        Level::Info,
                         "Copied to clipboard".to_string(),
                     )))?;
                 ctx.set_contents(content.to_string()).unwrap();

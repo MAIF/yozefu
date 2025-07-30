@@ -1,6 +1,7 @@
 FROM rust:1-slim-bookworm AS builder
 WORKDIR /app
 RUN --mount=type=bind,source=crates,target=crates \
+    --mount=type=bind,source=.cargo/,target=.cargo/ \
     --mount=type=bind,source=Cargo.toml,target=Cargo.toml \
     --mount=type=bind,source=Cargo.lock,target=Cargo.lock \
     --mount=type=bind,source=.git,target=.git \

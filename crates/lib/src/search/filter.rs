@@ -113,7 +113,26 @@ pub(crate) fn parse_filter(input: &str) -> IResult<&str, Filter> {
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
+#[cfg_attr(test, derive(schemars::JsonSchema))]
 pub struct FilterInput {
     pub record: KafkaRecord,
     pub params: Vec<Value>,
+}
+
+#[test]
+fn generate_json_schema_for_filter_input() {
+    use schemars::schema_for;
+    let schema = schema_for!(FilterInput);
+    std::fs::write(
+        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("docs")
+            .join("json-schemas")
+            .join("filter-input.json"),
+        serde_json::to_string_pretty(&schema).unwrap(),
+    )
+    .unwrap();
 }
