@@ -6,6 +6,9 @@ use serde::Serialize;
 use serde_json::Error;
 use std::collections::BTreeMap;
 
+#[cfg(feature = "native")]
+use crate::kafka::internal::extract_key_and_value_from_consumer_offsets_topics;
+
 /// Inspired of the `[rdkafka::Message]` struct.
 /// Currently, we only support utf-8 string keys/values/headers.
 #[derive(Clone, Debug, Deserialize, Serialize, Hash, PartialEq, Eq, Default)]
@@ -93,10 +96,18 @@ impl KafkaRecord {
         let size = owned_message.payload().map(|e| e.len()).unwrap_or(0)
             + owned_message.key().map(|e| e.len()).unwrap_or(0);
 
-        let (key, key_schema) =
-            Self::extract_data_and_schema(owned_message.key(), schema_registry).await;
-        let (value, value_schema) =
-            Self::extract_data_and_schema(owned_message.payload(), schema_registry).await;
+        let (key, key_schema, value, value_schema) = match owned_message.topic() {
+            "__consumer_offsets" => {
+                extract_key_and_value_from_consumer_offsets_topics(&owned_message)
+            }
+            _ => {
+                let (key, key_schema) =
+                    Self::extract_data_and_schema(owned_message.key(), schema_registry).await;
+                let (value, value_schema) =
+                    Self::extract_data_and_schema(owned_message.payload(), schema_registry).await;
+                (key, key_schema, value, value_schema)
+            }
+        };
 
         Self {
             value_as_string: value.to_string(),
@@ -196,6 +207,7 @@ impl KafkaRecord {
         payload: Option<&[u8]>,
         schema_registry: &mut Option<SchemaRegistryClient>,
     ) -> (DataType, Option<Schema>) {
+        let _ = std::fs::write("./lol", format!("{payload:?}"));
         let schema_id = SchemaId::parse(payload);
         match (schema_id, schema_registry.as_mut()) {
             (None, _) => (Self::payload_to_data_type(payload, &None), None),
