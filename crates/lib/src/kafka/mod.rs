@@ -12,8 +12,11 @@ pub use schema_registry_client::SchemaRegistryClient;
 mod avro;
 #[cfg(feature = "native")]
 pub use schema_registry_client::SchemaResponse;
+#[cfg(feature = "native")]
+mod internal;
 
 mod data_type;
+
 mod kafka_record;
 mod schema;
 pub use data_type::Comparable;

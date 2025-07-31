@@ -6442,6 +6442,7 @@ name = "yozefu-lib"
 version = "0.0.12"
 dependencies = [
  "apache-avro",
+ "byteorder",
  "chrono",
  "fuzzydate",
  "insta",

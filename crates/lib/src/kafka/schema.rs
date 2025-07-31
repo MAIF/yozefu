@@ -83,6 +83,10 @@ impl SchemaId {
             Err(_) => None,
         }
     }
+
+    pub fn parse_from_consumer_offsets_topic(_payload: Option<&[u8]>) -> Option<Self> {
+        None
+    }
 }
 
 #[test]
