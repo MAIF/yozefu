@@ -4,7 +4,8 @@ use app::App;
 use app::search::{Search, SearchContext};
 use chrono::DateTime;
 use crossterm::event::KeyEvent;
-use futures::{StreamExt, TryStreamExt};
+use futures::{StreamExt, future};
+use futures_batch::TryChunksTimeoutStreamExt;
 use itertools::Itertools;
 use lib::KafkaRecord;
 use ratatui::prelude::Rect;
@@ -118,7 +119,7 @@ impl Ui {
             .spawn(async move {
                 while !token.is_cancelled() {
                     r.lock().unwrap().sort(&order_by);
-                    let mut interval = time::interval(Duration::from_secs(1));
+                    let mut interval = time::interval(Duration::from_secs(5));
                     interval.tick().await;
                 }
             })
@@ -147,17 +148,25 @@ impl Ui {
                     Some(message) = rx_dd.recv() => {
                         let record = KafkaRecord::parse(message, &mut schema_registry).await;
                         let context = SearchContext::new(&record, &filters_directory);
+                        let span = info_span!("matching", offset = %record.offset, partition = %record.partition, topic = %record.topic);
+                        let search_span = span.enter();
+                        let mut matched = false;
+                        if search_query.matches(&context) {
+                            matched = true;
+                        }
+                        drop(search_span);
+                        let push_span = info_span!("push-to-buffer", offset = %record.offset, partition = %record.partition, topic = %record.topic);
                         let mut ll = r.lock().unwrap();
                         ll.new_record_read();
-                        let span = info_span!("matching", offset = %record.offset, partition = %record.partition, topic = %record.topic);
-                        let e = span.enter();
-                        if search_query.matches(&context) {
-                            ll.push(record);
+                        if matched {
+                            ll.push(record.clone());
                         }
-                        drop(e);
+                        drop(push_span);
                         ll.dispatch_metrics();
+                        let stats = ll.stats();
+                        drop(ll);
                         if let Some(limit) = query.limit {
-                            if Some(ll.stats().matched) >= Some(limit) {
+                            if Some(stats.matched) >= Some(limit) {
                                 token_cloned.cancel();
                             }
                         }
@@ -195,10 +204,17 @@ impl Ui {
                 let _ = consumer
                     .stream()
                     .take_until(token.cancelled())
-                    .try_for_each(|message| {
-                        let message = message.detach();
-                        let timestamp = message.timestamp().to_millis().unwrap_or_default();
-                        tx_dd.send(message).unwrap();
+                    .try_chunks_timeout(1000, Duration::from_millis(50))
+                    .for_each(|bulk_of_records| {
+                        let bulk_of_records = bulk_of_records.unwrap();
+                        info!("Received a bulk of records: {}", bulk_of_records.len());
+                        let timestamp = bulk_of_records
+                            .last()
+                            .and_then(|r| r.timestamp().to_millis())
+                            .unwrap_or(0);
+                        for record in bulk_of_records {
+                            tx_dd.send(record.detach()).unwrap();
+                        }
                         if current_time.elapsed() > Duration::from_secs(13) {
                             current_time = Instant::now();
 
@@ -211,7 +227,7 @@ impl Ui {
                             )))
                             .unwrap();
                         }
-                        futures::future::ok(())
+                        future::ready(())
                     })
                     .await;
                 consumer.unassign().unwrap();
@@ -377,6 +393,8 @@ impl Ui {
                         ))?;
                     }
                     Action::Render => {
+                        let span = tracing::span!(tracing::Level::INFO, "render");
+                        let _ = span.enter();
                         tui.draw(|f| {
                             let _ = self.root.draw(f, f.area(), &state);
                         })?;

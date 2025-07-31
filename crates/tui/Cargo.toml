@@ -41,6 +41,7 @@ app = { workspace = true }
 tracing = { workspace = true }
 rdkafka = { version = "0.38.0", features = ["cmake-build"] }
 timeago = "0.4.2"
+futures-batch = "0.7.0"
 
 
 [features]

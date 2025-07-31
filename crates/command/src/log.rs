@@ -29,9 +29,13 @@ pub(crate) fn init_logging_file(
     is_debug: bool,
     path: &PathBuf,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>> {
-    tracing_subscriber_builder(is_debug)
+    if let Err(e) = tracing_subscriber_builder(is_debug)
         .with_writer(OpenOptions::new().append(true).create(true).open(path)?)
         .try_init()
+    {
+        eprintln!("Failed to initialize logging: {}", e);
+    }
+    Ok(())
 }
 
 /// When the user starts the TUI, it writes logs to a file.

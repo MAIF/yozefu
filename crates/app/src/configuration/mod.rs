@@ -19,6 +19,7 @@ pub trait Configuration {
     /// Returns the kafka properties
     fn kafka_config_map(&self) -> HashMap<String, String>;
 
+    /// Properties you can set for the kafka consumer: https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md
     fn create_kafka_consumer<T>(&self) -> Result<T, Error>
     where
         T: FromClientConfig,
