@@ -77,6 +77,8 @@ impl Tui {
                 let mut render_interval = tokio::time::interval(render_delay);
                 event_tx.send(Event::Init).unwrap();
                 loop {
+                    let span = tracing::span!(tracing::Level::TRACE, "render-loop");
+                    let _ = span.enter();
                     let tick_delay = tick_interval.tick();
                     let render_delay = render_interval.tick();
                     let crossterm_event = reader.next().fuse();

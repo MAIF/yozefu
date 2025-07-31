@@ -9,6 +9,8 @@
 <a href="https://crates.io/crates/yozefu/"><img src="https://img.shields.io/crates/v/yozefu?logo=Rust"></a>
 <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/MSRV-1.85.0+-lightgray.svg?logo=rust" alt="Minimum supported Rust version: 1.85.0 or plus"/></a>
 <a href="https://github.com/MAIF/yozefu/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="Licence"/></a>
+<a href="https://ratatui.rs/"><img src="https://ratatui.rs/built-with-ratatui/badge.svg" alt="Built With Ratatui"/></a>
+
 
 </p>
 
