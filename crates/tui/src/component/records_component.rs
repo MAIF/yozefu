@@ -333,10 +333,15 @@ impl Component for RecordsComponent<'_> {
             .style(normal_style)
             .height(1)
             .bottom_margin(1);
-        let r = self.records.lock().unwrap();
+
+        let mut records = Vec::with_capacity(500);
+        {
+            let r = self.records.lock().unwrap();
+            records.extend(r.iter().cloned());
+        }
 
         // TODO render only records in the viewport
-        let rows = r.iter().enumerate().map(|(index, item)| {
+        let rows = records.iter().enumerate().map(|(index, item)| {
             if let Some(s) = self.state.selected() {
                 let is_visible = (s + rect.height as usize) > index
                     && s.saturating_sub(rect.height as usize) <= index;

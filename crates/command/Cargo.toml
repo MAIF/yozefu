@@ -49,6 +49,8 @@ reqwest = { version = "0.12.22", features = ["json"] }
 const_format = { version = "0.2.34", features = ["rust_1_64"] }
 tracing = { workspace = true }
 tracing-subscriber = { version = "0.3.19" }
+futures-batch = "0.7.0"
+thousands = "0.2.0"
 
 [features]
 ssl-vendored = ["rdkafka/ssl-vendored", "tui/ssl-vendored", "app/ssl-vendored"]
