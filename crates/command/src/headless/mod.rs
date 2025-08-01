@@ -3,10 +3,13 @@
 use app::App;
 use app::search::Search;
 use app::search::SearchContext;
+use chrono::DateTime;
+use futures_batch::TryChunksTimeoutStreamExt;
 use rdkafka::Message;
 use rdkafka::message::OwnedMessage;
 use std::time::Duration;
 use std::time::Instant;
+use thousands::Separable;
 use tokio::select;
 use tokio::sync::mpsc;
 use tracing::info;
@@ -99,17 +102,34 @@ impl Headless {
             .name("headless-kafka-consumer")
             .spawn(async move {
                 let mut current_time = Instant::now();
+                let mut consumed = 0;
+                let mut total_consumed = 0;
                 let task = consumer
                     .stream()
                     .take_until(token.cancelled())
-                    .try_for_each(|message| {
-                        let message = message.detach();
-                        let timestamp = message.timestamp().to_millis().unwrap_or_default();
-                        tx_dd.send(message).unwrap();
+                    .try_chunks_timeout(1000, Duration::from_millis(10))
+                    .try_for_each(|messages| {
+                        let timestamp = messages
+                            .last()
+                            .and_then(|r| r.timestamp().to_millis())
+                            .unwrap_or_default();
+                        for message in messages {
+                            consumed += 1;
+                            total_consumed += 1;
+                            let message = message.detach();
+                            tx_dd.send(message).unwrap();
+                        }
 
-                        if current_time.elapsed() > Duration::from_secs(15) {
+                        let elapsed = current_time.elapsed();
+
+                        if elapsed > Duration::from_secs(5) {
                             current_time = Instant::now();
-                            info!("Checkpoint: {timestamp}");
+                            info!("Checkpoint: {} records read in {}ms ({} rec/s). Total read is {}. The last record timestamp read is {}", 
+                            consumed.separate_with_underscores(),
+                            elapsed.as_millis().separate_with_underscores(), (consumed / elapsed.as_secs()).separate_with_underscores(),
+                            total_consumed.separate_with_underscores(),
+                            DateTime::from_timestamp_millis(timestamp).map(|e| e.to_rfc3339()).unwrap_or_default());
+                            consumed = 0;
                         }
                         progress.inc(1);
                         futures::future::ok(())

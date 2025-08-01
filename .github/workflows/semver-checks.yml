@@ -116,7 +116,7 @@ jobs:
         run: |
           printf "\`cargo-semver-checks\` has detected some issues: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\n" > report.md
           printf '```bash' >> report.md
-          cargo semver-checks --color never --package yozefu-lib --package yozefu-app --package yozefu-wasm-types --package yozefu-command --baseline-rev "${{ needs.setup.outputs.currentVersion }}" --release-type "${{ steps.semver.outputs.release }}" 2>&1 | tee -a report.md
+          RUSTFLAGS="--cfg tokio_unstable" cargo semver-checks --color never --package yozefu-lib --package yozefu-app --package yozefu-wasm-types --package yozefu-command --baseline-rev "${{ needs.setup.outputs.currentVersion }}" --release-type "${{ steps.semver.outputs.release }}" 2>&1 | tee -a report.md
           if [[ "${PIPESTATUS[0]}" != "0" ]]; then
             printf '```' >> report.md
             exit 1
@@ -161,7 +161,7 @@ jobs:
           b="major"
           for t in patch minor; do
             echo "Checking whether the next version is $t"
-            if cargo semver-checks --color never --package yozefu-lib --package yozefu-app --package yozefu-wasm-types --package yozefu-command --baseline-rev "${{ needs.setup.outputs.currentVersion }}" --release-type "$t"; then
+            if RUSTFLAGS="--cfg tokio_unstable" cargo semver-checks --color never --package yozefu-lib --package yozefu-app --package yozefu-wasm-types --package yozefu-command --baseline-rev "${{ needs.setup.outputs.currentVersion }}" --release-type "$t"; then
               b="$t"
               break
             fi

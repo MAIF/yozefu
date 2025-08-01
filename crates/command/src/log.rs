@@ -19,7 +19,7 @@ pub(crate) fn init_logging_stderr(
     is_debug: bool,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>> {
     tracing_subscriber_builder(is_debug)
-        //.with_writer(std::io::stderr)
+        .with_writer(std::io::stderr)
         .with_ansi(true)
         .try_init()
 }
@@ -33,7 +33,7 @@ pub(crate) fn init_logging_file(
         .with_writer(OpenOptions::new().append(true).create(true).open(path)?)
         .try_init()
     {
-        eprintln!("Failed to initialize logging: {}", e);
+        eprintln!("Failed to initialize logging: {e}");
     }
     Ok(())
 }

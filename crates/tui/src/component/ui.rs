@@ -90,7 +90,10 @@ impl Ui {
         tx: UnboundedSender<Action>,
     ) -> Result<(), TuiError> {
         self.worker.cancel();
-        self.records.lock().unwrap().reset();
+        {
+            self.records.lock().unwrap().reset();
+        }
+
         if self.topics.is_empty() {
             tx.send(Action::StopConsuming())?;
             return Ok(());
@@ -118,8 +121,10 @@ impl Ui {
             .name("kafka-records-sorter")
             .spawn(async move {
                 while !token.is_cancelled() {
-                    r.lock().unwrap().sort(&order_by);
-                    let mut interval = time::interval(Duration::from_secs(5));
+                    {
+                        r.lock().unwrap().sort(&order_by);
+                    }
+                    let mut interval = time::interval(Duration::from_secs(1));
                     interval.tick().await;
                 }
             })
@@ -155,16 +160,17 @@ impl Ui {
                             matched = true;
                         }
                         drop(search_span);
-                        let push_span = info_span!("push-to-buffer", offset = %record.offset, partition = %record.partition, topic = %record.topic);
-                        let mut ll = r.lock().unwrap();
-                        ll.new_record_read();
-                        if matched {
-                            ll.push(record.clone());
-                        }
-                        drop(push_span);
-                        ll.dispatch_metrics();
-                        let stats = ll.stats();
-                        drop(ll);
+                        let stats = {
+                            let push_span = info_span!("push-to-buffer", offset = %record.offset, partition = %record.partition, topic = %record.topic);
+                            let _ = push_span.enter();
+                            let mut ll = r.lock().unwrap();
+                            ll.new_record_read();
+                            if matched {
+                                ll.push(record.clone());
+                            }
+                            ll.dispatch_metrics();
+                            ll.stats()
+                        };
                         if let Some(limit) = query.limit {
                             if Some(stats.matched) >= Some(limit) {
                                 token_cloned.cancel();
