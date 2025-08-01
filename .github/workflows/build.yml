@@ -285,3 +285,25 @@ jobs:
         with:
           persist-credentials: false
       - uses: EmbarkStudios/cargo-deny-action@v2
+
+  archlinux:
+    name: Arch Linux
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    container:
+      image: archlinux:latest
+    needs: [check]
+    steps:
+      - name: Checkout Actions Repository
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        run: pacman -Sy --noconfirm --needed cargo devtools gcc-libs openssl cmake gcc14 clang base-devel
+      - name: Use GCC 14 
+        # Because https://github.com/MaterializeInc/rust-krb5-src/issues/28
+        run: |
+          sudo ln -s "$(which gcc-14)" "/usr/local/bin/gcc"
+          sudo ln -s "$(which g++-14)" "/usr/local/bin/g++"
+          hash -r
+      - name: build
+        run: cargo build --release --all-features --locked
