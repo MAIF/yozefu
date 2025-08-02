@@ -2,13 +2,14 @@
 use std::{
     fs,
     path::{Path, PathBuf},
+    process::Stdio,
 };
 
 use chrono::Local;
 use clap::Args;
 use lib::Error;
 use strum::{Display, EnumIter, EnumString};
-use tracing::{info, warn};
+use tracing::{error, info};
 
 use crate::{
     APPLICATION_NAME,
@@ -62,14 +63,14 @@ impl Command for CreateFilterCommand {
                     repo_dir.display()
                 );
             }
-            Err(_e) => {
-                warn!("I was not able to clone the repository. Please download it manually.");
-                println!("    mkdir -p '{}'", repo_dir.parent().unwrap().display());
-                println!(
+            Err(e) => {
+                error!("I was not able to clone the repository: {e}. Please download it manually.");
+                eprintln!("    mkdir -p '{}'", repo_dir.parent().unwrap().display());
+                eprintln!(
                     "    curl -L 'https://github.com/MAIF/yozefu/archive/refs/heads/main.zip'"
                 );
-                println!("    unzip yozefu-main.zip -d .");
-                println!("    mv 'yozefu-main' {}", repo_dir.display());
+                eprintln!("    unzip yozefu-main.zip -d .");
+                eprintln!("    mv 'yozefu-main' {}", repo_dir.display());
             }
         }
 
@@ -110,33 +111,27 @@ impl CreateFilterCommand {
         Ok(())
     }
 
-    /// try the clone the filter repository from GitHub,
-    /// first with SSH, then with HTTPS.
+    /// try the clone the filter repository from GitHub with HTTPS.
     fn clone_repository(&self, repo_dir: &Path) -> Result<(), Error> {
         info!("Cloning the filter repository to '{}'", repo_dir.display());
-        let mut output = ProcessCommand::new("git")
+        let output = ProcessCommand::new("git")
             .arg("clone")
-            .arg("git@github.com:MAIF/yozefu.git")
+            .arg("https://github.com/MAIF/yozefu.git")
             .arg("--depth")
             .arg("1")
             .arg(repo_dir)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
             .spawn()?
-            .wait()?;
+            .wait_with_output()?;
 
-        if !output.success() {
-            output = ProcessCommand::new("git")
-                .arg("clone")
-                .arg("https://github.com/MAIF/yozefu.git")
-                .arg("--depth")
-                .arg("1")
-                .arg(repo_dir)
-                .spawn()?
-                .wait()?;
-        }
-
-        match output.success() {
+        match output.status.success() {
             true => Ok(()),
-            false => Err(Error::Error("Failed to clone the repository".to_string())),
+            false => Err(Error::Error(format!(
+                "Failed to clone the repository: {}",
+                String::from_utf8(output.stderr).unwrap()
+            ))),
         }
     }
 }
@@ -144,6 +139,9 @@ impl CreateFilterCommand {
 #[tokio::test]
 async fn test_success() {
     use itertools::Itertools;
+
+    tracing_subscriber::fmt().init();
+
     let temp_dir = tempfile::tempdir().expect("Failed to create temp directory");
     let command = CreateFilterCommand {
         language: SupportedLanguages::Rust,
@@ -156,6 +154,7 @@ async fn test_success() {
         !fs::read_dir(temp_dir.path())
             .unwrap()
             .collect_vec()
-            .is_empty()
+            .is_empty(),
+        "Running this command should create a directory containing the code for the search filter"
     )
 }
