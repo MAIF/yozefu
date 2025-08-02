@@ -1,6 +1,6 @@
 # yozefu-lib
 
-[![Build](https://github.com/MAIF/yozefu/actions/workflows/build.yml/badge.svg)](https://github.com/MAIF/yozefu/actions/workflows/build.yml)
+[![Build](https://github.com/MAIF/yozefu/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/MAIF/yozefu/actions/workflows/build.yml)
 [![](https://img.shields.io/crates/v/yozefu-lib.svg)](https://crates.io/crates/yozefu-lib)
 
 

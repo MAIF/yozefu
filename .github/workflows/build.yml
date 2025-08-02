@@ -197,7 +197,7 @@ jobs:
           toolchain: stable
       - uses: Swatinem/rust-cache@v2
       - run: cargo install cargo-nextest --locked
-      - run: cargo nextest run
+      - run: cargo nextest run --locked
         env:
           RUST_BACKTRACE: full
           CI: "true"
@@ -286,6 +286,7 @@ jobs:
           persist-credentials: false
       - uses: EmbarkStudios/cargo-deny-action@v2
 
+  # https://github.com/orhun/PKGBUILDs/tree/master/yozefu
   archlinux:
     name: Arch Linux
     runs-on: ubuntu-latest
@@ -302,8 +303,10 @@ jobs:
       - name: Use GCC 14 
         # Because https://github.com/MaterializeInc/rust-krb5-src/issues/28
         run: |
-          sudo ln -s "$(which gcc-14)" "/usr/local/bin/gcc"
-          sudo ln -s "$(which g++-14)" "/usr/local/bin/g++"
+          ln -s "$(which gcc-14)" "/usr/local/bin/gcc"
+          ln -s "$(which g++-14)" "/usr/local/bin/g++"
           hash -r
       - name: build
         run: cargo build --all-features --locked
+      - name: test
+        run: cargo test --all-features --locked
