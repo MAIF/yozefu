@@ -2,9 +2,9 @@ use byteorder::{BigEndian, ReadBytesExt};
 use serde::Serialize;
 use std::io::{Cursor, Error as IoError, Read};
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, PartialEq, Eq)]
 pub struct GroupMetadataKey {
-    group: String,
+    pub group: String,
 }
 
 impl TryFrom<&[u8]> for GroupMetadataKey {

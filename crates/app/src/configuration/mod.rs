@@ -4,6 +4,7 @@ use lib::Error;
 use rdkafka::{ClientConfig, config::FromClientConfig};
 
 mod cluster_config;
+mod consumer_config;
 mod global_config;
 mod internal_config;
 mod yozefu_config;
@@ -11,6 +12,7 @@ mod yozefu_config;
 pub use cluster_config::ClusterConfig;
 pub use cluster_config::KAFKA_PROPERTIES_WITH_LOCATIONS;
 pub use cluster_config::SchemaRegistryConfig;
+pub use consumer_config::ConsumerConfig;
 pub use global_config::GlobalConfig;
 pub use internal_config::InternalConfig;
 pub use yozefu_config::YozefuConfig;

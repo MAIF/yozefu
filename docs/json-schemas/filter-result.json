@@ -1,9 +1,12 @@
 {
+  "$id": "https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/json-schemas/filter-result.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "FilterResult",
+  "description": "Result of a search filter evaluation.",
   "type": "object",
   "properties": {
     "match": {
+      "description": "`true` if the kafka record matched the search filter condition, `false` otherwise.",
       "type": "boolean"
     }
   },

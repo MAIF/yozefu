@@ -1,12 +1,16 @@
 {
+  "$id": "https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/json-schemas/filter-input.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "FilterInput",
+  "description": "Input for a search filter",
   "type": "object",
   "properties": {
     "record": {
+      "description": "The kafka record to evaluate against the filter.",
       "$ref": "#/$defs/KafkaRecord"
     },
     "params": {
+      "description": "The user-provided parameters for the filter.",
       "type": "array",
       "items": true
     }
@@ -65,7 +69,7 @@
           ]
         },
         "size": {
-          "description": "Number of bytes in the key + the value",
+          "description": "Number of bytes for the key + the value",
           "type": "integer",
           "format": "uint",
           "minimum": 0,

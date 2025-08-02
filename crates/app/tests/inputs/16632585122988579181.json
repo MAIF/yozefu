@@ -1,0 +1,10 @@
+{
+  "default_url_template": "",
+  "initial_query": "from end - 10",
+  "theme": "default",
+  "clusters": {},
+  "default_kafka_config": {},
+  "history": [],
+  "show_shortcuts": false,
+  "export_directory": "./yozefu-exports"
+}

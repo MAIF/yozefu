@@ -45,7 +45,8 @@ fn test_has_schema() {
 #[test]
 fn generate_json_schema_for_kafka_record() {
     use schemars::schema_for;
-    let schema = schema_for!(KafkaRecord);
+    let mut schema = schema_for!(KafkaRecord);
+    schema.insert("$id".into(), "https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/json-schemas/kafka-record.json".into());
     let output_file = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .parent()
         .unwrap()

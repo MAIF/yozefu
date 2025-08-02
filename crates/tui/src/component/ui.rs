@@ -19,7 +19,7 @@ use tokio::sync::mpsc::{self, UnboundedSender};
 use tokio::time::Instant;
 use tokio::{select, time};
 use tokio_util::sync::CancellationToken;
-use tracing::{error, info, info_span, warn};
+use tracing::{debug, error, info, trace_span, warn};
 
 use crate::action::{Action, Level, Notification};
 use crate::component::{Component, RootComponent};
@@ -151,9 +151,10 @@ impl Ui {
                         return;
                      },
                     Some(message) = rx_dd.recv() => {
+                        debug!("{:?}", message);
                         let record = KafkaRecord::parse(message, &mut schema_registry).await;
                         let context = SearchContext::new(&record, &filters_directory);
-                        let span = info_span!("matching", offset = %record.offset, partition = %record.partition, topic = %record.topic);
+                        let span = trace_span!("matching", offset = %record.offset, partition = %record.partition, topic = %record.topic);
                         let search_span = span.enter();
                         let mut matched = false;
                         if search_query.matches(&context) {
@@ -161,7 +162,7 @@ impl Ui {
                         }
                         drop(search_span);
                         let stats = {
-                            let push_span = info_span!("push-to-buffer", offset = %record.offset, partition = %record.partition, topic = %record.topic);
+                            let push_span = trace_span!("push-to-buffer", offset = %record.offset, partition = %record.partition, topic = %record.topic);
                             let _ = push_span.enter();
                             let mut ll = r.lock().unwrap();
                             ll.new_record_read();
@@ -181,6 +182,7 @@ impl Ui {
             }
         }).unwrap();
 
+        let consumer_config = self.app.consumer_config();
         tokio::task::Builder::new()
             .name("kafka-consumer")
             .spawn(async move {
@@ -207,10 +209,14 @@ impl Ui {
                     })
                     .unwrap();
                 let mut current_time = Instant::now();
+
                 let _ = consumer
                     .stream()
                     .take_until(token.cancelled())
-                    .try_chunks_timeout(1000, Duration::from_millis(50))
+                    .try_chunks_timeout(
+                        consumer_config.buffer_capacity,
+                        Duration::from_millis(consumer_config.timeout_in_ms),
+                    )
                     .for_each(|bulk_of_records| {
                         let bulk_of_records = bulk_of_records.unwrap();
                         info!("Received a bulk of records: {}", bulk_of_records.len());
@@ -399,7 +405,7 @@ impl Ui {
                         ))?;
                     }
                     Action::Render => {
-                        let span = tracing::span!(tracing::Level::INFO, "render");
+                        let span = tracing::span!(tracing::Level::TRACE, "render");
                         let _ = span.enter();
                         tui.draw(|f| {
                             let _ = self.root.draw(f, f.area(), &state);

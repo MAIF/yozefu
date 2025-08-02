@@ -59,6 +59,7 @@ impl YozefuConfig {
                 url_template: None,
                 schema_registry: None,
                 kafka: indexmap::IndexMap::from_iter(kafka_properties),
+                consumer: self.cluster_config.consumer,
             },
             logs_file: self.logs_file,
             export_directory: self.export_directory,

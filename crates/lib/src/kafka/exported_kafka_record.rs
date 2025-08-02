@@ -8,6 +8,7 @@ use super::KafkaRecord;
 /// An exported Kafka record is a wrapper around the `KafkaRecord` struct
 /// with additional fields for analytics purposes.
 #[derive(Clone, Debug, Deserialize, Serialize, Hash, PartialEq, Eq)]
+#[cfg_attr(test, derive(schemars::JsonSchema))]
 pub struct ExportedKafkaRecord {
     #[serde(flatten)]
     pub record: KafkaRecord,
@@ -46,4 +47,23 @@ impl From<&KafkaRecord> for ExportedKafkaRecord {
             search_query: "".to_string(),
         }
     }
+}
+
+#[test]
+fn generate_json_schema_for_exported_kafka_record() {
+    use schemars::schema_for;
+    let mut schema = schema_for!(ExportedKafkaRecord);
+    schema.insert("$id".into(), "https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/json-schemas/exported-kafka-record.json".into());
+    std::fs::write(
+        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("docs")
+            .join("json-schemas")
+            .join("exported-kafka-record.json"),
+        serde_json::to_string_pretty(&schema).unwrap(),
+    )
+    .unwrap();
 }

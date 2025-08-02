@@ -77,9 +77,11 @@ pub mod number_test;
 #[cfg(test)]
 pub mod offset_test;
 
+/// Result of a search filter evaluation.
 #[derive(Debug, PartialEq, Clone, Default, Deserialize, Serialize)]
 #[cfg_attr(test, derive(schemars::JsonSchema))]
 pub struct FilterResult {
+    /// `true` if the kafka record matched the search filter condition, `false` otherwise.
     pub r#match: bool,
 }
 
@@ -98,7 +100,8 @@ impl From<bool> for FilterResult {
 #[test]
 fn generate_json_schema_filter_result() {
     use schemars::schema_for;
-    let schema = schema_for!(FilterResult);
+    let mut schema = schema_for!(FilterResult);
+    schema.insert("$id".into(), "https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/json-schemas/filter-result.json".into());
     std::fs::write(
         std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .parent()
