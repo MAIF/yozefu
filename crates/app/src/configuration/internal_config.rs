@@ -4,7 +4,7 @@ use std::{collections::HashMap, path::PathBuf};
 
 use chrono::Local;
 
-use crate::configuration::{GlobalConfig, SchemaRegistryConfig};
+use crate::configuration::{ConsumerConfig, GlobalConfig, SchemaRegistryConfig};
 
 use super::{Configuration, yozefu_config::YozefuConfig};
 
@@ -50,6 +50,11 @@ impl InternalConfig {
             Some(url) => url.to_string(),
             None => self.global.url_template_of(cluster),
         }
+    }
+
+    /// Consumer configuration for the given cluster.
+    pub fn consumer_config(&self, cluster: &str) -> ConsumerConfig {
+        self.global.consumer_config_of(cluster)
     }
 
     /// Returns the schema registry configuration for the given cluster.

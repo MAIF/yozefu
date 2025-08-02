@@ -1,6 +1,6 @@
 //! This module shows you how to include yozefu to your own CLI.
 
-use app::configuration::{ClusterConfig, YozefuConfig};
+use app::configuration::{ClusterConfig, ConsumerConfig, YozefuConfig};
 use clap::Parser;
 use indexmap::IndexMap;
 use rdkafka::ClientConfig;
@@ -52,6 +52,10 @@ impl MyCli {
             url_template: None,
             schema_registry: None,
             kafka: IndexMap::from_iter(config.config_map().clone()),
+            consumer: Some(ConsumerConfig {
+                buffer_capacity: 1000,
+                timeout_in_ms: 100,
+            }),
         }
     }
 

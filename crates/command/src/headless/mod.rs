@@ -98,6 +98,7 @@ impl Headless {
             })
             .unwrap();
 
+        let consumer_config = self.app.consumer_config();
         tokio::task::Builder::new()
             .name("headless-kafka-consumer")
             .spawn(async move {
@@ -107,7 +108,7 @@ impl Headless {
                 let task = consumer
                     .stream()
                     .take_until(token.cancelled())
-                    .try_chunks_timeout(1000, Duration::from_millis(10))
+                    .try_chunks_timeout(consumer_config.buffer_capacity, Duration::from_micros(consumer_config.timeout_in_ms))
                     .try_for_each(|messages| {
                         let timestamp = messages
                             .last()

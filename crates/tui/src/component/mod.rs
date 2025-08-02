@@ -163,6 +163,7 @@ pub fn default_global_config() -> GlobalConfig {
         history: vec![],
         show_shortcuts: true,
         export_directory: std::path::PathBuf::from(""),
+        consumer: Default::default(),
     }
 }
 

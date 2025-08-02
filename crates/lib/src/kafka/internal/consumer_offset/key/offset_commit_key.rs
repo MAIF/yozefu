@@ -4,11 +4,21 @@ use byteorder::{BigEndian, ReadBytesExt};
 use serde::Serialize;
 use std::io::Error as IoError;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, PartialEq, Eq)]
 pub struct OffsetCommitKey {
     group: String,
     topic: String,
     partition: i32,
+}
+
+impl OffsetCommitKey {
+    pub fn new(group: String, topic: String, partition: i32) -> Self {
+        OffsetCommitKey {
+            group,
+            topic,
+            partition,
+        }
+    }
 }
 
 impl TryFrom<&[u8]> for OffsetCommitKey {
@@ -56,10 +66,6 @@ impl TryFrom<&[u8]> for OffsetCommitKey {
 
         let partition = reader.read_i32::<BigEndian>()?;
 
-        Ok(OffsetCommitKey {
-            group,
-            topic,
-            partition,
-        })
+        Ok(OffsetCommitKey::new(group, topic, partition))
     }
 }

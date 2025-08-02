@@ -1,8 +1,8 @@
 {
-  "$id": "https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/json-schemas/kafka-record.json",
+  "$id": "https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/json-schemas/exported-kafka-record.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "KafkaRecord",
-  "description": "Inspired of the `[rdkafka::Message]` struct.\nCurrently, we only support utf-8 string keys/values/headers.",
+  "title": "ExportedKafkaRecord",
+  "description": "An exported Kafka record is a wrapper around the `KafkaRecord` struct\nwith additional fields for analytics purposes.",
   "type": "object",
   "properties": {
     "topic": {
@@ -72,6 +72,26 @@
       "description": "The value as a string. needed to be displayed in the TUI",
       "type": "string",
       "writeOnly": true
+    },
+    "date_time": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "absolute_delta_in_ms": {
+      "description": "Milliseconds elapsed since the first exported kafka record.",
+      "type": "integer",
+      "format": "int64"
+    },
+    "relative_delta_in_ms": {
+      "description": "Milliseconds elapsed since the previous exported kafka record.",
+      "type": "integer",
+      "format": "int64"
+    },
+    "search_query": {
+      "type": "string"
     }
   },
   "required": [
@@ -80,7 +100,10 @@
     "offset",
     "headers",
     "key",
-    "value"
+    "value",
+    "absolute_delta_in_ms",
+    "relative_delta_in_ms",
+    "search_query"
   ],
   "$defs": {
     "Schema": {

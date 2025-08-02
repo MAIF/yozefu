@@ -1,18 +1,19 @@
 //! module defining the configuration structure of the application
 
-use directories::ProjectDirs;
-use indexmap::IndexMap;
-use itertools::Itertools;
-use lib::Error;
-use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use std::{
     collections::HashMap,
     fs,
     path::{Path, PathBuf},
 };
 
-use crate::APPLICATION_NAME;
+use directories::ProjectDirs;
+use indexmap::IndexMap;
+use itertools::Itertools;
+use lib::Error;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+
+use crate::{APPLICATION_NAME, configuration::ConsumerConfig};
 
 use super::cluster_config::{ClusterConfig, SchemaRegistryConfig};
 
@@ -44,6 +45,9 @@ pub struct GlobalConfig {
     pub theme: String,
     /// The kafka properties for each cluster
     pub clusters: IndexMap<String, ClusterConfig>,
+    #[serde(default)]
+    /// The default configuration for the yozefu kafka consumer
+    pub consumer: ConsumerConfig,
     /// The default kafka properties inherited for every cluster
     pub default_kafka_config: IndexMap<String, String>,
     /// History of past search queries
@@ -91,6 +95,7 @@ impl TryFrom<&PathBuf> for GlobalConfig {
             theme: default_theme(),
             show_shortcuts: true,
             export_directory: default_export_directory(),
+            consumer: ConsumerConfig::default(),
         })
     }
 }
@@ -169,6 +174,14 @@ impl GlobalConfig {
             .unwrap_or(self.default_url_template.clone())
     }
 
+    /// Consumer config of a given cluster
+    pub(crate) fn consumer_config_of(&self, cluster: &str) -> ConsumerConfig {
+        self.clusters
+            .get(cluster)
+            .and_then(|e| e.consumer.clone())
+            .unwrap_or(self.consumer.clone())
+    }
+
     /// Returns the schema registry configuration for the given cluster.
     pub fn schema_registry_config_of(&self, cluster: &str) -> Option<SchemaRegistryConfig> {
         self.clusters
@@ -180,7 +193,8 @@ impl GlobalConfig {
 #[test]
 fn generate_json_schema_for_global_config() {
     use schemars::schema_for;
-    let schema = schema_for!(GlobalConfig);
+    let mut schema = schema_for!(GlobalConfig);
+    schema.insert("$id".into(), "https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/json-schemas/global-config.json".into());
     fs::write(
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .parent()

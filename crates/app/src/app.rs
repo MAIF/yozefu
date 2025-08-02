@@ -15,7 +15,7 @@ use std::{collections::HashSet, fs, time::Duration};
 use itertools::Itertools;
 
 use crate::{
-    configuration::{Configuration, InternalConfig, YozefuConfig},
+    configuration::{Configuration, ConsumerConfig, InternalConfig, YozefuConfig},
     search::{Search, ValidSearchQuery},
 };
 
@@ -75,6 +75,10 @@ impl App {
                 Ok(consumer)
             }
         }
+    }
+
+    pub fn consumer_config(&self) -> ConsumerConfig {
+        self.config.consumer_config(&self.cluster)
     }
 
     /// Exports a given kafka record to a file.

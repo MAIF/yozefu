@@ -53,6 +53,8 @@ services:
     image: tchiotludo/akhq:latest
     restart: unless-stopped
     environment:
+      MICRONAUT_SERVER_HOST: localhost
+      MICRONAUT_SERVER_PORT: 9000
       AKHQ_CONFIGURATION: |
         akhq:
           connections:
@@ -63,7 +65,7 @@ services:
                 type: "confluent"
                 url: "http://schema-registry:${SCHEMA_REGISTRY_PORT:-8081}"
     ports:
-      - "9000:8080"
+      - "9000:9000"
 
   redpanda-console:
     profiles: ["disabled"]
@@ -76,11 +78,13 @@ services:
       CONSOLE_CONFIG_FILE: |
         kafka:
           brokers: ["kafka:19092"]
-          schemaRegistry:
-            enabled: true
-            urls: ["http://schema-registry:${SCHEMA_REGISTRY_PORT:-8081}"]
+        schemaRegistry:
+          enabled: true
+          urls: ["http://schema-registry:${SCHEMA_REGISTRY_PORT:-8081}"]
+        server:
+          listenPort: 9001
     ports:
-      - "9001:8080"
+      - "9001:9001"
 
   kafka-ui:
     profiles: ["disabled"]

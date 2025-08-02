@@ -2,7 +2,7 @@ name: Build
 
 on:
   schedule:
-    - cron: "0 0 1 * *"
+    - cron: "0 0 1 * *" # First day of every month
   push:
     paths-ignore:
       - changelog
@@ -306,4 +306,4 @@ jobs:
           sudo ln -s "$(which g++-14)" "/usr/local/bin/g++"
           hash -r
       - name: build
-        run: cargo build --release --all-features --locked
+        run: cargo build --all-features --locked

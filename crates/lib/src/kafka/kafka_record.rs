@@ -24,7 +24,7 @@ pub struct KafkaRecord {
     pub key_schema: Option<Schema>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub value_schema: Option<Schema>,
-    /// Number of bytes in the key + the value
+    /// Number of bytes for the key + the value
     #[serde(default)]
     pub size: usize,
     /// A human readable representation of the key
