@@ -1,3 +1,31 @@
+## What's Changed in v0.0.12
+* Develop by @Mcdostone in [#87](https://github.com/MAIF/yozefu/pull/87)
+* docs: fix typos by @Mcdostone
+* test: added more details when the createFilter test failed by @Mcdostone
+* feat: new config for the consumer batch size and the timeout by @Mcdostone
+* build: add job to build yozefu with archlinux by @Mcdostone
+* build: dependabot config for docker by @Mcdostone
+* perf: try to improve throughput of read kafka records by @Mcdostone
+* docs: update README.md by @Mcdostone
+* feat: Trying to parse records published in `__consumer_offsets` by @Mcdostone
+* build: enable `tokio_unstable` by @Mcdostone
+* refactor: tracing regarding parsing time by @Mcdostone
+* fix: fix preselected topics when using --topics by @Mcdostone
+* feat: move to tracing by @Mcdostone
+* feat: selected topics are highlighted in the `TopicsComponent` by @Mcdostone
+* feat: generate a json schema for Kafka record. by @Mcdostone
+* refactor: remove unused enum FocusDirection by @Mcdostone
+* docs: add json schema for the configuration file by @Mcdostone
+* build: update deps by @Mcdostone
+* ci: fix the changelog action by @Mcdostone
+* chore: Release version v0.0.12 by @Mcdostone
+* feat: minimum width for the topics component by @Mcdostone
+* docs: update typo in README.md by @Mcdostone
+* chore: Update changelog by @Mcdostone in [#86](https://github.com/MAIF/yozefu/pull/86)
+* chore: Update changelog by @Mcdostone
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.11...v0.0.12
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
