@@ -19,7 +19,7 @@ rust-version.workspace = true
 
 
 [dependencies]
-clap = { version = "4.5.40", features = [
+clap = { version = "4.5.42", features = [
     "derive",
     "env",
     "color",
