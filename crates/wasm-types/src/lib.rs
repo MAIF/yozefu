@@ -4,7 +4,7 @@ use lib::KafkaRecord;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-/// A filter receives a a struct composed of 2 fields:
+/// A filter receives a struct composed of 2 fields:
 ///  - The consumed kafka record,
 ///  - The parameters passed to that filter, it can be numbers or strings
 ///

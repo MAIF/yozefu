@@ -55,7 +55,7 @@ impl Headless {
         }
         info!("Creating consumer for topics [{}]", self.topics.join(", "));
         let consumer = self.app.create_consumer(&self.topics)?;
-        let mut records_channel = tokio::sync::mpsc::unbounded_channel::<KafkaRecord>();
+        let mut records_channel = mpsc::unbounded_channel::<KafkaRecord>();
         let search_query = self.app.search_query.clone();
         let token = CancellationToken::new();
         let progress = self.progress.clone();

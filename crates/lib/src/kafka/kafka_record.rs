@@ -27,11 +27,11 @@ pub struct KafkaRecord {
     /// Number of bytes for the key + the value
     #[serde(default)]
     pub size: usize,
-    /// A human readable representation of the key
+    /// A human-readable representation of the key
     pub key: DataType,
     #[serde(skip_serializing, default)]
     pub key_as_string: String,
-    /// A human readable representation of the value
+    /// A human-readable representation of the value
     pub value: DataType,
     #[serde(skip_serializing, default)]
     /// The value as a string. needed to be displayed in the TUI

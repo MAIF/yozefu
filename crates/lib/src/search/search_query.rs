@@ -18,7 +18,7 @@ use super::{
     wsi::wsi,
 };
 
-/// A `SearchQuery` is a combination of a expression, a limit, an offset and an order by clause.
+/// A `SearchQuery` is a combination of an expression, a limit, an offset and an order by clause.
 #[derive(Debug, Clone, PartialEq)]
 pub struct SearchQuery {
     pub expression: Expression,
