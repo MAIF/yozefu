@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-<a href="https://crates.io/crates/yozefu/"><img src="https://img.shields.io/crates/v/yozefu?logo=Rust"></a>
+<a href="https://crates.io/crates/yozefu/"><img alt="Yozefu crate.io page" src="https://img.shields.io/crates/v/yozefu?logo=Rust"></a>
 <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/MSRV-1.85.0+-lightgray.svg?logo=rust" alt="Minimum supported Rust version: 1.85.0 or plus"/></a>
 <a href="https://github.com/MAIF/yozefu/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="Licence"/></a>
 <a href="https://ratatui.rs/"><img src="https://ratatui.rs/built-with-ratatui/badge.svg" alt="Built With Ratatui"/></a>
@@ -41,7 +41,7 @@ By default, [the kafka consumer is configured](https://github.com/MAIF/yozefu/bl
  - Serialization formats such as `json`, `xml` or plain text are supported. [Avro](https://avro.apache.org/) support is [experimental for now](https://github.com/MAIF/yozefu/tree/main/docs/schema-registry/README.md). [Protobuf](https://protobuf.dev/) is not supported.
  - The tool uses a ring buffer to store the [last 500 kafka records](https://github.com/MAIF/yozefu/blob/main/crates/tui/src/records_buffer.rs#L17).
  - There is probably room for improvement regarding the throughput (lot of `clone()` and deserialization).
- - Yozefu has been tested on MacOS Silicon but not on Windows or Linux. Feedback or contributions are welcome.
+ - Yozefu has been tested on macOS Silicon but not on Windows or Linux. Feedback or contributions are welcome.
 
 
 ## Getting started

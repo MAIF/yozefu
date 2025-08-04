@@ -1,4 +1,4 @@
-//! As you you, a kafka record is just a bunch of bytes. The key and the value of a record can be of different types.
+//! A kafka record is just a bunch of bytes. The key and the value of a record can be of different types.
 //! This module defines the different data types supported.
 //! More details about the bytes format when using a schema: <https://docs.confluent.io/platform/current/schema-registry/fundamentals/serdes-develop/index.html#wire-format>
 use std::fmt::Display;

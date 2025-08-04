@@ -86,7 +86,7 @@ pub(crate) trait WithHeight: Component {
     }
 }
 
-pub(crate) trait Component: std::marker::Send + std::marker::Sync {
+pub(crate) trait Component: Send + Sync {
     fn register_action_handler(&mut self, _tx: UnboundedSender<Action>) {}
 
     fn id(&self) -> ComponentName;

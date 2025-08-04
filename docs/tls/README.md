@@ -1,8 +1,9 @@
 # TLS encryption and authentication
 <p>
 <a href="https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md">
-        <img src="https://img.shields.io/badge/librdkafka-Global_configuration_properties-black.svg?logo=github"></a> <a href="https://github.com/confluentinc/librdkafka/wiki/Using-SSL-with-librdkafka#configure-librdkafka-client">
-        <img src="https://img.shields.io/badge/librdkafka-Configure_librdkafka_client-black.svg?logo=github"></a>
+        <img alt="Link to librdkakfa configuration" src="https://img.shields.io/badge/librdkafka-Global_configuration_properties-black.svg?logo=github"></a>
+        <a href="https://github.com/confluentinc/librdkafka/wiki/Using-SSL-with-librdkafka#configure-librdkafka-client">
+        <img alt="How to configure the librdkakfa client" src="https://img.shields.io/badge/librdkafka-Configure_librdkafka_client-black.svg?logo=github"></a>
 </p>
 
 
@@ -136,7 +137,7 @@ Please note that, according to [the documentation](https://github.com/confluenti
 
 
 | Provider                | Compatible | Documentation                                                                                                                 |
-| ----------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------- |
+|-------------------------|------------|-------------------------------------------------------------------------------------------------------------------------------|
 | Google Cloud Platform   | ?          | https://cloud.google.com/managed-service-for-apache-kafka/docs/quickstart#cloud-shell                                         |
 | Amazon Web Services     | ?          | https://docs.aws.amazon.com/msk/latest/developerguide/produce-consume.html                                                    |
 | Microsoft Azure         | ?          | https://learn.microsoft.com/fr-fr/azure/event-hubs/azure-event-hubs-kafka-overview                                            |

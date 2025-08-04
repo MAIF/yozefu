@@ -27,7 +27,7 @@ pub(crate) enum Action {
     Search(ValidSearchQuery),
     ///  notification to the UI
     ShowRecord(KafkaRecord),
-    /// Request the app to setup a new kafka consumer
+    /// Request the app to set up a new kafka consumer
     NewConsumer(),
     /// Request the app to start consuming
     Consuming,
@@ -49,7 +49,7 @@ pub(crate) enum Action {
     SelectedTopics(Vec<String>),
     /// Copy the given record to the clipboard
     CopyToClipboard(String),
-    /// Notify the UI that a new component has been be displayed
+    /// Notify the UI that a new component has been displayed
     NewView(ComponentName),
     /// Notify the UI the visible components and their order in the stack view
     ViewStack((ComponentName, Vec<ComponentName>)),
@@ -63,7 +63,7 @@ pub(crate) enum Action {
     RecordsToRead(usize),
 }
 
-/// A notification is a message displayed at the bottom-right corner of the TUI.
+/// A notification is a message displayed in the bottom-right corner of the TUI.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Notification {
     pub level: Level,

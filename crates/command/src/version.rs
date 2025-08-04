@@ -1,6 +1,6 @@
 //! Inspired of <https://vallentin.dev/blog/post/versioning>
 //!
-//! Github environment variables <https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables>
+//! GitHub environment variables <https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables>
 //! The version message looks like this:
 //! ```shell
 //! yozefu 0.0.9 (develop:13aedf2, debug build, macos [aarch64])

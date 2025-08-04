@@ -43,7 +43,7 @@ impl Display for FromOffset {
     }
 }
 
-/// parses the clause defining from where the consumer should starting reading records.
+/// parses the clause defining from where the consumer should start reading records.
 /// ```text
 /// from begin
 /// from end

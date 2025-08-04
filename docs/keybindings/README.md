@@ -2,7 +2,7 @@
 
 
 So far, keybindings are hardcoded.
-The choices I made are completely personal. I use a qwerty apple keyboard for your information.
+The choices I made are completely personal. I use a qwerty Apple keyboard for your information.
 
 **General**
 | Keybinding                        | Description                            |

@@ -1,4 +1,4 @@
-//! This module defines the the parsing functions of search query.
+//! This module defines the parsing functions of search query.
 //! The grammar of the syntax is the following:
 //!
 //! ```bnf

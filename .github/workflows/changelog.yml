@@ -46,7 +46,7 @@ jobs:
       - name: Commit changelog
         run: |
           git checkout -b "changelog/${VERSION}"
-          git config user.name 'github-actions[bot]'
+          git config user.name "github-actions[bot]"
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           set +e
           git add CHANGELOG.md
