@@ -106,7 +106,7 @@ yozf -c localhost
  - [URL templates to switch to web applications.](https://github.com/MAIF/yozefu/tree/main/docs/url-templates/README.md)
  - [Schema registry.](https://github.com/MAIF/yozefu/tree/main/docs/schema-registry/README.md)
  - [Themes.](https://github.com/MAIF/yozefu/tree/main/docs/themes/README.md)
- - [Internal JSON schemas.](https://github.com/MAIF/yozefu/tree/main/docs/json-schemas/README.md)
+ - [Internal JSON schemas.](https://github.com/MAIF/yozefu/tree/main/docs/json-schemas/)
  - [Keybindings.](https://github.com/MAIF/yozefu/tree/main/docs/keybindings/README.md)
  - [Releasing a new version.](https://github.com/MAIF/yozefu/tree/main/docs/release/README.md)
  
