@@ -1,7 +1,7 @@
 <p align="center" style="width: 150px">
 <picture>
-    <source width="150" media="(prefers-color-scheme: dark)" srcset="./docs/assets/logo.svg">
-    <img width="150" alt="Logo Yozefu" src="./docs/assets/logo.svg">
+    <source width="150" media="(prefers-color-scheme: dark)" srcset="https://github.com/MAIF/yozefu/raw/main/docs/assets/logo.svg">
+    <img width="150" alt=" Pixel art portrait of a serious-faced person in grayscale above the text 'Yozefu'" src="https://github.com/MAIF/yozefu/raw/main/docs/assets/logo.svg">
   </picture>
 </p>
 
@@ -117,10 +117,10 @@ yozf -c localhost
 <table>
   <tr>
     <td>
-      <img alt="A table listing topics and kafka records" src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/assets/topics.png">
+      <img alt=" A TUI displays a list of topics on the left, a search bar below, and records with timestamps and values in a table on the right. " src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/assets/topics.png">
     </td>
     <td>
-      <img alt="A table listing kafka records" src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/assets/records.png">
+      <img alt="A TUI listing the consumed kafka records with their timestamps, their partition, their offset and an excerpt of the key and the value." src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/assets/records.png">
     </td>
   </tr>
   <tr>
