@@ -207,7 +207,6 @@ impl KafkaRecord {
         payload: Option<&[u8]>,
         schema_registry: &mut Option<SchemaRegistryClient>,
     ) -> (DataType, Option<Schema>) {
-        let _ = std::fs::write("./lol", format!("{payload:?}"));
         let schema_id = SchemaId::parse(payload);
         match (schema_id, schema_registry.as_mut()) {
             (None, _) => (Self::payload_to_data_type(payload, &None), None),
