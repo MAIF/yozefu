@@ -1,3 +1,10 @@
+## What's Changed in v0.0.13
+* chore: Release version v0.0.13 by @Mcdostone in [#97](https://github.com/MAIF/yozefu/pull/97)
+* chore: Release version v0.0.13 by @Mcdostone
+* Changelog for v0.0.12 by @github-actions[bot] in [#95](https://github.com/MAIF/yozefu/pull/95)
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.12...v0.0.13
+
 ## What's Changed in v0.0.12
 * Develop by @Mcdostone in [#87](https://github.com/MAIF/yozefu/pull/87)
 * docs: fix typos by @Mcdostone
