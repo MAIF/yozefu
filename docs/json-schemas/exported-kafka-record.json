@@ -57,7 +57,7 @@
       "default": 0
     },
     "key": {
-      "description": "A human readable representation of the key",
+      "description": "A human-readable representation of the key",
       "$ref": "#/$defs/DataType"
     },
     "key_as_string": {
@@ -65,7 +65,7 @@
       "writeOnly": true
     },
     "value": {
-      "description": "A human readable representation of the value",
+      "description": "A human-readable representation of the value",
       "$ref": "#/$defs/DataType"
     },
     "value_as_string": {

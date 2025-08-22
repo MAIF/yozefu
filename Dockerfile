@@ -1,4 +1,4 @@
-FROM rust:1-slim-bookworm AS builder
+FROM rust:1-slim-trixie AS builder
 WORKDIR /app
 RUN --mount=type=bind,source=crates,target=crates \
     --mount=type=bind,source=.cargo/,target=.cargo/ \
@@ -17,11 +17,9 @@ cp ./target/release/yozf /tmp/yozf
 EOF
 
 
-FROM debian:bookworm-slim AS final
+FROM debian:trixie-slim AS final
 ARG UID=10001
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
+RUN useradd \
     --shell "/sbin/nologin" \
     --uid "${UID}" \
     yozefu

@@ -5,6 +5,11 @@ updates:
     schedule:
       interval: "weekly"
 
+  - package-ecosystem: "cargo"
+    directory: "/crates/wasm-blueprints/rust/"
+    schedule:
+      interval: "weekly"
+
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -17,5 +22,15 @@ updates:
 
   - package-ecosystem: "gomod"
     directory: "/crates/wasm-blueprints/golang/"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "rust-toolchain"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "npm"
+    directory: "/crates/wasm-blueprints/js/"
     schedule:
       interval: "weekly"
