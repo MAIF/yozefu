@@ -106,3 +106,25 @@ jobs:
       - name: Build a JS search filter
         run: make -C crates/wasm-blueprints/js/ build test
         continue-on-error: true
+
+
+  docker:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    continue-on-error: true
+    strategy:
+      matrix:
+        package:
+          - name: rust
+            directory: ./crates/wasm-blueprints/rust/
+          - name: golang
+            directory: ./crates/wasm-blueprints/golang/
+          - name: js
+            directory: ./crates/wasm-blueprints/js/
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Run docker build
+        run: docker build ${{ matrix.package.directory }}
