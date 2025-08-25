@@ -106,30 +106,30 @@ impl RecordsBuffer {
         if self.stats.read == self.last_time_sorted {
             return;
         }
-        let reverse = order_by.is_descending();
+        let is_descending = order_by.is_descending();
         match order_by.order {
             Order::Timestamp => {
-                sort_records!(unsorted, timestamp, reverse)
+                sort_records!(unsorted, timestamp, is_descending)
             }
             Order::Key => {
-                sort_records!(unsorted, key_as_string, reverse)
+                sort_records!(unsorted, key_as_string, is_descending)
             }
-            Order::Value => sort_records!(unsorted, value_as_string, reverse),
+            Order::Value => sort_records!(unsorted, value_as_string, is_descending),
             Order::Partition => {
-                sort_records!(unsorted, partition, reverse)
+                sort_records!(unsorted, partition, is_descending)
             }
             Order::Offset => {
-                sort_records!(unsorted, offset, reverse)
+                sort_records!(unsorted, offset, is_descending)
             }
             Order::Size => unsorted.sort_by(|a, b| {
                 let mut ordering = a.size.cmp(&b.size);
                 if order_by.is_descending() {
-                    ordering = ordering.reverse();
+                    ordering = ordering.is_descending();
                 }
                 ordering
             }),
             Order::Topic => {
-                sort_records!(unsorted, topic, reverse)
+                sort_records!(unsorted, topic, is_descending)
             }
         }
         self.buffer.clear();
