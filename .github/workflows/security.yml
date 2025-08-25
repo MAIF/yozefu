@@ -22,6 +22,7 @@ concurrency:
 jobs:
   dependencies:
    runs-on: ubuntu-latest
+   if: ${{ github.actor != 'dependabot[bot]' }}
    permissions:
       contents: read
    steps:
