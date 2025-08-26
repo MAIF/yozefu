@@ -42,13 +42,15 @@ jobs:
           - name: yozefu
             command: cargo run --locked -- --version
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
       - uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: true
       - name: Run cargo check
         run: ${{ matrix.package.command }}
 
@@ -65,7 +67,7 @@ jobs:
           - beta
           - nightly
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
       - uses: dtolnay/rust-toolchain@stable
@@ -85,10 +87,10 @@ jobs:
     strategy:
       matrix:
         platforms:
-          - os: macOS-latest
+          - os: macos-14
             target: aarch64-apple-darwin
             features: ""
-          - os: macos-latest-large
+          - os: macos-14-large
             target: x86_64-apple-darwin
             features: ""
           - os: ubuntu-latest
@@ -103,9 +105,8 @@ jobs:
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             features: "--no-default-features --features ssl-vendored"
-
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
       - uses: houseabsolute/actions-rust-cross@v1
@@ -114,6 +115,23 @@ jobs:
           args: "--locked ${{ matrix.platforms.features }}"
           strip: true
 
+  lockfile:
+    name: Lockfile
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Check lockfile is updated
+        run: cargo update --locked
+
   clippy:
     needs: check
     name: Clippy
@@ -121,7 +139,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
       - uses: dtolnay/rust-toolchain@stable
@@ -139,7 +157,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
       - uses: dtolnay/rust-toolchain@stable
@@ -158,7 +176,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
       - uses: dtolnay/rust-toolchain@stable
@@ -176,7 +194,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
       - uses: Swatinem/rust-cache@v2
@@ -189,7 +207,7 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
       - uses: dtolnay/rust-toolchain@stable
@@ -209,7 +227,7 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
       - uses: dtolnay/rust-toolchain@stable
@@ -226,7 +244,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
       - uses: lycheeverse/lychee-action@v2
@@ -247,7 +265,7 @@ jobs:
       id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           persist-credentials: false
       - name: Set up Docker Buildx
@@ -268,7 +286,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout Actions Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           persist-credentials: false
       - name: Check spelling of the project
@@ -281,7 +299,7 @@ jobs:
       contents: read
     needs: [check]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
       - uses: EmbarkStudios/cargo-deny-action@v2
@@ -297,7 +315,7 @@ jobs:
     needs: [check]
     steps:
       - name: Checkout Actions Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Install dependencies
         run: pacman -Sy --noconfirm --needed cargo devtools gcc-libs openssl cmake gcc14 clang base-devel
       - name: Use GCC 14 
