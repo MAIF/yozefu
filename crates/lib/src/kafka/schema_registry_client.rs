@@ -31,6 +31,8 @@ impl SimpleSchemaRegistryClient {
         }
         let builder = reqwest::Client::builder()
             .timeout(Duration::from_secs(5))
+            .connect_timeout(Duration::from_secs(5))
+            .read_timeout(Duration::from_secs(5))
             .default_headers(default_headers);
         Self {
             url,
