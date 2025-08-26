@@ -124,7 +124,7 @@ impl RecordsBuffer {
             Order::Size => unsorted.sort_by(|a, b| {
                 let mut ordering = a.size.cmp(&b.size);
                 if order_by.is_descending() {
-                    ordering = ordering.is_descending();
+                    ordering = ordering.reverse();
                 }
                 ordering
             }),

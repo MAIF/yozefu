@@ -48,7 +48,7 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
           fetch-depth: 0
@@ -90,7 +90,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ needs.setup.outputs.nextStep != 'compute' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
           fetch-depth: 0
@@ -144,7 +144,7 @@ jobs:
     if: ${{ needs.setup.outputs.nextStep == 'compute' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
           fetch-depth: 0
