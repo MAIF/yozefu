@@ -1,3 +1,17 @@
+## What's Changed in v0.0.14
+* add cargo config for every crate by @Mcdostone in [#100](https://github.com/MAIF/yozefu/pull/100)
+* test: add new tests thanks to `cargo mutants` by @Mcdostone
+* build: update dependencies by @Mcdostone
+* ci: make sure the lockfile is up-to-date by @Mcdostone
+* refactor: rename somes variable, update README.md, disable specific CI jobs when the actor is dependabot by @Mcdostone
+* ci: Fix docker builds for wasm blueprints by @Mcdostone
+* docs: typo for the 'size' type by @Mcdostone
+* add cargo config for every crate by @Mcdostone
+* docs: flag RUSTFLAGS is missing in the README.md by @Mcdostone
+* Changelog for v0.0.13 by @github-actions[bot] in [#99](https://github.com/MAIF/yozefu/pull/99)
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.13...v0.0.14
+
 ## What's Changed in v0.0.13
 * chore: Release version v0.0.13 by @Mcdostone in [#97](https://github.com/MAIF/yozefu/pull/97)
 * chore: Release version v0.0.13 by @Mcdostone
