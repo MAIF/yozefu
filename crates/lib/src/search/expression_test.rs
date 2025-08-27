@@ -37,3 +37,11 @@ fn test_parse_and_expression() {
         ))
     )
 }
+
+#[test]
+fn test_expression_is_empty() {
+    let expression = parse_or_expression("");
+    assert_eq!(expression, Ok(("", Expression::OrExpression(vec![]),)));
+
+    assert!(expression.unwrap().1.is_empty());
+}

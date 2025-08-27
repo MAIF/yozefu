@@ -1,5 +1,6 @@
 use std::{collections::BTreeMap, fs, path::PathBuf};
 
+use chrono::{Local, TimeZone};
 use rdkafka::message::OwnedMessage;
 
 use crate::{
@@ -20,11 +21,15 @@ async fn test_kafka_record_deserialization() {
         None,
     );
     let record = KafkaRecord::parse(message, &mut None).await;
-    assert_eq!(record.size, 20)
+    assert_eq!(record.size, 20);
+    assert_eq!(
+        record.timestamp_as_local_date_time(),
+        Some(Local.timestamp_opt(0, 0).unwrap())
+    );
 }
 
 #[test]
-fn test_has_schema() {
+fn test_has_schemas() {
     let record = KafkaRecord {
         topic: "topic".into(),
         timestamp: None,
@@ -39,7 +44,24 @@ fn test_has_schema() {
         value_as_string: "".into(),
         value: DataType::String("".into()),
     };
-    assert!(record.has_schemas())
+    assert!(record.has_schemas());
+
+    let record = KafkaRecord {
+        topic: "topic".into(),
+        timestamp: None,
+        partition: 1,
+        offset: 32,
+        headers: BTreeMap::default(),
+        key_schema: None,
+        value_schema: None,
+        size: 32,
+        key_as_string: "".into(),
+        key: DataType::String("".into()),
+        value_as_string: "".into(),
+        value: DataType::String("".into()),
+    };
+
+    assert!(!record.has_schemas());
 }
 
 #[test]
