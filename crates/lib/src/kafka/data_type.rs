@@ -150,3 +150,12 @@ fn test_compare_json() {
     assert!(!data_type.compare(&Some("/hello".into()), &StringOperator::NotEqual, "world"));
     assert!(!data_type.compare(&None, &StringOperator::Equal, "goodbye"));
 }
+
+#[test]
+fn test_data_type_to_string() {
+    assert_eq!(
+        DataType::Json(serde_json::json!({"key": "value"})).to_string(),
+        r#"{"key":"value"}"#
+    );
+    assert_eq!(DataType::String("hello".into()).to_string(), "hello");
+}

@@ -1,13 +1,28 @@
 #[cfg(feature = "native")]
+use super::SchemaRegistryClient;
+#[cfg(feature = "native")]
+use super::avro::avro_to_json;
+use super::data_type::DataType;
+use super::schema::Schema;
+#[cfg(feature = "native")]
+use super::schema::SchemaId;
+#[cfg(feature = "native")]
+use super::schema::SchemaType;
+#[cfg(feature = "native")]
+use super::schema_registry_client::SchemaResponse;
+#[cfg(feature = "native")]
+use crate::kafka::internal::extract_key_and_value_from_consumer_offsets_topics;
+#[cfg(feature = "native")]
 use apache_avro::from_avro_datum;
+#[cfg(feature = "native")]
+use chrono::{DateTime, Local, Utc};
+#[cfg(feature = "native")]
+use rdkafka::message::{Headers, Message, OwnedMessage};
 use serde::Deserialize;
 use serde::Serialize;
 #[cfg(feature = "native")]
 use serde_json::Error;
 use std::collections::BTreeMap;
-
-#[cfg(feature = "native")]
-use crate::kafka::internal::extract_key_and_value_from_consumer_offsets_topics;
 
 /// Inspired of the `[rdkafka::Message]` struct.
 /// Currently, we only support utf-8 string keys/values/headers.
@@ -37,24 +52,6 @@ pub struct KafkaRecord {
     /// The value as a string. needed to be displayed in the TUI
     pub value_as_string: String,
 }
-
-#[cfg(feature = "native")]
-use chrono::{DateTime, Local, Utc};
-#[cfg(feature = "native")]
-use rdkafka::message::{Headers, Message, OwnedMessage};
-
-#[cfg(feature = "native")]
-use super::SchemaRegistryClient;
-#[cfg(feature = "native")]
-use super::avro::avro_to_json;
-use super::data_type::DataType;
-use super::schema::Schema;
-#[cfg(feature = "native")]
-use super::schema::SchemaId;
-#[cfg(feature = "native")]
-use super::schema::SchemaType;
-#[cfg(feature = "native")]
-use super::schema_registry_client::SchemaResponse;
 
 #[cfg(feature = "native")]
 impl KafkaRecord {
@@ -267,4 +264,10 @@ impl KafkaRecord {
             }
         }
     }
+}
+
+#[test]
+fn test_payload_to_data_type() {
+    let d = KafkaRecord::payload_to_data_type(Some("true".as_bytes()), &None);
+    assert_eq!(d, DataType::Json(serde_json::json!(true)));
 }

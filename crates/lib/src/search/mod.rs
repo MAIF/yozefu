@@ -73,6 +73,8 @@ use serde::Serialize;
 #[cfg(test)]
 pub mod expression_test;
 #[cfg(test)]
+pub mod filter_test;
+#[cfg(test)]
 pub mod number_test;
 #[cfg(test)]
 pub mod offset_test;

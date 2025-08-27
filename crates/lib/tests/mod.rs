@@ -33,7 +33,7 @@ fn test_exported_record() {
 
 #[test]
 fn test_parse_records() {
-    let rt = Runtime::new().unwrap();
+    let rt: Runtime = Runtime::new().unwrap();
     glob!("inputs/raw-records/record*.json", |path| {
         let input = fs::read_to_string(path).unwrap();
         let key_value: KeyValue = serde_json::from_str(&input).unwrap();
