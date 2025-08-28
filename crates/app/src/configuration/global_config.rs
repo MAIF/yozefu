@@ -41,8 +41,11 @@ pub struct GlobalConfig {
     pub default_url_template: String,
     /// The initial search query when you start the UI
     pub initial_query: String,
+    /// The theme to use in the TUI
     #[serde(default = "default_theme")]
     pub theme: String,
+    /// The theme to use for syntax highlighting
+    pub highlighter_theme: Option<String>,
     /// The kafka properties for each cluster
     pub clusters: IndexMap<String, ClusterConfig>,
     #[serde(default)]
@@ -93,6 +96,7 @@ impl TryFrom<&PathBuf> for GlobalConfig {
             clusters: IndexMap::default(),
             default_kafka_config: IndexMap::default(),
             theme: default_theme(),
+            highlighter_theme: None,
             show_shortcuts: true,
             export_directory: default_export_directory(),
             consumer: ConsumerConfig::default(),

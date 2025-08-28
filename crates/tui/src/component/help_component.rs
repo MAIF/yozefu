@@ -16,7 +16,7 @@ use super::{
     scroll_state::ScrollState,
 };
 
-const HELP_HEIGHT: usize = 42;
+const HELP_HEIGHT: usize = 43;
 const TEN_MINUTES_FRAME: usize = 30 * 60 * 10;
 const REPOSITORY_URL: &str = concat!(
     "      https://github.com/MAIF/yozefu/tree/v",
@@ -114,6 +114,16 @@ impl Component for HelpComponent {
                 Span::from(format!(
                                         "      Theme is '{}'. run `yozf config get themes` to list available themes.",
                                         state.theme.name
+                                    ))
+            ]),
+            Line::from(vec![
+                Span::from("                                                   Highlighter").bold(),
+                Span::from(format!(
+                                        "      {}",
+                                        match state.highlighter_theme {
+                                            Some(ref theme) => theme.name.as_deref(),
+                                            None => Some("unknown"),
+                                        }.unwrap()
                                     ))
             ]),
             Line::from(vec![

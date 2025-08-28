@@ -15,8 +15,16 @@
       "type": "string"
     },
     "theme": {
+      "description": "The theme to use in the TUI",
       "type": "string",
       "default": "light"
+    },
+    "highlighter_theme": {
+      "description": "The theme to use for syntax highlighting",
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "clusters": {
       "description": "The kafka properties for each cluster",

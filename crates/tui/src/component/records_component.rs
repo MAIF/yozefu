@@ -199,7 +199,7 @@ impl<'a> RecordsComponent<'a> {
     }
 
     fn truncate_value(value: &str, rect: &Rect) -> String {
-        let split_at = rect.width.checked_sub(70).unwrap_or(3) as usize;
+        let split_at = rect.width.checked_sub(68).unwrap_or(3) as usize;
         match value.len() > split_at {
             true => value.chars().take(split_at).collect(),
             false => value.to_string(),

@@ -3,7 +3,7 @@
 use app::configuration::GlobalConfig;
 use std::path::PathBuf;
 
-use crate::theme::Theme;
+use crate::{highlighter::Highlighter, theme::Theme};
 
 use super::ComponentName;
 
@@ -13,6 +13,7 @@ pub struct State {
     pub cluster: String,
     pub themes: Vec<String>,
     pub theme: Theme,
+    pub highlighter_theme: Option<syntect::highlighting::Theme>,
     pub configuration_file: PathBuf,
     pub logs_file: PathBuf,
     pub themes_file: PathBuf,
@@ -21,10 +22,12 @@ pub struct State {
 
 impl State {
     pub fn new(cluster: &str, theme: Theme, config: &GlobalConfig) -> Self {
+        let temp = theme.highlighter_theme.clone();
         Self {
             focused: ComponentName::default(),
             cluster: cluster.to_string(),
             theme,
+            highlighter_theme: Highlighter::theme(&temp, config.highlighter_theme.as_deref()),
             themes: config.themes(),
             themes_file: config.themes_file(),
             configuration_file: config.path.clone(),

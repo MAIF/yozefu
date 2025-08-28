@@ -31,6 +31,7 @@ pub struct Theme {
     pub dialog_border: Color,
     pub autocomplete: Color,
     pub shortcuts: Option<Color>,
+    pub highlighter_theme: Option<String>,
 }
 
 impl Theme {
@@ -60,6 +61,7 @@ impl Theme {
             bg_active: Color::Green,
             fg_active: Color::Black,
             shortcuts: Some(Color::DarkGray),
+            highlighter_theme: Some("base16-ocean.light".to_string()),
         }
     }
 }

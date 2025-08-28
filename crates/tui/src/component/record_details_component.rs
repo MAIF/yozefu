@@ -11,14 +11,13 @@ use ratatui::{
     Frame,
     layout::Rect,
     style::{Style, Stylize},
-    text::{Line, Span, Text},
+    text::{Line, Span},
     widgets::{Block, Borders, Clear, Padding, Paragraph, Wrap},
 };
 use tokio::sync::mpsc::UnboundedSender;
 
-use crate::{Action, Theme, error::TuiError};
-
 use super::{Component, ComponentName, Shortcut, State, scroll_state::ScrollState, styles};
+use crate::{Action, Theme, error::TuiError, highlighter::Highlighter};
 
 #[derive(Default)]
 pub(crate) struct RecordDetailsComponent<'a> {
@@ -28,16 +27,18 @@ pub(crate) struct RecordDetailsComponent<'a> {
     scroll: ScrollState,
     theme: Option<Theme>,
     action_tx: Option<UnboundedSender<Action>>,
+    highlighter: Highlighter,
 }
 
-impl RecordDetailsComponent<'_> {
-    pub fn new(_state: &State) -> Self {
+impl<'a> RecordDetailsComponent<'a> {
+    pub fn new(highlighter: Highlighter) -> Self {
         Self {
+            highlighter,
             ..Default::default()
         }
     }
 
-    fn generate_span<'a>(key: &str, value: Line<'a>) -> Line<'a> {
+    fn generate_span(key: &str, value: Line<'a>) -> Line<'a> {
         let mut spans = vec![Span::styled(
             format!("{:>12}: ", key.to_string()),
             Style::default().bold(),
@@ -172,22 +173,11 @@ impl RecordDetailsComponent<'_> {
             Self::generate_span("Key", record.key_as_string.clone().fg(theme.green).into()),
             Self::generate_span("Value", "".to_string().into()),
         ]);
-
-        //let syntax = SYNTAX_SET.find_syntax_by_extension("json").unwrap();
-        //let mut h = HighlightLines::new(syntax, &self.theme);
-        //
-        //let mut payload_lines = vec![];
-        //for line in LinesWithEndings::from(&value_s) {
-        //    let ranges: Vec<(syntect::highlighting::Style, &str)> =
-        //        h.highlight_line(line, &SYNTAX_SET).unwrap();
-        //    let escaped = as_24_bit_terminal_escaped(&ranges[..], false);
-        //    let output = escaped.into_text().unwrap();
-        //    payload_lines.extend(output.lines);
-        //}
-        let text = Text::from(record.value.to_string_pretty());
-        to_render.extend(text.lines);
-
+        let value = &record.value;
+        let highlighted = self.highlighter.highlight_data_type(value);
+        to_render.extend(highlighted.lines);
         self.lines = to_render;
+
         self.scroll.reset();
     }
 }

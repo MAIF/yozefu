@@ -6,6 +6,7 @@ use app::configuration::GlobalConfig;
 use clap::Args;
 use lib::Error;
 use serde_json::Value;
+use tui::HIGHLIGHTER_THEMES;
 
 #[derive(Debug, Args, Clone)]
 pub struct ConfigureGetCommand {
@@ -45,24 +46,27 @@ impl CliCommand for ConfigureGetCommand {
                                 );
                             }
                         }
-                        println!("{:}", serde_json::to_string_pretty(&filters)?);
+                        println!("{}", serde_json::to_string_pretty(&filters)?);
                     }
-                    "path" | "file" => println!("{:?}", config.path),
+                    "path" | "file" => println!("{}", config.path.display()),
                     "filter_dir" | "filters_dir" | "filters-dir" | "functions-dir"
                     | "functions_dir" | "function_dir" => {
-                        println!("{:?}", config.filters_dir().display())
+                        println!("{}", config.filters_dir().display())
                     }
-                    "log" | "logs" => println!("{:?}", config.logs_file().display()),
+                    "log" | "logs" => println!("{}", config.logs_file().display()),
                     "configuration_file" | "configuration-file" | "config" | "conf" => {
-                        println!("{file:?}")
+                        println!("{}", file.display())
                     }
-                    "directory" | "dir" => println!("{:?}", file.parent().unwrap()),
+                    "directory" | "dir" => println!("{}", file.parent().unwrap().display()),
                     "themes" => {
+                        let mut output = HashMap::new();
                         let _ = update_themes().await;
-                        println!("{}", serde_json::to_string_pretty(&config.themes())?)
+                        output.insert("themes", serde_json::to_value(config.themes())?);
+                        output.insert("higlighter", serde_json::to_value(HIGHLIGHTER_THEMES)?);
+                        println!("{}", serde_json::to_string_pretty(&output)?);
                     }
                     "theme-file" | "themes-file" | "themes_file" | "theme_file" => {
-                        println!("{:?}", config.themes_file())
+                        println!("{}", config.themes_file().display())
                     }
                     _ => {
                         return Err(Error::Error(format!(
