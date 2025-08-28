@@ -6,6 +6,7 @@
 use crate::{
     Action,
     error::TuiError,
+    highlighter::Highlighter,
     schema_detail::{ExportedSchemasDetails, SchemaDetail},
 };
 use crossterm::event::{KeyCode, KeyEvent};
@@ -14,7 +15,7 @@ use ratatui::{
     Frame,
     layout::Rect,
     style::Style,
-    text::{Line, Span, Text},
+    text::{Line, Span},
     widgets::{Block, Borders, Clear, Padding, Paragraph, Wrap},
 };
 use tokio::sync::mpsc::UnboundedSender;
@@ -28,11 +29,15 @@ pub(crate) struct SchemasComponent<'a> {
     lines: Vec<Line<'a>>,
     action_tx: Option<UnboundedSender<Action>>,
     scroll: ScrollState,
+    highlighter: Highlighter,
 }
 
 impl SchemasComponent<'_> {
-    pub fn new() -> Self {
-        Self::default()
+    pub fn new(highlighter: Highlighter) -> Self {
+        Self {
+            highlighter,
+            ..Self::default()
+        }
     }
 
     fn compute_schemas_rendering(&mut self) {
@@ -52,39 +57,52 @@ impl SchemasComponent<'_> {
         }
         if let Some(s) = &self.key {
             to_render.push(Line::default());
-            let schema = Text::from(
-                s.response
+            let schema_content = s.response
                     .as_ref()
                     .map(|r| r.schema_to_string_pretty())
                     .unwrap_or(
                         format!("The Schema {} is unavailable. Please make sure you configured Yozefu to use the schema registry.", s.id),
-                    ),
-            );
+                    );
             to_render.push(Line::from(vec![Span::styled(
                 "Key schema: ",
                 Style::default().bold(),
             )]));
-            to_render.extend(schema.lines);
+
+            let highlighted = self.highlighter.highlight(&schema_content);
+            to_render.extend(highlighted.lines);
         }
 
         if let Some(s) = &self.value {
             to_render.push(Line::default());
-            let schema = Text::from(
-                s.response
+
+            let schema_content =     s.response
                     .as_ref()
                     .map(|r| r.schema_to_string_pretty())
                     .unwrap_or(
                         format!("The Schema {} is unavailable. Please make sure you configured Yozefu to use the schema registry.", s.id),
-                    ),
-            );
+                    );
+
             to_render.push(Line::from(vec![Span::styled(
                 "Value schema: ",
                 Style::default().bold(),
             )]));
-            to_render.extend(schema.lines);
+
+            let highlighted = self.highlighter.highlight(&schema_content);
+            to_render.extend(highlighted.lines);
         }
         self.lines = to_render;
     }
+
+    //fn highlight_schema<'b>(&self, schema: &'b SchemaDetail) -> Text<'b> {
+    //    let schema_content =     schema.response
+    //                .as_ref()
+    //                .map(|r| r.schema_to_string_pretty())
+    //                .unwrap_or(
+    //                    format!("The Schema {} is unavailable. Please make sure you configured Yozefu to use the schema registry.", schema.id),
+    //                );
+    //
+    //    self.highlighter.highlight(&schema_content)
+    //}
 }
 
 impl Component for SchemasComponent<'_> {

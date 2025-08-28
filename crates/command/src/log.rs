@@ -26,12 +26,12 @@ pub(crate) fn init_logging_stderr(
 
 /// When the user starts the TUI, it writes logs to a file.
 pub(crate) fn init_logging_file(
-    _is_debug: bool,
+    is_debug: bool,
     path: &PathBuf,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>> {
     let filter = EnvFilter::try_from_default_env().unwrap_or(
         EnvFilter::builder()
-            .with_default_directive(LevelFilter::ERROR.into())
+            .with_default_directive(log_level(is_debug).into())
             .from_env_lossy(),
     );
 

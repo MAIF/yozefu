@@ -5,6 +5,7 @@ macro_rules! assert_draw {
         use insta::assert_snapshot;
         use ratatui::{Terminal, backend::TestBackend};
         use $crate::{State, Theme};
+        use $crate::highlighter::HIGHLIGHTER_DEFAULT_THEME;
 
         unsafe {
             use std::env;
@@ -25,6 +26,7 @@ macro_rules! assert_draw {
                 default_url_template: "".to_string(),
                 initial_query: "".to_string(),
                 theme: "light".to_string(),
+                highlighter_theme: HIGHLIGHTER_DEFAULT_THEME.to_string(),
                 clusters: indexmap::IndexMap::default(),
                 default_kafka_config: indexmap::IndexMap::default(),
                 history: vec![],

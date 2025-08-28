@@ -146,6 +146,7 @@ pub mod root_component_test;
 
 #[cfg(test)]
 pub fn default_global_config() -> GlobalConfig {
+    use crate::highlighter::HIGHLIGHTER_DEFAULT_THEME;
     use app::configuration::GlobalConfig;
 
     let temp_dir = tempfile::tempdir().unwrap();
@@ -158,6 +159,7 @@ pub fn default_global_config() -> GlobalConfig {
         default_url_template: "".to_string(),
         initial_query: "".to_string(),
         theme: "light".to_string(),
+        highlighter_theme: HIGHLIGHTER_DEFAULT_THEME.to_string(),
         clusters: indexmap::IndexMap::default(),
         default_kafka_config: indexmap::IndexMap::default(),
         history: vec![],

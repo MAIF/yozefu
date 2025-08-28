@@ -22,7 +22,8 @@
     "bg_active": "Green",
     "fg_active": "Black",
     "dialog_border": "Black",
-    "autocomplete": "#646464"
+    "autocomplete": "#646464",
+    "highlighter_theme": "base16-ocean.light"
   },
   "dark": {
     "name": "dark",
@@ -47,7 +48,8 @@
     "bg_active": "LightGreen",
     "fg_active": "Black",
     "dialog_border": "Yellow",
-    "autocomplete": "#646464"
+    "autocomplete": "#646464",
+    "highlighter_theme": "base16-ocean.light"
   },
   "solarized-dark": {
     "name": "solarized-dark",
@@ -72,7 +74,8 @@
     "bg_active": "Green",
     "fg_active": "DarkGray",
     "dialog_border": "Yellow",
-    "autocomplete": "#646464"
+    "autocomplete": "#646464",
+    "highlighter_theme": "base16-ocean.dark"
   },
   "solarized-dark-higher-contrast": {
     "name": "solarized-dark-higher-contrast",
@@ -97,6 +100,7 @@
     "bg_active": "LightGreen",
     "fg_active": "Black",
     "dialog_border": "Yellow",
-    "autocomplete": "#646464"
+    "autocomplete": "#646464",
+    "highlighter_theme": "base16-ocean.dark"
   }
 }

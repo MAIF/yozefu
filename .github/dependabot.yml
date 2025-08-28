@@ -6,6 +6,11 @@ updates:
       interval: "weekly"
 
   - package-ecosystem: "cargo"
+    directory: "/crates/app/tests/http_search_filter"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "cargo"
     directory: "/crates/wasm-blueprints/rust/"
     schedule:
       interval: "weekly"
