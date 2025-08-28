@@ -3,7 +3,7 @@
 * test: add new tests thanks to `cargo mutants` by @Mcdostone
 * build: update dependencies by @Mcdostone
 * ci: make sure the lockfile is up-to-date by @Mcdostone
-* refactor: rename somes variable, update README.md, disable specific CI jobs when the actor is dependabot by @Mcdostone
+* refactor: rename some variable, update README.md, disable specific CI jobs when the actor is dependabot by @Mcdostone
 * ci: Fix docker builds for wasm blueprints by @Mcdostone
 * docs: typo for the 'size' type by @Mcdostone
 * add cargo config for every crate by @Mcdostone

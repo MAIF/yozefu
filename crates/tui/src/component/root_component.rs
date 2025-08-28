@@ -16,7 +16,10 @@ use ratatui::{
 };
 use tokio::sync::{mpsc::UnboundedSender, watch::Receiver};
 
-use crate::{Action, Notification, action::Level, error::TuiError, records_buffer::BufferAction};
+use crate::{
+    Action, Notification, action::Level, error::TuiError, highlighter::Highlighter,
+    records_buffer::BufferAction,
+};
 
 use super::{
     Component, ComponentName, ConcurrentRecordsBuffer, State, footer_component::FooterComponent,
@@ -53,11 +56,13 @@ impl RootComponent {
 
         let topics_component = Arc::new(Mutex::new(TopicsComponent::new(selected_topics)));
 
+        let highlighter = Highlighter::new(state.highlighter_theme.clone());
+
         let mut components: [Arc<Mutex<dyn Component>>; 10] = [
             topics_component.clone(),
             Arc::new(Mutex::new(RecordsComponent::new(records))),
             Arc::new(Mutex::new(TopicDetailsComponent::default())),
-            Arc::new(Mutex::new(RecordDetailsComponent::new(&state))),
+            Arc::new(Mutex::new(RecordDetailsComponent::new(highlighter.clone()))),
             Arc::new(Mutex::new(SearchComponent::new(
                 &query,
                 config.history.clone(),
@@ -65,7 +70,7 @@ impl RootComponent {
             ))),
             Arc::new(Mutex::new(footer)),
             Arc::new(Mutex::new(HelpComponent::default())),
-            Arc::new(Mutex::new(SchemasComponent::new())),
+            Arc::new(Mutex::new(SchemasComponent::new(highlighter))),
             Arc::new(Mutex::new(HeaderComponent::default())),
             Arc::new(Mutex::new(FooterComponent::default())),
         ];

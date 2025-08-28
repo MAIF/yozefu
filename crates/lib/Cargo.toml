@@ -23,7 +23,7 @@ fuzzydate = {version = "0.2.3", optional = true }
 nom = "8.0.0"
 rdkafka = { version = "0.38.0", features = [], optional = true}
 url = "2.5.7"
-apache-avro = "0.19.0"
+apache-avro = "0.20.0"
 reqwest = { version = "0.12.23", features = ["json"] }
 byteorder = "1.5.0"
 

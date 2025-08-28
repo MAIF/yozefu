@@ -3,6 +3,7 @@
 mod action;
 mod component;
 pub mod error;
+mod highlighter;
 mod records_buffer;
 mod schema_detail;
 pub mod theme;
@@ -15,3 +16,5 @@ pub use component::State;
 pub use component::Ui;
 pub use error::TuiError;
 pub use theme::Theme;
+
+pub use highlighter::HIGHLIGHTER_THEMES;

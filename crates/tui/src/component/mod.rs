@@ -158,6 +158,7 @@ pub fn default_global_config() -> GlobalConfig {
         default_url_template: "".to_string(),
         initial_query: "".to_string(),
         theme: "light".to_string(),
+        highlighter_theme: None,
         clusters: indexmap::IndexMap::default(),
         default_kafka_config: indexmap::IndexMap::default(),
         history: vec![],
