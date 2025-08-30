@@ -41,8 +41,12 @@ pub struct GlobalConfig {
     pub default_url_template: String,
     /// The initial search query when you start the UI
     pub initial_query: String,
+    /// The theme to use in the TUI
     #[serde(default = "default_theme")]
     pub theme: String,
+    /// The theme to use for syntax highlighting
+    #[serde(default = "default_highlighter_theme")]
+    pub highlighter_theme: String,
     /// The kafka properties for each cluster
     pub clusters: IndexMap<String, ClusterConfig>,
     #[serde(default)]
@@ -75,6 +79,14 @@ fn default_theme() -> String {
     }
 }
 
+fn default_highlighter_theme() -> String {
+    if cfg!(target_os = "windows") {
+        "base16-ocean.dark".to_string()
+    } else {
+        "base16-ocean.light".to_string()
+    }
+}
+
 fn default_show_shortcuts() -> bool {
     true
 }
@@ -93,6 +105,7 @@ impl TryFrom<&PathBuf> for GlobalConfig {
             clusters: IndexMap::default(),
             default_kafka_config: IndexMap::default(),
             theme: default_theme(),
+            highlighter_theme: default_highlighter_theme(),
             show_shortcuts: true,
             export_directory: default_export_directory(),
             consumer: ConsumerConfig::default(),
