@@ -1,3 +1,10 @@
+## What's Changed in v0.0.15
+* syntax highlighting by @Mcdostone in [#110](https://github.com/MAIF/yozefu/pull/110)
+* feat: highlights the record payload with syntect by @Mcdostone
+* Changelog for v0.0.14 by @github-actions[bot] in [#106](https://github.com/MAIF/yozefu/pull/106)
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.14...v0.0.15
+
 ## What's Changed in v0.0.14
 * add cargo config for every crate by @Mcdostone in [#100](https://github.com/MAIF/yozefu/pull/100)
 * test: add new tests thanks to `cargo mutants` by @Mcdostone
