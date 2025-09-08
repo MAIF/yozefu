@@ -54,7 +54,7 @@ jobs:
         with:
           toolchain: stable
       - name: Setup Go ${{ env.GOLANG_VERSION }}
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: ${{ env.GOLANG_VERSION }}
       - name: Install extism CLI
@@ -74,7 +74,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup Go ${{ env.GOLANG_VERSION }}
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: ${{ env.GOLANG_VERSION }}
       - name: Install extism CLI
@@ -94,11 +94,11 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup JS ${{ env.JS_VERSION }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ env.JS_VERSION }}
       - name: Setup Go ${{ env.GOLANG_VERSION }}
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: ${{ env.GOLANG_VERSION }}
       - name: Install extism CLI
