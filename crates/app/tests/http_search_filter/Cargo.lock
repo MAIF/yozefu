@@ -25,9 +25,9 @@ checksum = "b0674a1ddeecb70197781e945de4b3b8ffb61fa939a5597bcf48503737663100"
 
 [[package]]
 name = "apache-avro"
-version = "0.19.0"
+version = "0.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ce74162d8bc5bc22bd746e1849fb33f2c9416d2ce505d1d65ba49f170a207c90"
+checksum = "3a033b4ced7c585199fb78ef50fca7fe2f444369ec48080c5fd072efa1a03cc7"
 dependencies = [
  "bigdecimal",
  "bon",
@@ -92,7 +92,6 @@ dependencies = [
  "num-integer",
  "num-traits",
  "serde",
- "serde_json",
 ]
 
 [[package]]
@@ -2082,8 +2081,8 @@ dependencies = [
 
 [[package]]
 name = "yozefu-lib"
-version = "0.0.14"
-source = "git+https://github.com/MAIF/yozefu.git?branch=main#3e170eafb034062dc0d74f96e10e44004e0341d5"
+version = "0.0.15"
+source = "git+https://github.com/MAIF/yozefu.git?branch=main#a68317ecaded376cd8e17f85ef1f62129c99a040"
 dependencies = [
  "apache-avro",
  "byteorder",
@@ -2106,8 +2105,8 @@ dependencies = [
 
 [[package]]
 name = "yozefu-wasm-types"
-version = "0.0.14"
-source = "git+https://github.com/MAIF/yozefu.git?branch=main#3e170eafb034062dc0d74f96e10e44004e0341d5"
+version = "0.0.15"
+source = "git+https://github.com/MAIF/yozefu.git?branch=main#a68317ecaded376cd8e17f85ef1f62129c99a040"
 dependencies = [
  "serde",
  "serde_json",
