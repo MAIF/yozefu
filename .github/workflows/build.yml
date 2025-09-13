@@ -328,3 +328,28 @@ jobs:
         run: cargo build --all-features --locked
       - name: test
         run: cargo test --all-features --locked
+
+  nix:
+    name: Nix
+    needs: check
+    runs-on: ${{ matrix.platforms.os }}
+    continue-on-error: true
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        platforms:
+          - os: macos-14
+            target: aarch64-apple-darwin
+          - os: macos-14-large
+            target: x86_64-apple-darwin
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+    steps:
+      - uses: actions/checkout@v5
+      - uses: cachix/install-nix-action@v31
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      - run: nix build

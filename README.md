@@ -85,6 +85,8 @@ gh attestation verify --repo MAIF/yozefu $(which yozf)
 brew install yozefu
 
 yay -S yozefu
+
+nix run github:MAIF/yozefu
 ```
 
 
