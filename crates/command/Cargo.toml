@@ -26,7 +26,7 @@ clap = { version = "4.5.47", features = [
     "suggestions",
 ] }
 serde_json = { workspace = true }
-chrono = "0.4.41"
+chrono = "0.4.42"
 strum = { workspace = true, features = ["derive", "strum_macros"] }
 indicatif = { version = "0.18.0", features = ["tokio"] }
 tempfile = "3.21.0"

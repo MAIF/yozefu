@@ -16,7 +16,7 @@ rust-version.workspace = true
 [dependencies]
 serde = { workspace = true }
 serde_json = { workspace = true }
-chrono = { version = "0.4.41", features = ["serde"], optional = true }
+chrono = { version = "0.4.42", features = ["serde"], optional = true }
 itertools = "0.14.0"
 strum = { workspace = true, features = ["derive", "strum_macros"], optional = true }
 fuzzydate = {version = "0.2.3", optional = true }
