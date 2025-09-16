@@ -121,6 +121,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
       - uses: actions/checkout@v5
         with:
