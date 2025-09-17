@@ -1,5 +1,6 @@
 FROM rust:1-slim-trixie AS builder
 WORKDIR /app
+RUN apt-get update && apt-get install --no-install-recommends -y git build-essential cmake libclang-dev
 RUN --mount=type=bind,source=crates,target=crates \
     --mount=type=bind,source=.cargo/,target=.cargo/ \
     --mount=type=bind,source=Cargo.toml,target=Cargo.toml \
@@ -9,12 +10,12 @@ RUN --mount=type=bind,source=crates,target=crates \
     --mount=type=cache,target=/usr/local/cargo/registry/ \
     <<EOF
 set -e
-apt-get update && apt-get install --no-install-recommends -y git build-essential cmake libclang-dev
 export GITHUB_REF_NAME=$(git rev-parse --abbrev-ref HEAD)
 export GITHUB_SHA=$(git rev-parse HEAD)
 cargo build --release --all-features --locked
 cp ./target/release/yozf /tmp/yozf
 EOF
+
 
 
 FROM debian:trixie-slim AS final
@@ -26,18 +27,18 @@ RUN useradd \
 RUN apt-get update && \
     apt-get install --no-install-recommends vim jq ca-certificates --yes && \
     rm -rf /var/lib/apt/lists/*
-COPY --from=builder "/tmp/yozf" /bin/app
+COPY --from=builder "/tmp/yozf" /bin/yozf
 RUN <<EOF
-ln -fs "/bin/app" /usr/local/bin/yozf
-ln -fs "/bin/app" /usr/local/bin/yozefu
-ln -fs "/bin/app" /usr/bin/yozf
-ln -fs "/bin/app" /usr/local/bin/yozefu
+ln -fs "/bin/yozf" /usr/local/bin/yozf
+ln -fs "/bin/yozf" /usr/local/bin/yozefu
+ln -fs "/bin/yozf" /usr/bin/yozf
+ln -fs "/bin/yozf" /usr/local/bin/yozefu
 EOF
-RUN /bin/app --version
+RUN /bin/yozf --version
 
 USER yozefu
 WORKDIR /home/yozefu
-ENTRYPOINT ["/bin/app"]
+ENTRYPOINT ["/bin/yozf"]
 
 
 # docker pull ghcr.io/maif/yozefu:latest
