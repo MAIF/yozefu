@@ -77,7 +77,6 @@ impl Headless {
                     let mut limit = 0;
                     select! {
                         _ = token_cloned.cancelled() => {
-                            info!("Consumer is about to be cancelled");
                             return;
                          },
                         Some(message) = rx_dd.recv() => {

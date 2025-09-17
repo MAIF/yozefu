@@ -19,7 +19,7 @@ use tokio::sync::mpsc::{self, UnboundedSender};
 use tokio::time::Instant;
 use tokio::{select, time};
 use tokio_util::sync::CancellationToken;
-use tracing::{debug, error, info, trace_span, warn};
+use tracing::{error, info, trace_span, warn};
 
 use crate::action::{Action, Level, Notification};
 use crate::component::{Component, RootComponent};
@@ -147,11 +147,9 @@ impl Ui {
             loop {
                 select! {
                     _ = token_cloned.cancelled() => {
-                        info!("Consumer is about to be cancelled");
                         return;
                      },
                     Some(message) = rx_dd.recv() => {
-                        debug!("{:?}", message);
                         let record = KafkaRecord::parse(message, &mut schema_registry).await;
                         let context = SearchContext::new(&record, &filters_directory);
                         let span = trace_span!("matching", offset = %record.offset, partition = %record.partition, topic = %record.topic);
