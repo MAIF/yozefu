@@ -19,17 +19,17 @@ serde_json = { workspace = true }
 lib = { workspace = true, features = ["native"] }
 itertools = "0.14.0"
 thousands = "0.2.0"
-indexmap = "2.11.0"
+indexmap = "2.11.3"
 rdkafka = { version = "0.38.0", features = ["cmake-build"] }
 extism = { version = "1.12.0", features = [] }
 url = { version = "2.5.7", features = ["serde"] }
 resolve-path = "0.1.0"
 directories = "6.0.0"
-chrono = "0.4.41"
+chrono = "0.4.42"
 tracing = { workspace = true }
 
 [dev-dependencies]
-tempfile = "3.21.0"
+tempfile = "3.22.0"
 testing_logger = "0.1.1"
 schemars = { version = "1.0.4", features = ["indexmap2", "url2"] }
 
