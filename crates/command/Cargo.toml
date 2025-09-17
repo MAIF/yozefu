@@ -26,10 +26,10 @@ clap = { version = "4.5.47", features = [
     "suggestions",
 ] }
 serde_json = { workspace = true }
-chrono = "0.4.41"
+chrono = "0.4.42"
 strum = { workspace = true, features = ["derive", "strum_macros"] }
 indicatif = { version = "0.18.0", features = ["tokio"] }
-tempfile = "3.21.0"
+tempfile = "3.22.0"
 tokio-util = "0.7.16"
 futures = "0.3.31"
 itertools = "0.14.0"
@@ -41,7 +41,7 @@ rdkafka = { version = "0.38.0", features = [
     "external-lz4",
 ] }
 extism = { version = "1.12.0" }
-indexmap = "2.11.0"
+indexmap = "2.11.3"
 tui = { workspace = true }
 app = { workspace = true }
 lib = { workspace = true }
