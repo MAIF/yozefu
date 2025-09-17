@@ -1,3 +1,19 @@
+## What's Changed in v0.0.16
+* Develop by @Mcdostone in [#122](https://github.com/MAIF/yozefu/pull/122)
+* ci: update dependencies by @Mcdostone
+* fix: the global configuration is now taken into account when you create a consumer by @Mcdostone
+* ci: disable dependabot for lockfile job by @Mcdostone
+* test nix by @Mcdostone
+* ci: delete cargo.lock for testing by @Mcdostone
+* build(deps-dev): bump esbuild in /crates/wasm-blueprints/js by @dependabot[bot]
+* build(deps): bump insta from 1.43.1 to 1.43.2 by @dependabot[bot]
+* feat: remove Cargo.lock to avoid dependabot PRs by @Mcdostone
+* build(deps): bump actions/setup-node from 4 to 5 by @dependabot[bot]
+* build(deps): bump actions/setup-go from 5 to 6 by @dependabot[bot]
+* Changelog for v0.0.15 by @github-actions[bot] in [#115](https://github.com/MAIF/yozefu/pull/115)
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.15...v0.0.16
+
 ## What's Changed in v0.0.15
 * syntax highlighting by @Mcdostone in [#110](https://github.com/MAIF/yozefu/pull/110)
 * feat: highlights the record payload with syntect by @Mcdostone
