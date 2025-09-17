@@ -17,7 +17,14 @@ pub struct InternalConfig {
 
 impl Configuration for InternalConfig {
     fn kafka_config_map(&self) -> HashMap<String, String> {
-        self.specific.kafka_config_map()
+        let mut config_map: HashMap<String, String> = self
+            .global
+            .default_kafka_config
+            .clone()
+            .into_iter()
+            .collect();
+        config_map.extend(self.specific.kafka_config_map());
+        config_map
     }
 }
 
