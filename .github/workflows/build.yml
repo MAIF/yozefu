@@ -325,9 +325,9 @@ jobs:
           ln -s "$(which gcc-14)" "/usr/local/bin/gcc"
           ln -s "$(which g++-14)" "/usr/local/bin/g++"
           hash -r
-      - name: build
+      - name: Cargo build
         run: cargo build --all-features --locked
-      - name: test
+      - name: Cargo test
         run: cargo test --all-features --locked
 
   nix:
