@@ -28,6 +28,7 @@ readme = "README.md"
 homepage = "https://github.com/MAIF/yozefu"
 repository = "https://github.com/MAIF/yozefu"
 documentation = "https://docs.rs/yozefu"
+description = "Yozefu is a CLI tool for Apache kafka. It allows you to navigate topics and search Kafka records."
 license = "Apache-2.0"
 rust-version = "1.85.0"
 
