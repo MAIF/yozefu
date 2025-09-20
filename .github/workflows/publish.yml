@@ -123,7 +123,7 @@ jobs:
           VERSION: ${{ needs.version.outputs.version }}
 
       - name: Attest
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v3
         with:
           subject-path: "${{ steps.variables.outputs.source }}"
           subject-name: "${{ steps.variables.outputs.archive }}-${{ needs.version.outputs.version }}"
@@ -225,7 +225,7 @@ jobs:
         annotations: ${{ steps.meta.outputs.annotations }}
     # https://github.com/actions/attest-build-provenance
     - name: Generate artifact attestation
-      uses: actions/attest-build-provenance@v2
+      uses: actions/attest-build-provenance@v3
       with:
         subject-name: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}
         subject-digest: ${{ steps.push.outputs.digest }}
@@ -248,9 +248,4 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Publish the crates
         run: |
-          cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }} -p yozefu-lib || true
-          cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }} -p yozefu-wasm-types || true
-          cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }} -p yozefu-app || true
-          cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }} -p yozefu-tui
-          cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }} -p yozefu-command
-          cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }} -p yozefu
+          cargo publish --workspace --token ${{ secrets.CARGO_REGISTRY_TOKEN }}

@@ -1,6 +1,6 @@
 [package]
 name = "yozefu"
-description = "Yozefu is a CLI tool for Apache kafka. It allows you to navigate topics and search Kafka records."
+description.workspace = true
 keywords = ["kafka", "consumer", "avro", "tui", "ratatui"]
 categories = [
     "command-line-utilities",

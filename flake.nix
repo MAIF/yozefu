@@ -17,6 +17,12 @@
 
       let
         pkgs = import nixpkgs { inherit system; };
+        cargoToml = builtins.fromTOML (builtins.readFile ./Cargo.toml);
+        toolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
+        rustPlatform = pkgs.makeRustPlatform {
+          cargo = toolchain;
+          rustc = toolchain;
+        };
         buildInputs =
           with pkgs;
           [
@@ -53,6 +59,7 @@
             lib,
             fetchgit,
             rustPlatform,
+            makeRustPlatform
           }:
           rustPlatform.buildRustPackage (finalAttrs: rec {
             pname = "yozefu";
@@ -76,10 +83,21 @@
             cargoHash = "sha256-FrwwrCewVjZnLY2i6MZxBE8WxQ1/LKA5KFf9YpSm10s=";
 
             meta = {
-              mainProgram = "yozf";
-              description = " CLI tool for Apache kafka. It allows you to navigate topics and search Kafka records.";
-              homepage = "https://github.com/MAIF/yozefu";
+              description = cargoToml.workspace.package.description;
+              homepage = cargoToml.workspace.package.repository;
               license = lib.licenses.asl20;
+              changelog = "${cargoToml.workspace.package.repository}/releases";
+              platforms = lib.platforms.unix ++ lib.platforms.windows;
+              mainProgram = "yozf";
+              categories = cargoToml.workspace.package.categories or [ ];
+              keywords = cargoToml.workspace.package.keywords or [ ];
+               maintainers = [
+                {
+                  name = "Yann Prono";
+                  github = "mcdostone";
+                  email = "yann.prono@maif.fr";
+                }
+              ];
             };
           })
         ) { };

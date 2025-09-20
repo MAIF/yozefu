@@ -197,3 +197,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  # cargo publish --registry kellnr --token "admin:admin" --workspace
+  kellnr:
+    image: ghcr.io/kellnr/kellnr:5
+    ports:
+      - "8000:8000"
+    environment:
+      KELLNR_SETUP__ADMIN_TOKEN: "admin:admin"
