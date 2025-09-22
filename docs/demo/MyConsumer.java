@@ -1,8 +1,8 @@
-//JAVA 21+
+//JAVA 25+
 //REPOS central,confluent=https://packages.confluent.io/maven
-//DEPS org.apache.kafka:kafka-clients:3.9.0
-//DEPS org.slf4j:slf4j-nop:2.0.16
-//DEPS info.picocli:picocli:4.7.6
+//DEPS org.apache.kafka:kafka-clients:4.1.0
+//DEPS org.slf4j:slf4j-nop:2.0.17
+//DEPS info.picocli:picocli:4.7.7
 
 // jbang run ./MyConsumer.java public-french-addresses
 
