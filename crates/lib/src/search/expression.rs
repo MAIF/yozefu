@@ -39,7 +39,7 @@ impl Display for AndExpression {
                 f,
                 "{}",
                 e.iter()
-                    .map(|a| a.to_string())
+                    .map(std::string::ToString::to_string)
                     .collect::<Vec<_>>()
                     .join(" && ")
             ),
@@ -55,7 +55,7 @@ impl Display for OrExpression {
                 f,
                 "{}",
                 t.iter()
-                    .map(|a| a.to_string())
+                    .map(std::string::ToString::to_string)
                     .collect::<Vec<_>>()
                     .join(" || ")
             ),

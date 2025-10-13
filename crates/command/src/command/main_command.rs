@@ -128,7 +128,9 @@ where
         match self.headless {
             true => {
                 let _ = init_logging_stderr(self.debug);
-                self.headless(&yozefu_config).await.map_err(|e| e.into())
+                self.headless(&yozefu_config)
+                    .await
+                    .map_err(std::convert::Into::into)
             }
             false => {
                 // Ignore the result, we just want to make sure the logger is initialized
@@ -161,7 +163,7 @@ where
             return Ok(buffer);
         }
 
-        match q.starts_with("@") {
+        match q.starts_with('@') {
             true => {
                 let query_file = Path::new(&q[1..]);
                 fs::read_to_string(query_file).map_err(|e| {
@@ -179,7 +181,7 @@ where
     fn config(&self, yozefu_config: &YozefuConfig) -> Result<GlobalConfig, Error> {
         let path = self.config.clone().unwrap_or(GlobalConfig::path()?);
         let mut config = GlobalConfig::read(&path)?;
-        config.logs = yozefu_config.logs_file.clone();
+        config.logs.clone_from(&yozefu_config.logs_file);
         Ok(config)
     }
 
@@ -220,14 +222,14 @@ where
                     .into());
                 }
             }
-        };
+        }
         Ok(config.clusters.get(&cluster.to_string()).unwrap().clone())
     }
 
     fn read_config(&self) -> Result<GlobalConfig, Error> {
         match GlobalConfig::read(&GlobalConfig::path()?) {
             Ok(mut config) => {
-                config.logs = self.logs_file.clone();
+                config.logs.clone_from(&self.logs_file);
                 Ok(config)
             }
             Err(e) => Err(e),
@@ -277,16 +279,16 @@ where
         let state = State::new(&cluster.to_string(), color_palette, &config);
         let mut ui = Ui::new(
             self.app(&query, yozefu_config)?,
-            query,
+            &query,
             self.topics.clone(),
             state.clone(),
         );
 
-        self.check_connection(yozefu_config)?;
+        Self::check_connection(yozefu_config)?;
         ui.run(self.topics.clone(), state).await
     }
 
-    fn check_connection(&self, yozefu_config: &YozefuConfig) -> Result<(), Error> {
+    fn check_connection(yozefu_config: &YozefuConfig) -> Result<(), Error> {
         let _ = yozefu_config.create_kafka_consumer::<BaseConsumer>()?;
         Ok(())
     }
@@ -351,7 +353,7 @@ where
                 cluster,
                 topics.join(","),
                 query
-            )
+            );
         }
     }
 

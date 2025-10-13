@@ -8,8 +8,9 @@ use nom::{
     sequence::{pair, preceded},
 };
 
+use crate::search::number::parse_number;
+
 use super::expression::{Expression, parse_or_expression};
-use super::number::parse_unsigned_number;
 use super::offset::{FromOffset, parse_from_offset};
 use super::order::{Order, OrderKeyword, parse_order, parse_order_keyword};
 use super::wsi::wsi;
@@ -52,7 +53,7 @@ pub(crate) fn parse_from_offset_clause(input: &str) -> IResult<&str, SearchClaus
 
 pub(crate) fn parse_limit(input: &str) -> IResult<&str, SearchClause> {
     map(
-        preceded(wsi(tag_no_case("limit")), wsi(parse_unsigned_number)),
+        preceded(wsi(tag_no_case("limit")), wsi(parse_number)),
         SearchClause::Limit,
     )
     .parse(input)

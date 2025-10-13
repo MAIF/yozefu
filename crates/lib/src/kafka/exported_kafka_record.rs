@@ -44,7 +44,7 @@ impl From<&KafkaRecord> for ExportedKafkaRecord {
             date_time,
             absolute_delta_in_ms: 0,
             relative_delta_in_ms: 0,
-            search_query: "".to_string(),
+            search_query: String::new(),
         }
     }
 }

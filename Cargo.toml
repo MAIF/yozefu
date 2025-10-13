@@ -61,6 +61,7 @@ pre-release-commit-message = "chore: Release version v{{version}}"
 tag-name = "{{version}}"
 
 [workspace.lints.clippy]
+pedantic = {level = "warn", priority = 10 }
 arithmetic_overflow = "warn"
 checked_conversions = "warn"
 cast_possible_truncation = "warn"
@@ -77,8 +78,10 @@ option_env_unwrap = "warn"
 indexing_slicing = "warn"
 join_absolute_paths = "warn"
 serde_api_misuse = "warn"
+match_bool = {level = "allow", priority = 2 }
 uninit_vec = "warn"
 transmute_int_to_char = "warn"
 transmute_int_to_float = "warn"
 transmute_ptr_to_ref = "warn"
 transmute_undefined_repr = "warn"
+missing_errors_doc = {level = "allow", priority = 2 }

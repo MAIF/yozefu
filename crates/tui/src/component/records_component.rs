@@ -45,16 +45,16 @@ impl<'a> RecordsComponent<'a> {
 
         Self {
             records,
-            state: Default::default(),
-            status: Default::default(),
-            search_query: Default::default(),
-            consuming: Default::default(),
-            stats: Default::default(),
-            follow: Default::default(),
-            action_tx: Default::default(),
+            state: TableState::default(),
+            status: ThrobberState::default(),
+            search_query: ValidSearchQuery::default(),
+            consuming: false,
+            stats: Stats::default(),
+            follow: false,
+            action_tx: None,
             buffer_tx,
-            selected_topics: Default::default(),
-            key_events_buffer: Default::default(),
+            selected_topics: 0,
+            key_events_buffer: Vec::default(),
         }
     }
 
@@ -90,7 +90,7 @@ impl<'a> RecordsComponent<'a> {
                 .as_ref()
                 .unwrap()
                 .send(Action::NewView(ComponentName::RecordDetails))?;
-            self.set_event_dialog()?
+            self.set_event_dialog()?;
         }
         Ok(())
     }
@@ -138,7 +138,7 @@ impl<'a> RecordsComponent<'a> {
         }
     }
 
-    pub fn on_new_record(&mut self, stats: Stats) -> Result<(), TuiError> {
+    pub fn on_new_record(&mut self, stats: Stats) {
         self.stats = stats;
         let length = self.stats.buffer_size;
         let empty_buffer = length == 0;
@@ -157,7 +157,6 @@ impl<'a> RecordsComponent<'a> {
                 self.state.select(Some(ii));
             }
         }
-        Ok(())
     }
 
     fn buffer_key_event(&mut self, e: KeyEvent) -> Result<(), TuiError> {
@@ -198,7 +197,7 @@ impl<'a> RecordsComponent<'a> {
         Ok(())
     }
 
-    fn truncate_value(value: &str, rect: &Rect) -> String {
+    fn truncate_value(value: &str, rect: Rect) -> String {
         let split_at = rect.width.checked_sub(68).unwrap_or(3) as usize;
         match value.len() > split_at {
             true => value.chars().take(split_at).collect(),
@@ -282,7 +281,7 @@ impl Component for RecordsComponent<'_> {
                 self.previous();
                 self.set_event_dialog()?;
             }
-            KeyCode::Char('g') | KeyCode::Char('G') => self.buffer_key_event(key)?,
+            KeyCode::Char('g' | 'G') => self.buffer_key_event(key)?,
             _ => (),
         }
         Ok(None)
@@ -291,29 +290,29 @@ impl Component for RecordsComponent<'_> {
     fn update(&mut self, action: Action) -> Result<Option<Action>, TuiError> {
         let mut a = self.buffer_tx.clone();
         let BufferAction::Stats(stats) = *a.borrow_and_update();
-        let _ = self.on_new_record(stats);
+        self.on_new_record(stats);
         match action.clone() {
             Action::NewConsumer() => {
-                self.stats = Default::default();
+                self.stats = Stats::default();
             }
             Action::Tick => self.status.calc_next(),
             Action::SelectedTopics(topics) => self.selected_topics = topics.len(),
             Action::Consuming => self.consuming = true,
             Action::StopConsuming() => {
                 self.consuming = false;
-                self.stats = Default::default();
+                self.stats = Stats::default();
             }
             Action::Search(search_query) => {
                 self.state.select(None);
                 self.search_query = search_query;
             }
             _ => (),
-        };
+        }
         Ok(None)
     }
 
     fn draw(&mut self, f: &mut Frame<'_>, rect: Rect, state: &State) -> Result<(), TuiError> {
-        let focused = state.is_focused(self.id());
+        let focused = state.is_focused(&self.id());
         let block = Block::default()
             .borders(Borders::ALL)
             .border_type(BorderType::Rounded)
@@ -367,7 +366,7 @@ impl Component for RecordsComponent<'_> {
                 ),
                 Cell::new(Text::from(Self::truncate_value(
                     &item.value_as_string,
-                    &rect,
+                    rect,
                 ))),
             ];
             Row::new(cells).height(1_u16)

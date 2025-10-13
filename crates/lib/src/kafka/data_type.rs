@@ -27,7 +27,7 @@ impl From<DataType> for serde_json::Value {
 
 impl Default for DataType {
     fn default() -> Self {
-        Self::String("".to_string())
+        Self::String(String::new())
     }
 }
 
@@ -48,7 +48,9 @@ impl Comparable for DataType {
         right: &str,
     ) -> bool {
         match &self {
-            DataType::Json(value) => Self::compare_json(value, json_pointer, operator, right),
+            DataType::Json(value) => {
+                Self::compare_json(value, json_pointer.as_deref(), operator, right)
+            }
             DataType::String(value) => Self::compare_string(value, operator, right),
         }
     }
@@ -57,7 +59,7 @@ impl Comparable for DataType {
 impl DataType {
     fn compare_json(
         value: &serde_json::Value,
-        json_pointer: &Option<String>,
+        json_pointer: Option<&str>,
         operator: &StringOperator,
         right: &str,
     ) -> bool {

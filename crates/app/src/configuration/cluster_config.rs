@@ -25,7 +25,7 @@ impl Default for ClusterConfig {
         Self {
             url_template: Some(default_url_template()),
             schema_registry: None,
-            kafka: Default::default(),
+            kafka: IndexMap::default(),
             consumer: None,
         }
     }
@@ -40,7 +40,7 @@ pub struct ClusterConfig {
     /// Schema registry configuration
     #[serde(skip_serializing_if = "Option::is_none")]
     pub schema_registry: Option<SchemaRegistryConfig>,
-    // Kafka consumer properties for this cluster, see <https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md> for more details
+    /// Kafka consumer properties for this cluster, see <https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md> for more details
     pub kafka: IndexMap<String, String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub consumer: Option<ConsumerConfig>,

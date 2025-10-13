@@ -30,21 +30,21 @@ impl TransposeFormatter {
 impl KafkaFormatter for TransposeFormatter {
     fn fmt(&self, record: &KafkaRecord) -> String {
         format!(
-            r#"    Topic: {}
+            "    Topic: {}
 Partition: {}
    Offset: {}
 Timestamp: {}
       Key: {}
     Value: {}
   Headers: {}
-"#,
+",
             record.topic,
             record.partition,
             record.offset,
             record
                 .timestamp_as_local_date_time()
                 .map(|d| d.to_rfc3339_opts(chrono::SecondsFormat::Millis, true))
-                .unwrap_or("".to_string()),
+                .unwrap_or_default(),
             record.key,
             record.value_as_string,
             record

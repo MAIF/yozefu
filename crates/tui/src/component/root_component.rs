@@ -44,7 +44,7 @@ pub(crate) struct RootComponent {
 impl RootComponent {
     #[allow(clippy::arc_with_non_send_sync)]
     pub fn new(
-        query: String,
+        query: &str,
         selected_topics: Vec<String>,
         config: &GlobalConfig,
         records: &'static ConcurrentRecordsBuffer,
@@ -64,7 +64,7 @@ impl RootComponent {
             Arc::new(Mutex::new(TopicDetailsComponent::default())),
             Arc::new(Mutex::new(RecordDetailsComponent::new(highlighter.clone()))),
             Arc::new(Mutex::new(SearchComponent::new(
-                &query,
+                query,
                 config.history.clone(),
                 config.filters_dir(),
             ))),
@@ -95,7 +95,7 @@ impl RootComponent {
             focus_order: focus_order_of(&ComponentName::TopicsAndRecords),
             focus_history: vec![],
             state,
-            action_tx: Default::default(),
+            action_tx: None,
         }
     }
 
@@ -241,9 +241,7 @@ impl Component for RootComponent {
                 self.state.focused = ComponentName::Search;
                 return Ok(None);
             }
-            KeyCode::Char('/') | KeyCode::Char(':')
-                if self.state.focused != ComponentName::Search =>
-            {
+            KeyCode::Char('/' | ':') if self.state.focused != ComponentName::Search => {
                 self.state.focused = ComponentName::Search;
                 return Ok(None);
             }
@@ -281,7 +279,7 @@ impl Component for RootComponent {
             }
             KeyCode::Esc => self.close(),
             _ => (),
-        };
+        }
         let focused_component = self.components.get(&self.state.focused).unwrap();
         focused_component.lock().unwrap().handle_key_events(key)?;
         if self.state.focused == ComponentName::RecordDetails

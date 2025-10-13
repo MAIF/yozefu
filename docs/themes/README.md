@@ -1,8 +1,8 @@
 # Themes.
 
-A theme is a [set of colors](https://github.com/MAIF/yozefu/blob/main/crates/command/themes.json) defining the appearance of UI. By default, Yozefu comes with 3 built-in themes: 
+A theme is a [set of colors](https://github.com/MAIF/yozefu/blob/main/crates/command/themes.json) defining the appearance of UI. By default, Yozefu comes with 3 built-in themes:
  - `light`
- - `dark` 
+ - `dark`
  - `solarized-dark-higher-contrast`
 
 These themes are defined in the [`themes.json` file](https://github.com/MAIF/yozefu/blob/main/crates/command/themes.json). You can find the location of your `themes.json` by running:
@@ -29,12 +29,12 @@ Syntect includes [7 built-in themes](https://github.com/trishume/syntect/blob/2a
  - `base16-eighties.dark`
  - `base16-mocha.dark`
  - `base16-ocean.light`
- - `InspiredGitHub` 
+ - `InspiredGitHub`
  - `Solarized (dark)`
  - `Solarized (light)`
 
 
-## How to select a higlighter theme
+## How to select a highlighter theme
 
 You can configure it in two ways:
  1. In `config.json`, under the `/highlighter_theme` property.

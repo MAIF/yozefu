@@ -5,7 +5,10 @@ use filter::{CACHED_FILTERS, PARSE_PARAMETERS_FUNCTION_NAME};
 use itertools::Itertools;
 use lib::{
     KafkaRecord, SearchQuery, parse_search_query,
-    search::{filter::Filter, offset::FromOffset},
+    search::{
+        filter::{Filter, Parameter},
+        offset::FromOffset,
+    },
 };
 use std::{
     collections::HashMap,
@@ -98,13 +101,13 @@ impl ValidSearchQuery {
             let wasm_module = &mut filters.get_mut(&name).unwrap();
             if let Err(e) = wasm_module.call::<&str, &str>(
                 PARSE_PARAMETERS_FUNCTION_NAME,
-                &serde_json::to_string(&params.iter().map(|e| e.json()).collect_vec()).unwrap(),
+                &serde_json::to_string(&params.iter().map(Parameter::json).collect_vec()).unwrap(),
             ) {
                 error!(
                     "Error when calling '{PARSE_PARAMETERS_FUNCTION_NAME}' from wasm module '{name}': {e:?}"
                 );
                 return Err(lib::Error::Error(format!("{}: {e}", &name)));
-            };
+            }
         }
 
         Ok(ValidSearchQuery(query))

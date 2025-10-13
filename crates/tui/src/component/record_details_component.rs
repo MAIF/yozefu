@@ -49,9 +49,9 @@ impl<'a> RecordDetailsComponent<'a> {
     }
 
     fn show_schema(&mut self) -> Result<(), TuiError> {
-        if self.record.as_ref().map(|r| r.has_schemas()) == Some(false) {
+        if self.record.as_ref().is_some_and(|r| !r.has_schemas()) {
             return Ok(());
-        };
+        }
 
         let r = self.record.as_ref().unwrap();
 
@@ -106,7 +106,7 @@ impl<'a> RecordDetailsComponent<'a> {
             .unwrap()
             .headers
             .keys()
-            .map(|e| e.len())
+            .map(String::len)
             .max()
             .unwrap_or(0);
 
@@ -130,7 +130,7 @@ impl<'a> RecordDetailsComponent<'a> {
                     format!("              {: <width$}", e.0, width = longest_header_key),
                     Style::default().italic(),
                 )),
-            };
+            }
             formatted_headers.push(Span::styled(" : ", Style::default()));
             formatted_headers.push(Span::styled(e.1.to_string(), Style::default()));
         }
@@ -164,14 +164,14 @@ impl<'a> RecordDetailsComponent<'a> {
                     format!("{} - {}", s.id, t).into(),
                 )),
                 None => {
-                    to_render.push(Self::generate_span("Value schema", s.id.to_string().into()))
+                    to_render.push(Self::generate_span("Value schema", s.id.to_string().into()));
                 }
             }
         }
 
         to_render.extend(vec![
             Self::generate_span("Key", record.key_as_string.clone().fg(theme.green).into()),
-            Self::generate_span("Value", "".to_string().into()),
+            Self::generate_span("Value", "".into()),
         ]);
         let value = &record.value;
         let highlighted = self.highlighter.highlight_data_type(value);
@@ -248,7 +248,7 @@ impl Component for RecordDetailsComponent<'_> {
             }
             Action::Search(e) => self.search_query = e.query().to_string(),
             _ => {}
-        };
+        }
         Ok(None)
     }
 
@@ -261,10 +261,9 @@ impl Component for RecordDetailsComponent<'_> {
         if self
             .record
             .as_ref()
-            .map(|r| r.key_schema.is_some() || r.value_schema.is_some())
-            .unwrap_or(false)
+            .is_some_and(|r| r.key_schema.is_some() || r.value_schema.is_some())
         {
-            shortcuts.push(Shortcut::new("S", "Schemas"))
+            shortcuts.push(Shortcut::new("S", "Schemas"));
         }
 
         shortcuts

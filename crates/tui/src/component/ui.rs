@@ -41,7 +41,7 @@ pub struct Ui {
 }
 
 impl Ui {
-    pub fn new(app: App, query: String, selected_topics: Vec<String>, state: State) -> Self {
+    pub fn new(app: App, query: &str, selected_topics: Vec<String>, state: State) -> Self {
         let config = app.config.clone();
         Self {
             should_quit: false,
@@ -67,7 +67,7 @@ impl Ui {
         Ok(())
     }
 
-    pub(crate) async fn create_consumer(
+    pub(crate) fn create_consumer(
         app: &App,
         topics: Vec<String>,
         tx: UnboundedSender<Action>,
@@ -85,10 +85,7 @@ impl Ui {
         }
     }
 
-    pub(crate) async fn consume_topics(
-        &mut self,
-        tx: UnboundedSender<Action>,
-    ) -> Result<(), TuiError> {
+    pub(crate) fn consume_topics(&mut self, tx: UnboundedSender<Action>) -> Result<(), TuiError> {
         self.worker.cancel();
         {
             self.records.lock().unwrap().reset();
@@ -185,8 +182,7 @@ impl Ui {
             .name("kafka-consumer")
             .spawn(async move {
                 let _ = tx.send(Action::Consuming);
-                let consumer = match Self::create_consumer(&app, topics.clone(), txx.clone()).await
-                {
+                let consumer = match Self::create_consumer(&app, topics.clone(), txx.clone()) {
                     Ok(c) => c,
                     Err(e) => {
                         let _ = tx.send(Action::StopConsuming());
@@ -201,7 +197,7 @@ impl Ui {
                     .name("records-to-read")
                     .spawn(async move {
                         let count = app
-                            .estimate_number_of_records_to_read(assignments)
+                            .estimate_number_of_records_to_read(&assignments)
                             .unwrap_or(0);
                         let _ = txx.send(Action::RecordsToRead(count as usize));
                     })
@@ -255,7 +251,7 @@ impl Ui {
         &mut self,
         topics: HashSet<String>,
         action_tx: UnboundedSender<Action>,
-    ) -> Result<(), TuiError> {
+    ) {
         let app = self.app.clone();
         tokio::task::Builder::new()
             .name("topics-details")
@@ -271,13 +267,12 @@ impl Ui {
                 }
             })
             .unwrap();
-        Ok(())
     }
 
     pub(crate) fn export_record(
         &mut self,
         record: &KafkaRecord,
-        action_tx: UnboundedSender<Action>,
+        action_tx: &UnboundedSender<Action>,
     ) -> Result<(), TuiError> {
         self.app.export_record(record)?;
         action_tx.send(Action::Notification(Notification::new(
@@ -287,10 +282,7 @@ impl Ui {
         Ok(())
     }
 
-    pub(crate) fn load_topics(
-        &mut self,
-        action_tx: UnboundedSender<Action>,
-    ) -> Result<(), TuiError> {
+    pub(crate) fn load_topics(&mut self, action_tx: UnboundedSender<Action>) {
         let app = self.app.clone();
         tokio::task::Builder::new()
             .name("topics-loader")
@@ -310,19 +302,18 @@ impl Ui {
                         {
                             error!("Cannot notify the TUI: {e:?}");
                         }
-                        error!("Something went wrong when trying to list topics: {e}")
+                        error!("Something went wrong when trying to list topics: {e}");
                     }
                 }
             })
             .unwrap();
-        Ok(())
     }
 
     pub async fn run(&mut self, topics: Vec<String>, state: State) -> Result<(), TuiError> {
         let (action_tx, mut action_rx) = mpsc::unbounded_channel();
         let records_channel = mpsc::unbounded_channel::<KafkaRecord>();
         self.records_sender = Some(records_channel.0);
-        self.load_topics(action_tx.clone())?;
+        self.load_topics(action_tx.clone());
         let mut tui = tui::Tui::new()?;
         tui.enter()?;
         self.root.register_action_handler(action_tx.clone());
@@ -340,7 +331,7 @@ impl Ui {
                     tui::Event::Render => action_tx.send(Action::Render)?,
                     tui::Event::Resize(x, y) => action_tx.send(Action::Resize(x, y))?,
                     _ => {}
-                };
+                }
 
                 if let Some(action) = self.root.handle_events(Some(e.clone()))? {
                     action_tx.send(action)?;
@@ -354,13 +345,13 @@ impl Ui {
                         self.save_config()?;
                     }
                     Action::RequestTopicDetails(ref topics) => {
-                        self.topics_details(topics.clone(), action_tx.clone())?;
+                        self.topics_details(topics.clone(), action_tx.clone());
                     }
                     Action::Tick => {
                         self.last_tick_key_events.drain(..);
                     }
                     Action::Refresh => {
-                        self.load_topics(action_tx.clone())?;
+                        self.load_topics(action_tx.clone());
                         action_tx.send(Action::Notification(Notification::new(
                             Level::Info,
                             "Refreshing topics".to_string(),
@@ -384,7 +375,7 @@ impl Ui {
                                 Level::Info,
                                 "this action is not available right now".to_string(),
                             )))?;
-                            warn!("Cannot open the URL '{url}': {e}")
+                            warn!("Cannot open the URL '{url}': {e}");
                         }
                     }
                     Action::Resize(w, h) => {
@@ -394,12 +385,12 @@ impl Ui {
                         })?;
                     }
                     Action::Export(ref record) => {
-                        self.export_record(record, action_tx.clone())?;
+                        self.export_record(record, &action_tx)?;
                     }
                     Action::RequestSchemasOf(ref key, ref value) => {
                         action_tx.send(Action::Schemas(
-                            SchemaDetail::from(&mut schema_registry, key).await,
-                            SchemaDetail::from(&mut schema_registry, value).await,
+                            SchemaDetail::from(&mut schema_registry, key.as_ref()).await,
+                            SchemaDetail::from(&mut schema_registry, value.as_ref()).await,
                         ))?;
                     }
                     Action::Render => {
@@ -410,8 +401,8 @@ impl Ui {
                         })?;
                     }
                     Action::SelectedTopics(ref topics) => {
-                        self.topics = topics.iter().map(|t| t.into()).collect_vec();
-                        self.consume_topics(action_tx.clone()).await?;
+                        self.topics = topics.iter().map(Into::into).collect_vec();
+                        self.consume_topics(action_tx.clone())?;
                     }
                     Action::Search(ref search) => {
                         if self.topics.is_empty() {
@@ -421,17 +412,17 @@ impl Ui {
                             )))?;
                         }
                         self.app.search_query = search.clone();
-                        self.consume_topics(action_tx.clone()).await?;
+                        self.consume_topics(action_tx.clone())?;
                     }
                     _ => {}
                 }
 
                 if let Some(action) = self.root.update(action.clone())? {
-                    action_tx.send(action.clone())?
-                };
+                    action_tx.send(action.clone())?;
+                }
             }
             if self.should_quit {
-                tui.stop()?;
+                tui.stop();
                 break;
             }
         }

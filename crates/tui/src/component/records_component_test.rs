@@ -10,6 +10,8 @@ static BUFFER: ConcurrentRecordsBuffer =
 #[cfg(test)]
 #[test]
 fn test_draw() {
+    use std::collections::BTreeMap;
+
     use serde_json::json;
 
     let mut component = RecordsComponent::new(&BUFFER);
@@ -19,7 +21,7 @@ fn test_draw() {
         timestamp: None,
         partition: 0,
         offset: 314,
-        headers: Default::default(),
+        headers: BTreeMap::default(),
         key_schema: None,
         value_schema: None,
         size: 4348,
@@ -31,10 +33,10 @@ fn test_draw() {
             "title" : "Swiss Army Man",
             "year": 20013
             }
-            
+
             }"#
         )),
-        value_as_string: Default::default(),
+        value_as_string: String::default(),
     });
 
     assert_draw!(component, 120, 5)

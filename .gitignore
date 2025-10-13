@@ -24,7 +24,6 @@ yozefu-exports/
 .env
 certificates
 docs/schemas/kafka.properties
-CA20250127_001847.xlsx
 .jj
 mutants.out
 mutants.out.old

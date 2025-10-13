@@ -81,7 +81,7 @@ impl ImportFilterCommand {
 }
 
 fn check_presence_of_functions(plugin: &mut Plugin) -> Result<(), Error> {
-    for function_name in REQUIRED_WASM_FUNCTIONS.iter() {
+    for function_name in &REQUIRED_WASM_FUNCTIONS {
         match plugin.function_exists(function_name) {
             true => info!("'{function_name}' found in the search filter"),
             false => {

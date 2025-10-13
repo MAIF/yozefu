@@ -30,7 +30,7 @@ pub enum CompareExpression {
     Key(StringOperator, String),
     Value(Option<String>, StringOperator, String),
     Header(String, StringOperator, String),
-    Size(NumberOperator, i64),
+    Size(NumberOperator, usize),
     Timestamp(NumberOperator, DateTime<Local>),
     TimestampBetween(DateTime<Local>, DateTime<Local>),
 }
@@ -47,7 +47,7 @@ impl Display for CompareExpression {
             CompareExpression::Value(left, op, r) => write!(
                 f,
                 "value{} {} {}",
-                left.clone().unwrap_or("".to_string()),
+                left.clone().unwrap_or(String::new()),
                 op,
                 r
             ),
@@ -108,9 +108,9 @@ pub fn parse_compare(input: &str) -> IResult<&str, CompareExpression> {
             (
                 parse_partition,
                 wsi(parse_number_operator),
-                wsi(parse_number),
+                wsi(parse_number::<i32>),
             ),
-            |(_, op, r)| CompareExpression::Partition(op, r as i32),
+            |(_, op, partition)| CompareExpression::Partition(op, partition),
         ),
         map(
             (parse_topic, wsi(parse_string_operator), wsi(parse_string)),

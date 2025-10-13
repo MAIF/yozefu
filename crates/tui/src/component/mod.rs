@@ -146,7 +146,7 @@ pub mod root_component_test;
 
 #[cfg(test)]
 pub fn default_global_config() -> GlobalConfig {
-    use app::configuration::GlobalConfig;
+    use app::configuration::{ConsumerConfig, GlobalConfig};
 
     let temp_dir = tempfile::tempdir().unwrap();
     let temp_path = temp_dir.path().to_path_buf();
@@ -155,8 +155,8 @@ pub fn default_global_config() -> GlobalConfig {
         path: temp_path.clone().join("config.json"),
         yozefu_directory: temp_path.join("config"),
         logs: None,
-        default_url_template: "".to_string(),
-        initial_query: "".to_string(),
+        default_url_template: String::new(),
+        initial_query: String::new(),
         theme: "light".to_string(),
         highlighter_theme: None,
         clusters: indexmap::IndexMap::default(),
@@ -164,7 +164,7 @@ pub fn default_global_config() -> GlobalConfig {
         history: vec![],
         show_shortcuts: true,
         export_directory: std::path::PathBuf::from(""),
-        consumer: Default::default(),
+        consumer: ConsumerConfig::default(),
     }
 }
 

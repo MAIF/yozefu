@@ -87,11 +87,14 @@ impl TryFrom<&PathBuf> for GlobalConfig {
 
     fn try_from(path: &PathBuf) -> Result<Self, Self::Error> {
         Ok(Self {
-            path: path.to_path_buf(),
+            path: path.clone(),
             yozefu_directory: Self::yozefu_directory()?,
             logs: None,
             default_url_template: default_url_template(),
-            history: EXAMPLE_PROMPTS.iter().map(|e| e.to_string()).collect_vec(),
+            history: EXAMPLE_PROMPTS
+                .iter()
+                .map(|e| (*e).to_string())
+                .collect_vec(),
             initial_query: "from end - 10".to_string(),
             clusters: IndexMap::default(),
             default_kafka_config: IndexMap::default(),
@@ -160,7 +163,10 @@ impl GlobalConfig {
         let file = self.themes_file();
         let content = fs::read_to_string(file).unwrap_or("{}".to_string());
         let themes: HashMap<String, Value> = serde_json::from_str(&content).unwrap_or_default();
-        themes.keys().map(|e| e.to_string()).collect_vec()
+        themes
+            .keys()
+            .map(std::string::ToString::to_string)
+            .collect_vec()
     }
 
     /// Returns the name of the directory containing wasm filters

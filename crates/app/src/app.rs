@@ -121,7 +121,7 @@ impl App {
     /// This function is used to render a progress bar.
     pub fn estimate_number_of_records_to_read(
         &self,
-        topic_partition_list: TopicPartitionList,
+        topic_partition_list: &TopicPartitionList,
     ) -> Result<i64, Error> {
         let client: StreamConsumer = self.create_assigned_consumer()?;
         let mut count = 0;

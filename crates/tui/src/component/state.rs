@@ -27,7 +27,10 @@ impl State {
             focused: ComponentName::default(),
             cluster: cluster.to_string(),
             theme,
-            highlighter_theme: Highlighter::theme(&temp, config.highlighter_theme.as_deref()),
+            highlighter_theme: Highlighter::theme(
+                temp.as_deref(),
+                config.highlighter_theme.as_deref(),
+            ),
             themes: config.themes(),
             themes_file: config.themes_file(),
             configuration_file: config.path.clone(),
@@ -36,7 +39,7 @@ impl State {
         }
     }
 
-    pub(crate) fn is_focused(&self, component_name: ComponentName) -> bool {
-        self.focused == component_name
+    pub(crate) fn is_focused(&self, component_name: &ComponentName) -> bool {
+        &self.focused == component_name
     }
 }

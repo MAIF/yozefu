@@ -100,7 +100,7 @@ impl Component for TopicDetailsComponent {
                 }
             }
             _ => (),
-        };
+        }
         Ok(None)
     }
 
@@ -222,7 +222,7 @@ impl Component for TopicDetailsComponent {
                 );
             }
 
-            let focused = state.is_focused(self.id());
+            let focused = state.is_focused(&self.id());
             let table = Table::new(
                 rows,
                 [

@@ -29,7 +29,7 @@ impl TopicsAndRecordsComponent {
     fn longest_topics_length(topics: &[String]) -> u16 {
         topics
             .iter()
-            .map(|s| s.len())
+            .map(String::len)
             .max()
             .unwrap_or(32)
             .try_into()
@@ -46,7 +46,7 @@ impl Component for TopicsAndRecordsComponent {
     fn update(&mut self, action: Action) -> Result<Option<Action>, TuiError> {
         if let Action::Topics(new_topics) = action {
             self.longest_topic_size = Self::longest_topics_length(&new_topics);
-        };
+        }
         Ok(None)
     }
 
@@ -74,6 +74,8 @@ use crate::assert_draw;
 #[cfg(test)]
 #[test]
 fn test_draw() {
+    use std::collections::BTreeMap;
+
     use lib::{DataType, KafkaRecord};
     use serde_json::json;
 
@@ -89,7 +91,7 @@ fn test_draw() {
         timestamp: None,
         partition: 0,
         offset: 314,
-        headers: Default::default(),
+        headers: BTreeMap::default(),
         key_schema: None,
         value_schema: None,
         size: 4348,
@@ -101,10 +103,10 @@ fn test_draw() {
             "title" : "Swiss Army Man",
             "year": 20013
             }
-            
+
             }"#
         )),
-        value_as_string: Default::default(),
+        value_as_string: String::default(),
     });
 
     let mut component = TopicsAndRecordsComponent::new(

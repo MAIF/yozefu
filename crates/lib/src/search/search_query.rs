@@ -40,11 +40,11 @@ impl std::fmt::Display for SearchQuery {
 
         let from = match &self.from {
             Some(f) => format!("from {f}"),
-            None => "".to_string(),
+            None => String::new(),
         };
         let limit = match self.limit {
             Some(i) => format!("limit {i}"),
-            None => "".to_string(),
+            None => String::new(),
         };
         clauses.push(from.to_string());
         clauses.push(format!("{}", self.expression));
@@ -86,7 +86,7 @@ pub fn parse_search_query(input: &str) -> Result<(&str, SearchQuery), SearchErro
                     SearchClause::From(f) => s.from = Some(f),
                     SearchClause::Expression(u) => s.expression = u,
                     SearchClause::OrderBy(order, k) => {
-                        s.order_by = OrderBy::new(order, k.unwrap_or(OrderKeyword::Asc))
+                        s.order_by = OrderBy::new(order, k.unwrap_or(OrderKeyword::Asc));
                     } //SearchClause::GroupByKey => s.group_by_key = true,
                 }
             }

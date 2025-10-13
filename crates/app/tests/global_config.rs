@@ -15,7 +15,7 @@ fn check_backwards_compatibility() {
         initial_query: "from end - 10".to_string(),
         theme: "default".to_string(),
         default_kafka_config: IndexMap::new(),
-        history: Default::default(),
+        history: Vec::default(),
         show_shortcuts: false,
         export_directory: PathBuf::from("./yozefu-exports"),
         consumer: ConsumerConfig::default(),

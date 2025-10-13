@@ -5,6 +5,7 @@ use std::{
 
 use extism::{Plugin, convert::Json};
 use itertools::Itertools;
+use lib::search::filter::Parameter;
 use lib::{
     FilterResult,
     search::filter::{Filter, FilterInput},
@@ -26,7 +27,7 @@ impl Search for Filter {
         let plugin = &mut filters.get_mut(&self.name).unwrap();
         let input = FilterInput {
             record: context.record.clone(),
-            params: self.parameters.iter().map(|e| e.json()).collect_vec(),
+            params: self.parameters.iter().map(Parameter::json).collect_vec(),
         };
 
         match plugin

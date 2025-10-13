@@ -16,7 +16,7 @@ impl ProgressBarComponent {
     pub fn new(length: u64) -> Self {
         Self {
             length,
-            progress: Default::default(),
+            progress: 0,
         }
     }
 
@@ -35,7 +35,7 @@ impl Widget for ProgressBarComponent {
             return;
         }
         let percent = 100 * self.progress / self.length;
-        let dd = (area.right() - area.left()) as u64 * percent / 100;
+        let dd = u64::from(area.right() - area.left()) * percent / 100;
         buf.set_string(
             area.left(),
             area.top(),

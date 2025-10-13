@@ -93,7 +93,7 @@ impl SimpleSchemaRegistryClient {
         let mut url = self.url.clone();
         if let Ok(mut segments) = url.path_segments_mut() {
             segments.extend(vec!["schemas", "ids", &id.to_string()]);
-        };
+        }
         url.to_string()
     }
 }
@@ -142,9 +142,9 @@ pub struct SchemaResponse {
 impl SchemaResponse {
     pub fn schema_to_string_pretty(&self) -> String {
         match self.schema_type {
-            Some(SchemaType::Avro) | Some(SchemaType::Json) => {
+            Some(SchemaType::Avro | SchemaType::Json) => {
                 let json = serde_json::from_str::<Value>(&self.schema)
-                    .unwrap_or(Value::String("".to_string()));
+                    .unwrap_or(Value::String(String::new()));
                 serde_json::to_string_pretty(&json).unwrap()
             }
             _ => self.schema.clone(),
