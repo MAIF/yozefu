@@ -54,6 +54,6 @@ gssapi-vendored = ["rdkafka/gssapi-vendored"]
 [dev-dependencies]
 indexmap = "2.11.3"
 insta = { version = "1.43.2", features = ["filters"] }
-tempfile = "3.22.0"
+tempfile = "3.23.0"
 quickcheck = "1"
 quickcheck_macros = "1"
