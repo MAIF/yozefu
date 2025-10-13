@@ -9,7 +9,7 @@ use serde_json::Value;
 ///  - The parameters passed to that filter, it can be numbers or strings
 ///
 ///
-/// If the filter is `key-ends-with('1234')`, [FilterInput] serialized as json will be:
+/// If the filter is `key-ends-with('1234')`, [`FilterInput`] serialized as json will be:
 ///
 /// ```json
 /// {

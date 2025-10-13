@@ -41,10 +41,10 @@ impl Default for Highlighter {
 
 impl<'a> Highlighter {
     /// `name` and `fallback` could be a absolute file path to a `.tmTheme` file or a syntect theme name.
-    pub fn theme(name: &Option<String>, fallback: Option<&str>) -> Option<highlighting::Theme> {
-        match name.as_deref().or(fallback) {
-            Some(theme) => Self::try_to_load(&name.as_deref())
-                .or(Self::try_to_load(&fallback))
+    pub fn theme(name: Option<&str>, fallback: Option<&str>) -> Option<highlighting::Theme> {
+        match name.or(fallback) {
+            Some(theme) => Self::try_to_load(name)
+                .or(Self::try_to_load(fallback))
                 .or_else(|| {
                     warn!("Warning: Theme '{theme}' not found");
                     None
@@ -53,11 +53,8 @@ impl<'a> Highlighter {
         }
     }
 
-    pub fn try_to_load(name: &Option<&str>) -> Option<Theme> {
-        if name.is_none() {
-            return None;
-        }
-        let name = (*name).unwrap();
+    pub fn try_to_load(name: Option<&str>) -> Option<Theme> {
+        let name = name?;
         let name = PathBuf::from(&name)
             .resolve()
             .canonicalize()

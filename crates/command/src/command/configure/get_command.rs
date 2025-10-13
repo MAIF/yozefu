@@ -38,7 +38,7 @@ impl CliCommand for ConfigureGetCommand {
                         for path in paths {
                             let n = path.unwrap();
                             if n.file_type().unwrap().is_file()
-                                && n.path().extension().map(|s| s == "wasm").unwrap_or(false)
+                                && n.path().extension().is_some_and(|s| s == "wasm")
                             {
                                 filters.insert(
                                     n.path().file_stem().unwrap().to_str().unwrap().to_string(),
@@ -51,22 +51,22 @@ impl CliCommand for ConfigureGetCommand {
                     "path" | "file" => println!("{}", config.path.display()),
                     "filter_dir" | "filters_dir" | "filters-dir" | "functions-dir"
                     | "functions_dir" | "function_dir" => {
-                        println!("{}", config.filters_dir().display())
+                        println!("{}", config.filters_dir().display());
                     }
                     "log" | "logs" => println!("{}", config.logs_file().display()),
                     "configuration_file" | "configuration-file" | "config" | "conf" => {
-                        println!("{}", file.display())
+                        println!("{}", file.display());
                     }
                     "directory" | "dir" => println!("{}", file.parent().unwrap().display()),
                     "themes" => {
                         let mut output = HashMap::new();
                         let _ = update_themes().await;
                         output.insert("themes", serde_json::to_value(config.themes())?);
-                        output.insert("higlighter", serde_json::to_value(HIGHLIGHTER_THEMES)?);
+                        output.insert("highlighter", serde_json::to_value(HIGHLIGHTER_THEMES)?);
                         println!("{}", serde_json::to_string_pretty(&output)?);
                     }
                     "theme-file" | "themes-file" | "themes_file" | "theme_file" => {
-                        println!("{}", config.themes_file().display())
+                        println!("{}", config.themes_file().display());
                     }
                     _ => {
                         return Err(Error::Error(format!(

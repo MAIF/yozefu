@@ -90,8 +90,8 @@ impl KafkaRecord {
             }
         }
 
-        let size = owned_message.payload().map(|e| e.len()).unwrap_or(0)
-            + owned_message.key().map(|e| e.len()).unwrap_or(0);
+        let size = owned_message.payload().map_or(0, <[u8]>::len)
+            + owned_message.key().map_or(0, <[u8]>::len);
 
         let (key, key_schema, value, value_schema) = match owned_message.topic() {
             "__consumer_offsets" => {
@@ -122,10 +122,10 @@ impl KafkaRecord {
         }
     }
 
-    fn payload_to_data_type(payload: Option<&[u8]>, schema: &Option<SchemaResponse>) -> DataType {
+    fn payload_to_data_type(payload: Option<&[u8]>, schema: Option<&SchemaResponse>) -> DataType {
         if schema.is_none() {
             return Self::deserialize_json(payload);
-        };
+        }
 
         let schema = schema.as_ref().unwrap();
         match schema.schema_type {
@@ -206,7 +206,7 @@ impl KafkaRecord {
     ) -> (DataType, Option<Schema>) {
         let schema_id = SchemaId::parse(payload);
         match (schema_id, schema_registry.as_mut()) {
-            (None, _) => (Self::payload_to_data_type(payload, &None), None),
+            (None, _) => (Self::payload_to_data_type(payload, None), None),
             (Some(id), None) => {
                 let payload = payload.unwrap_or_default();
                 match serde_json::from_slice(payload) {
@@ -234,12 +234,12 @@ impl KafkaRecord {
                 let (schema_response, schema) = match schema_registry.schema(s.0).await {
                     Ok(Some(d)) => (Some(d.clone()), Some(Schema::new(s, d.schema_type))),
                     Ok(None) => (None, Some(Schema::new(s, None))),
-                    Err(_e) => {
+                    Err(e) => {
                         let payload = payload.unwrap_or_default();
                         return (
                             DataType::String(format!(
                                 "{}.\nYozefu was not able to retrieve the schema {}.\nPlease make sure the schema registry is correctly configured.\nPayload: {:?}\n String: {}",
-                                _e,
+                                e,
                                 s.0,
                                 payload,
                                 String::from_utf8(payload.to_vec()).unwrap_or_default()
@@ -250,13 +250,13 @@ impl KafkaRecord {
                 };
                 match p.len() <= 5 {
                     true => (
-                        Self::payload_to_data_type(payload, &schema_response),
+                        Self::payload_to_data_type(payload, schema_response.as_ref()),
                         schema,
                     ),
                     false => (
                         Self::payload_to_data_type(
                             payload.map(|e| e[5..].as_ref()),
-                            &schema_response,
+                            schema_response.as_ref(),
                         ),
                         schema,
                     ),
@@ -268,6 +268,6 @@ impl KafkaRecord {
 
 #[test]
 fn test_payload_to_data_type() {
-    let d = KafkaRecord::payload_to_data_type(Some("true".as_bytes()), &None);
+    let d = KafkaRecord::payload_to_data_type(Some("true".as_bytes()), None);
     assert_eq!(d, DataType::Json(serde_json::json!(true)));
 }

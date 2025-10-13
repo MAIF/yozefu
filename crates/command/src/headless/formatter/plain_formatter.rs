@@ -40,7 +40,7 @@ impl KafkaFormatter for PlainFormatter {
             record
                 .timestamp_as_local_date_time()
                 .map(|t| t.to_rfc3339_opts(chrono::SecondsFormat::Millis, true))
-                .unwrap_or("".to_string()),
+                .unwrap_or_default(),
             prefix,
             record.key,
             record.value_as_string

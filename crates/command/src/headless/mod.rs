@@ -62,7 +62,7 @@ impl Headless {
         progress.enable_steady_tick(Duration::from_secs(10));
         let count = self
             .app
-            .estimate_number_of_records_to_read(consumer.assignment()?)?;
+            .estimate_number_of_records_to_read(&consumer.assignment()?)?;
         progress.set_length(count as u64);
 
         let (tx_dd, mut rx_dd) = mpsc::unbounded_channel::<OwnedMessage>();
@@ -76,7 +76,7 @@ impl Headless {
                 loop {
                     let mut limit = 0;
                     select! {
-                        _ = token_cloned.cancelled() => {
+                        () = token_cloned.cancelled() => {
                             return;
                          },
                         Some(message) = rx_dd.recv() => {
@@ -124,7 +124,7 @@ impl Headless {
 
                         if elapsed > Duration::from_secs(5) {
                             current_time = Instant::now();
-                            info!("Checkpoint: {} records read in {}ms ({} rec/s). Total read is {}. The last record timestamp read is {}", 
+                            info!("Checkpoint: {} records read in {}ms ({} rec/s). Total read is {}. The last record timestamp read is {}",
                             consumed.separate_with_underscores(),
                             elapsed.as_millis().separate_with_underscores(), (consumed / elapsed.as_secs()).separate_with_underscores(),
                             total_consumed.separate_with_underscores(),

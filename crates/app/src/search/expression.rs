@@ -40,7 +40,7 @@ impl Search for AndExpression {
     fn filters(&self) -> Vec<Filter> {
         match self {
             AndExpression::AndTerm(term) => term.filters(),
-            AndExpression::AndExpression(vec) => vec.iter().flat_map(|t| t.filters()).collect(),
+            AndExpression::AndExpression(vec) => vec.iter().flat_map(Search::filters).collect(),
         }
     }
 }
@@ -73,7 +73,7 @@ impl Search for OrExpression {
     fn filters(&self) -> Vec<Filter> {
         match self {
             OrExpression::OrTerm(and_expression) => and_expression.filters(),
-            OrExpression::OrExpression(vec) => vec.iter().flat_map(|e| e.filters()).collect(),
+            OrExpression::OrExpression(vec) => vec.iter().flat_map(Search::filters).collect(),
         }
     }
 }

@@ -107,7 +107,7 @@ impl OffsetCommitValue {
             let length = if version >= 4 {
                 Self::read_unsigned_varint(reader)? as i32 - 1
             } else {
-                reader.read_i16::<BigEndian>()? as i32
+                i32::from(reader.read_i16::<BigEndian>()?)
             };
 
             if length < 0 {
@@ -117,11 +117,11 @@ impl OffsetCommitValue {
                     ErrorKind::InvalidData,
                     format!("Invalid metadata length: {length}"),
                 ));
-            } else {
-                let mut buf = vec![0; length as usize];
-                reader.read_exact(&mut buf)?;
-                String::from_utf8(buf).map_err(|e| Error::new(ErrorKind::InvalidData, e))?
             }
+            let mut buf =
+                vec![0; usize::try_from(length).expect("Cannot allocate buffer for the metadata")];
+            reader.read_exact(&mut buf)?;
+            String::from_utf8(buf).map_err(|e| Error::new(ErrorKind::InvalidData, e))?
         };
 
         let commit_timestamp = reader.read_i64::<BigEndian>()?;
@@ -165,7 +165,7 @@ impl OffsetCommitValue {
                 reader.read_exact(&mut buf)?;
                 buf[0]
             };
-            value |= ((byte & 0x7F) as u32) << shift;
+            value |= u32::from(byte & 0x7F) << shift;
             if (byte & 0x80) == 0 {
                 return Ok(value);
             }

@@ -46,7 +46,7 @@ impl Component for HeaderComponent {
             }
             Action::Notification(notification) => {
                 self.ticks = 0;
-                self.notification = Some(notification)
+                self.notification = Some(notification);
             }
             Action::Tick => {
                 self.ticks += 1;
@@ -116,7 +116,7 @@ impl Component for HeaderComponent {
             let notification = match n.level {
                 Level::Error => notification.fg(state.theme.red).underlined(),
                 Level::Warn => notification.fg(state.theme.yellow),
-                _ => notification,
+                Level::Info => notification,
             };
             f.render_widget(notification, r);
         }

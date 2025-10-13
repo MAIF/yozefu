@@ -20,7 +20,7 @@ const BUFFER_SIZE: usize = 500;
 #[cfg(target_family = "windows")]
 const BUFFER_SIZE: usize = 120;
 
-/// Wrapper around [CircularBuffer]
+/// Wrapper around [`CircularBuffer`]
 pub(crate) struct RecordsBuffer {
     buffer: CircularBuffer<BUFFER_SIZE, KafkaRecord>,
     stats: Stats,
@@ -109,17 +109,17 @@ impl RecordsBuffer {
         let is_descending = order_by.is_descending();
         match order_by.order {
             Order::Timestamp => {
-                sort_records!(unsorted, timestamp, is_descending)
+                sort_records!(unsorted, timestamp, is_descending);
             }
             Order::Key => {
-                sort_records!(unsorted, key_as_string, is_descending)
+                sort_records!(unsorted, key_as_string, is_descending);
             }
             Order::Value => sort_records!(unsorted, value_as_string, is_descending),
             Order::Partition => {
-                sort_records!(unsorted, partition, is_descending)
+                sort_records!(unsorted, partition, is_descending);
             }
             Order::Offset => {
-                sort_records!(unsorted, offset, is_descending)
+                sort_records!(unsorted, offset, is_descending);
             }
             Order::Size => unsorted.sort_by(|a, b| {
                 let mut ordering = a.size.cmp(&b.size);
@@ -129,11 +129,11 @@ impl RecordsBuffer {
                 ordering
             }),
             Order::Topic => {
-                sort_records!(unsorted, topic, is_descending)
+                sort_records!(unsorted, topic, is_descending);
             }
         }
         self.buffer.clear();
-        self.buffer.extend(unsorted)
+        self.buffer.extend(unsorted);
     }
 }
 

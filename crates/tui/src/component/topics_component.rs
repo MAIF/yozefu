@@ -30,10 +30,10 @@ pub(crate) struct TopicsComponent {
 impl TopicsComponent {
     pub fn new(selected_topics: Vec<String>) -> TopicsComponent {
         let loading = selected_topics.is_empty();
-        let topics = selected_topics.clone();
+        let topics = selected_topics.to_vec();
         let index = if loading { None } else { Some(1) };
         Self {
-            topics: TopicList::new(topics.clone(), selected_topics.clone()),
+            topics: TopicList::new(topics.clone(), selected_topics),
             state: ListState::default().with_selected(index),
             loading,
             ..Default::default()
@@ -58,7 +58,7 @@ impl TopicsComponent {
                 }
             }
             None => self.state.select(Some(0)),
-        };
+        }
     }
 
     fn previous(&mut self) {
@@ -75,7 +75,7 @@ impl TopicsComponent {
                 }
             }
             None => self.state.select(Some(0)),
-        };
+        }
     }
 
     fn filter_topics(&mut self) {
@@ -105,7 +105,7 @@ impl Component for TopicsComponent {
                         .send(Action::NewView(ComponentName::TopicDetails))?;
 
                     let mut h = HashSet::default();
-                    h.insert(self.topics.get().get(selected).unwrap().to_string());
+                    h.insert((*self.topics.get().get(selected).unwrap()).to_string());
                     self.action_tx
                         .as_ref()
                         .unwrap()
@@ -136,7 +136,7 @@ impl Component for TopicsComponent {
                     .topics
                     .get()
                     .get(self.state.selected().unwrap())
-                    .cloned();
+                    .copied();
                 if topic.is_none() {
                     return Ok(None);
                 }
@@ -161,7 +161,7 @@ impl Component for TopicsComponent {
                     self.filter_topics();
                 }
             }
-        };
+        }
         Ok(None)
     }
 
@@ -176,12 +176,12 @@ impl Component for TopicsComponent {
                     false => self.state.select(Some(0)),
                 }
             }
-        };
+        }
         Ok(None)
     }
 
     fn draw(&mut self, f: &mut Frame<'_>, rect: Rect, state: &State) -> Result<(), TuiError> {
-        let is_focused = state.is_focused(self.id());
+        let is_focused = state.is_focused(&self.id());
         let title = match self.topics.selected().len() {
             0 => " Topics ".to_string(),
             selected => format!(" Topics [{selected}] "),

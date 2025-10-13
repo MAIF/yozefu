@@ -152,7 +152,7 @@ impl SearchComponent {
                         e.to_string(),
                     )))?;
             }
-        };
+        }
         Ok(())
     }
 
@@ -218,7 +218,7 @@ impl Component for SearchComponent {
             _ => {
                 self.input.handle_event(&Event::Key(key));
             }
-        };
+        }
         Ok(None)
     }
 
@@ -278,7 +278,7 @@ impl Component for SearchComponent {
             .wrap(Wrap { trim: false });
 
         let paragraph = selected_style.block(block);
-        if state.is_focused(self.id()) {
+        if state.is_focused(&self.id()) {
             f.set_cursor_position(position_cursor);
         }
         //f.render_widget(Clear, rect);

@@ -8,6 +8,7 @@ use app::configuration::{ClusterConfig, GlobalConfig, SchemaRegistryConfig, Yoze
 use clap::command;
 use lib::Error;
 use reqwest::Url;
+use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
 use tui::error::TuiError;
@@ -77,7 +78,7 @@ where
     async fn run(&self, yozefu_config: Option<YozefuConfig>) -> Result<(), TuiError> {
         init_files().await?;
         match &self.subcommands {
-            Some(c) => c.execute().await.map_err(|e| e.into()),
+            Some(c) => c.execute().await.map_err(std::convert::Into::into),
             None => {
                 // Load the config from the yozefu config file
                 let yozefu_config = match yozefu_config {
@@ -85,7 +86,7 @@ where
                     Some(c) => c,
                 };
                 let mut command = self.default_command.clone();
-                command.logs_file = self.logs_file.clone();
+                command.logs_file.clone_from(&self.logs_file);
                 command.execute(yozefu_config).await
             }
         }
@@ -125,7 +126,7 @@ fn init_config_file() -> Result<PathBuf, Error> {
             kafka: localhost_config,
             schema_registry: Some(SchemaRegistryConfig {
                 url: Url::parse("http://localhost:8081").unwrap(),
-                headers: Default::default(),
+                headers: HashMap::default(),
             }),
             ..Default::default()
         },

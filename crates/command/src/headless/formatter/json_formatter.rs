@@ -39,6 +39,6 @@ impl JsonFormatter {
 
 impl KafkaFormatter for JsonFormatter {
     fn fmt(&self, record: &KafkaRecord) -> String {
-        serde_json::to_string_pretty(&record).unwrap_or("".to_string())
+        serde_json::to_string_pretty(&record).unwrap_or_default()
     }
 }

@@ -28,7 +28,7 @@ pub trait Configuration {
     {
         Self::kafka_client_config_from_properties(self.kafka_config_map().clone())
             .create()
-            .map_err(|e| e.into())
+            .map_err(std::convert::Into::into)
     }
 
     fn kafka_client_config_from_properties(

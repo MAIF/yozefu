@@ -47,7 +47,10 @@ impl Display for Filter {
             f,
             "{}({})",
             self.name,
-            self.parameters.iter().map(|e| e.to_string()).join(", ")
+            self.parameters
+                .iter()
+                .map(std::string::ToString::to_string)
+                .join(", ")
         )
     }
 }

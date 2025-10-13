@@ -14,7 +14,7 @@ fn test_draw() {
     BUFFER.lock().unwrap().reset();
     let config = default_global_config();
     let mut component = RootComponent::new(
-        "from begin".to_string(),
+        "from begin",
         vec!["topic1".to_string(), "topic2".to_string()],
         &config,
         &BUFFER,

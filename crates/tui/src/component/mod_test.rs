@@ -3,6 +3,7 @@ macro_rules! assert_draw {
     ($component:expr, $width:expr, $height:expr) => {{
         use app::configuration::GlobalConfig;
         use insta::assert_snapshot;
+        use app::configuration::ConsumerConfig;
         use ratatui::{Terminal, backend::TestBackend};
         use $crate::{State, Theme};
 
@@ -22,8 +23,8 @@ macro_rules! assert_draw {
                 path: temp_path.clone().join("config.json"),
                 yozefu_directory: temp_path.join("config"),
                 logs: None,
-                default_url_template: "".to_string(),
-                initial_query: "".to_string(),
+                default_url_template: String::new(),
+                initial_query: String::new(),
                 theme: "light".to_string(),
                 highlighter_theme: None,
                 clusters: indexmap::IndexMap::default(),
@@ -31,7 +32,7 @@ macro_rules! assert_draw {
                 history: vec![],
                 show_shortcuts: true,
                 export_directory: std::path::PathBuf::from(""),
-                consumer: Default::default(),
+                consumer: ConsumerConfig::default(),
             },
         );
 

@@ -67,7 +67,7 @@ impl Tui {
         let render_delay = std::time::Duration::from_secs_f64(1.0 / self.frame_rate);
         self.cancel();
         self.cancellation_token = CancellationToken::new();
-        let _cancellation_token = self.cancellation_token.clone();
+        let cancellation_token = self.cancellation_token.clone();
         let event_tx = self.event_tx.clone();
         self.task = tokio::task::Builder::new()
             .name("render-loop")
@@ -83,7 +83,7 @@ impl Tui {
                     let render_delay = render_interval.tick();
                     let crossterm_event = reader.next().fuse();
                     tokio::select! {
-                      _ = _cancellation_token.cancelled() => {
+                      _ = cancellation_token.cancelled() => {
                         break;
                       }
 
@@ -136,12 +136,11 @@ impl Tui {
             .unwrap();
     }
 
-    pub fn stop(&self) -> Result<(), Error> {
+    pub fn stop(&self) {
         self.cancel();
-        Ok(())
     }
 
-    pub fn init_panic_hook(&self) {
+    pub fn init_panic_hook() {
         let original_hook = take_hook();
         set_hook(Box::new(move |panic_info| {
             Self::restore_tui().unwrap();
@@ -150,7 +149,7 @@ impl Tui {
     }
 
     pub fn enter(&mut self) -> Result<(), Error> {
-        self.init_panic_hook();
+        Self::init_panic_hook();
         crossterm::terminal::enable_raw_mode()?;
         crossterm::execute!(
             std::io::stderr(),
@@ -167,7 +166,7 @@ impl Tui {
     }
 
     pub fn exit(&mut self) -> Result<(), Error> {
-        self.stop()?;
+        self.stop();
         if crossterm::terminal::is_raw_mode_enabled()? {
             self.flush()?;
             crossterm::execute!(

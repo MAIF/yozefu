@@ -13,7 +13,7 @@ impl TryFrom<&[u8]> for GroupMetadataKey {
     fn try_from(buf: &[u8]) -> Result<Self, Self::Error> {
         let mut reader = Cursor::new(buf);
         let group = {
-            let length = reader.read_i16::<BigEndian>()? as i32;
+            let length = i32::from(reader.read_i16::<BigEndian>()?);
             if length < 0 {
                 return Err(IoError::new(
                     std::io::ErrorKind::InvalidData,
@@ -25,7 +25,8 @@ impl TryFrom<&[u8]> for GroupMetadataKey {
                     "Length too long",
                 ));
             }
-            let mut buf = vec![0u8; length as usize];
+            let mut buf =
+                vec![0u8; usize::try_from(length).expect("Cannot allocate buffer for the group")];
             reader.read_exact(&mut buf)?;
             String::from_utf8(buf)
                 .map_err(|_| IoError::new(std::io::ErrorKind::InvalidData, "Invalid UTF-8"))?

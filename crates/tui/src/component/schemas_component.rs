@@ -10,6 +10,7 @@ use crate::{
     schema_detail::{ExportedSchemasDetails, SchemaDetail},
 };
 use crossterm::event::{KeyCode, KeyEvent};
+use lib::kafka::SchemaResponse;
 use ratatui::prelude::Stylize;
 use ratatui::{
     Frame,
@@ -59,7 +60,7 @@ impl SchemasComponent<'_> {
             to_render.push(Line::default());
             let schema_content = s.response
                     .as_ref()
-                    .map(|r| r.schema_to_string_pretty())
+                    .map(SchemaResponse::schema_to_string_pretty)
                     .unwrap_or(
                         format!("The Schema {} is unavailable. Please make sure you configured Yozefu to use the schema registry.", s.id),
                     );
@@ -75,9 +76,9 @@ impl SchemasComponent<'_> {
         if let Some(s) = &self.value {
             to_render.push(Line::default());
 
-            let schema_content =     s.response
+            let schema_content = s.response
                     .as_ref()
-                    .map(|r| r.schema_to_string_pretty())
+                    .map(SchemaResponse::schema_to_string_pretty)
                     .unwrap_or(
                         format!("The Schema {} is unavailable. Please make sure you configured Yozefu to use the schema registry.", s.id),
                     );
@@ -120,7 +121,7 @@ impl Component for SchemasComponent<'_> {
             self.value = value;
             self.compute_schemas_rendering();
             self.scroll.reset();
-        };
+        }
         Ok(None)
     }
 

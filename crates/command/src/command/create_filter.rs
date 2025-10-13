@@ -48,9 +48,9 @@ impl Command for CreateFilterCommand {
             )),
         };
 
-        let editor = default_editor(&None);
+        let editor = default_editor(None);
 
-        match self.clone_repository(&repo_dir) {
+        match Self::clone_repository(&repo_dir) {
             Ok(()) => {
                 self.prepare_git_repository(&repo_dir)?;
 
@@ -112,7 +112,7 @@ impl CreateFilterCommand {
     }
 
     /// try the clone the filter repository from GitHub with HTTPS.
-    fn clone_repository(&self, repo_dir: &Path) -> Result<(), Error> {
+    fn clone_repository(repo_dir: &Path) -> Result<(), Error> {
         info!("Cloning the filter repository to '{}'", repo_dir.display());
         let output = ProcessCommand::new("git")
             .arg("clone")

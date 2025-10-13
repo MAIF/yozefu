@@ -39,7 +39,7 @@ where
     C: WithHeight,
 {
     fn register_action_handler(&mut self, tx: UnboundedSender<Action>) {
-        self.component.register_action_handler(tx)
+        self.component.register_action_handler(tx);
     }
 
     fn id(&self) -> ComponentName {
@@ -102,7 +102,7 @@ where
 
     fn draw(&mut self, f: &mut Frame<'_>, rect: Rect, state: &State) -> Result<(), TuiError> {
         self.scrollbar_state = self.scrollbar_state.content_length(0);
-        let content_height = self.component.content_height() as u16;
+        let content_height = u16::try_from(self.component.content_height()).unwrap_or(u16::MAX);
         if rect.height < content_height {
             self.scroll_length = content_height - rect.height + 2;
             self.scrollbar_state = self

@@ -60,7 +60,7 @@ impl crate::command::Command for ConfigureCommand {
         fs::create_dir_all(temp_file.parent().expect("temp_file.parent() should return something unless the configuration file is at the root of your file system?"))?;
         fs::copy(&file, &temp_file)?;
 
-        let editor = default_editor(&self.editor);
+        let editor = default_editor(self.editor.as_deref());
         Command::new(editor)
             .arg(&temp_file)
             .status()
@@ -81,7 +81,7 @@ impl crate::command::Command for ConfigureCommand {
                     "Your new config file is not valid. Please try again: {e:?}"
                 )));
             }
-        };
+        }
         Ok(())
     }
 }

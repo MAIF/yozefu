@@ -27,9 +27,9 @@ pub trait Command: Send {
     async fn execute(&self) -> Result<(), Error>;
 }
 
-fn default_editor(editor: &Option<String>) -> String {
+fn default_editor(editor: Option<&str>) -> String {
     editor
-        .clone()
-        .or(var("EDITOR").ok())
-        .unwrap_or(DEFAULT_EDITOR.to_string())
+        .or(var("EDITOR").ok().as_deref())
+        .unwrap_or(DEFAULT_EDITOR)
+        .to_string()
 }

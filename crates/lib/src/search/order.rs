@@ -78,10 +78,9 @@ pub(crate) fn parse_order(input: &str) -> IResult<&str, Order> {
         Symbol::Topic => Order::Topic,
         Symbol::Value(_) => Order::Value,
         Symbol::Partition => Order::Partition,
-        Symbol::OffsetTail => unreachable!("nope"),
+        Symbol::Header(_) | Symbol::OffsetTail => unreachable!("nope"),
         Symbol::Size => Order::Size,
         Symbol::Timestamp => Order::Timestamp,
-        Symbol::Header(_) => unreachable!("nope"),
     };
     Ok((t.0, o))
 }

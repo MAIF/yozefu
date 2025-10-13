@@ -71,7 +71,7 @@ impl Component for FooterComponent {
                             .shortcuts
                             .push(Shortcut::new("CTRL + O", "Show topics")),
                         _ => (),
-                    };
+                    }
                 }
                 self.shortcuts.push(Shortcut::new("CTRL + H", "Help"));
                 self.shortcuts.push(Shortcut::new("TAB", "Next panel"));
