@@ -4295,11 +4295,10 @@ dependencies = [
 
 [[package]]
 name = "throbber-widgets-tui"
-version = "0.8.0"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d36b5738d666a2b4c91b7c24998a8588db724b3107258343ebf8824bf55b06d"
+checksum = "45e58887883fb0a259717b16d68d251983e40850b4b2f45c2da410f46d4333dc"
 dependencies = [
- "rand 0.8.5",
  "ratatui",
 ]
 
