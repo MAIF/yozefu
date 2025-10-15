@@ -1,3 +1,21 @@
+## What's Changed in 0.0.17
+* Develop by @Mcdostone in [#131](https://github.com/MAIF/yozefu/pull/131)
+* refactor: clippy pedantic by @Mcdostone
+* build: update java deps by @Mcdostone
+* build(deps): bump clap from 4.5.47 to 4.5.48 by @dependabot[bot]
+* build(deps): bump indexmap from 2.11.3 to 2.11.4 by @dependabot[bot]
+* build(deps): bump serde from 1.0.225 to 1.0.228 by @dependabot[bot]
+* build(deps): bump tempfile from 3.22.0 to 3.23.0 by @dependabot[bot]
+* build(deps): bump actions/attest-build-provenance from 2 to 3 by @dependabot[bot]
+* build(deps-dev): bump esbuild in /crates/wasm-blueprints/js by @dependabot[bot]
+* build(deps): bump actions/setup-java from 4 to 5 by @dependabot[bot]
+* ci: rust 1.90.0, improve flake.nix by @Mcdostone
+* build: update Dockerfile by @Mcdostone
+* chore: Release version v0.0.16 by @Mcdostone
+* Changelog for v0.0.16 by @github-actions[bot] in [#130](https://github.com/MAIF/yozefu/pull/130)
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.16...v0.0.17
+
 ## What's Changed in v0.0.16
 * Develop by @Mcdostone in [#122](https://github.com/MAIF/yozefu/pull/122)
 * ci: update dependencies by @Mcdostone
