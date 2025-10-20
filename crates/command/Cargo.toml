@@ -41,7 +41,7 @@ rdkafka = { version = "0.38.0", features = [
     "external-lz4",
 ] }
 extism = { version = "1.12.0" }
-indexmap = "2.11.4"
+indexmap = "2.12.0"
 tui = { workspace = true }
 app = { workspace = true }
 lib = { workspace = true }
