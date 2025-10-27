@@ -14,11 +14,11 @@ use tokio::sync::watch::{self, Receiver, Sender};
 
 /// Size of the ring buffer
 #[cfg(not(target_family = "windows"))]
-const BUFFER_SIZE: usize = 500;
+pub const BUFFER_SIZE: usize = 500;
 
 // Size of the ring buffer. I was not able to allocate a buffer of 500 items on Windows, so I reduced it to 120.
 #[cfg(target_family = "windows")]
-const BUFFER_SIZE: usize = 120;
+pub const BUFFER_SIZE: usize = 120;
 
 /// Wrapper around [`CircularBuffer`]
 pub(crate) struct RecordsBuffer {

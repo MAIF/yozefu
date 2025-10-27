@@ -1,6 +1,8 @@
 //! Component showing the help
 
+use app::configuration::{Configuration, SENSITIVE_KAFKA_PROPERTIES};
 use crossterm::event::{KeyCode, KeyEvent};
+use itertools::Itertools;
 use ratatui::{
     Frame,
     layout::Rect,
@@ -9,14 +11,13 @@ use ratatui::{
     widgets::{Block, BorderType, Borders, Clear, Padding, Paragraph, Wrap},
 };
 
-use crate::{Action, error::TuiError};
+use crate::{Action, error::TuiError, records_buffer::BUFFER_SIZE};
 
 use super::{
     Component, ComponentName, Shortcut, State, issue_component::IssueComponent,
     scroll_state::ScrollState,
 };
 
-const HELP_HEIGHT: usize = 43;
 const TEN_MINUTES_FRAME: usize = 30 * 60 * 10;
 const REPOSITORY_URL: &str = concat!(
     "      https://github.com/MAIF/yozefu/tree/v",
@@ -27,6 +28,22 @@ const REPOSITORY_URL: &str = concat!(
 pub(crate) struct HelpComponent {
     scroll: ScrollState,
     rendered: usize,
+}
+
+impl HelpComponent {
+    fn truncate_str(rect: &Rect, s: &str) -> String {
+        let max_len = (rect.width as usize).checked_sub(84).unwrap_or(30);
+        if s.len() <= max_len {
+            s.to_string()
+        } else {
+            let idx = s
+                .char_indices()
+                .nth(max_len)
+                .map(|(i, _)| i)
+                .unwrap_or(s.len());
+            s[..idx].to_string()
+        }
+    }
 }
 
 impl Component for HelpComponent {
@@ -69,8 +86,64 @@ impl Component for HelpComponent {
 
         let block = self.make_block_focused_with_state(state, block);
 
-        let text = vec![
+        let consumer_properties = state
+            .config
+            .kafka_config_map()
+            .iter()
+            .sorted_by(|a, b| a.0.cmp(b.0))
+            .filter_map(
+                |(k, v)| match SENSITIVE_KAFKA_PROPERTIES.contains(&k.as_str()) {
+                    false => Some(Line::from(vec![
+                        Span::raw(format!("{:>62}      ", k)),
+                        Span::from(Self::truncate_str(&rect, v)),
+                    ])),
+                    true => None,
+                },
+            )
+            .collect_vec();
+
+        let yozefu_config = state
+            .config
+            .specific
+            .config()
+            .consumer
+            .clone()
+            .unwrap_or_default();
+
+        let mut text = vec![
             Line::from(Span::raw("")),
+            Line::from("                                                        Yozefu      Value")
+                .bold(),
+            Line::from(vec![
+                Span::raw(format!("{:>62}      ", "Export file")),
+                Span::from(state.config.output_file().display().to_string()),
+            ]),
+            Line::from(vec![
+                Span::raw(format!("{:>62}      ", "Ring buffer capacity")),
+                Span::from(BUFFER_SIZE.to_string()),
+            ]),
+            Line::from(vec![
+                Span::raw(format!("{:>62}      ", "Stream Buffer capacity")),
+                Span::from(yozefu_config.buffer_capacity.to_string()),
+            ]),
+            Line::from(vec![
+                Span::raw(format!("{:>62}      ", "Stream Buffer timeout (ms)")),
+                Span::from(yozefu_config.timeout_in_ms.to_string()),
+            ]),
+            Line::from(Span::raw("")),
+            Line::from("                                                Kafka consumer      Value")
+                .bold(),
+        ];
+        text.extend(consumer_properties);
+
+        if let Some(schema_registry) = state.config.specific.schema_registry() {
+            text.push(Line::from(vec![
+                Span::raw(format!("{:>62}      ", "Schema Registry")),
+                Span::from(Self::truncate_str(&rect, schema_registry.url.as_str())),
+            ]));
+        }
+
+        text.extend(vec![
             Line::from(Span::raw("")),
             Line::from("                                                           Key      Description").bold(),
             Line::from("                                                             /      Focus search input"),
@@ -147,8 +220,9 @@ impl Component for HelpComponent {
                 Span::from(REPOSITORY_URL)
             ]),
             Line::from(""),
-        ];
+        ]);
 
+        let number_of_lines = text.len();
         let paragraph = Paragraph::new(text)
             .wrap(Wrap { trim: false })
             .scroll((self.scroll.value(), 0));
@@ -159,7 +233,7 @@ impl Component for HelpComponent {
             issue.draw(f, rect, state)?;
         }
 
-        self.scroll.draw(f, rect, HELP_HEIGHT);
+        self.scroll.draw(f, rect, number_of_lines + 2);
         self.rendered += 1;
 
         Ok(())

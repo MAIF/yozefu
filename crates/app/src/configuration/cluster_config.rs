@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, path::PathBuf};
 use url::Url;
 
-use crate::configuration::ConsumerConfig;
+use crate::configuration::{ConsumerConfig, YozefuConfig};
 
 use super::Configuration;
 
@@ -20,12 +20,16 @@ pub const KAFKA_PROPERTIES_WITH_LOCATIONS: [&str; 6] = [
     "ssl.engine.location",
 ];
 
+/// List of kafka properties that are a file location.
+pub const SENSITIVE_KAFKA_PROPERTIES: [&str; 3] =
+    ["sasl.password", "ssl.key.password", "ssl.keystore.password"];
+
 impl Default for ClusterConfig {
     fn default() -> Self {
         Self {
-            url_template: Some(default_url_template()),
+            url_template: None,
             schema_registry: None,
-            kafka: IndexMap::default(),
+            kafka: IndexMap::new(),
             consumer: None,
         }
     }
@@ -63,6 +67,17 @@ impl ClusterConfig {
         }
         cloned
     }
+
+    //    // cluster is something that can be converted to &str, must be a generic though
+    //    pub fn create<T>(self, cluster: T) -> ClusterConfig
+    //    where
+    //        T: ToString,
+    //    {
+    //        ClusterConfig {
+    //            cluster: cluster.to_string(),
+    //            config: self.normalize_paths(),
+    //        }
+    //    }
 }
 
 /// Schema registry configuration of a given cluster
@@ -76,10 +91,6 @@ pub struct SchemaRegistryConfig {
     pub headers: HashMap<String, String>,
 }
 
-fn default_url_template() -> String {
-    "http://localhost/cluster/{topic}/{partition}/{offset}".to_string()
-}
-
 impl Configuration for ClusterConfig {
     fn kafka_config_map(&self) -> HashMap<String, String> {
         let mut properties = HashMap::new();
@@ -87,3 +98,23 @@ impl Configuration for ClusterConfig {
         properties
     }
 }
+
+impl ClusterConfig {
+    pub fn with_kafka_properties(self, kafka_properties: HashMap<String, String>) -> Self {
+        Self {
+            url_template: None,
+            schema_registry: None,
+            kafka: indexmap::IndexMap::from_iter(kafka_properties),
+            consumer: self.consumer,
+        }
+    }
+
+    pub fn set_kafka_property(&mut self, key: &str, value: &str) {
+        self.kafka.insert(key.to_string(), value.to_string());
+    }
+
+    pub fn create(self, cluster: &str) -> YozefuConfig {
+        YozefuConfig::new(cluster, self)
+    }
+}
+//

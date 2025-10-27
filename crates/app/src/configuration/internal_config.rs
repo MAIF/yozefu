@@ -10,7 +10,7 @@ use super::{Configuration, yozefu_config::YozefuConfig};
 
 #[derive(Debug, Clone)]
 pub struct InternalConfig {
-    specific: YozefuConfig,
+    pub specific: YozefuConfig,
     pub global: GlobalConfig,
     output_file: PathBuf,
 }
@@ -44,6 +44,9 @@ impl InternalConfig {
                 .replace(':', "-"),
         ));
 
+        let output_file = std::path::absolute(output_file)
+            .expect("Failed to get absolute path for the export file");
+
         Self {
             specific,
             global,
@@ -57,6 +60,10 @@ impl InternalConfig {
             Some(url) => url.to_string(),
             None => self.global.url_template_of(cluster),
         }
+    }
+
+    pub fn cluster(&self) -> &str {
+        self.specific.cluster()
     }
 
     /// Consumer configuration for the given cluster.

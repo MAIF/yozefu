@@ -26,8 +26,9 @@ struct MyCli {
 }
 
 impl MyCli {
-    pub fn kafka_client_config(&self) -> ClusterConfig {
-        let url = match self.command.cluster().unwrap_or_default() {
+    pub fn yozefu_config(&self) -> YozefuConfig {
+        let cluster = self.command.cluster().unwrap_or_default();
+        let url = match cluster {
             Cluster::Localhost => "kafka.localhost.acme:9092",
             Cluster::Test => "kafka.test.acme:9092",
             Cluster::Development => "kafka.development.acme:9092",
@@ -35,7 +36,6 @@ impl MyCli {
         };
 
         let mut config = ClientConfig::new();
-        config.set_log_level(rdkafka::config::RDKafkaLogLevel::Emerg);
         config.set("bootstrap.servers", url.to_string());
         ClusterConfig {
             url_template: None,
@@ -46,11 +46,12 @@ impl MyCli {
                 timeout_in_ms: 100,
             }),
         }
+        .create(&cluster.to_string())
     }
 
     pub async fn execute(&self) -> Result<(), TuiError> {
         // To pass your configuration, create a `YozefuConfig`.
-        let yozefu_config = YozefuConfig::new(self.kafka_client_config());
+        let yozefu_config = self.yozefu_config();
         // And pass it to the `yozefu_command::Cli`
         self.command.execute_with(yozefu_config).await
     }
