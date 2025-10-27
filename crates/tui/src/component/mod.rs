@@ -20,7 +20,7 @@ pub mod ui;
 mod vertical_scrollable_block;
 
 #[cfg(test)]
-use app::configuration::GlobalConfig;
+use app::configuration::{GlobalConfig, InternalConfig};
 use crossterm::event::{KeyEvent, MouseEvent};
 use ratatui::prelude::Stylize;
 use ratatui::{
@@ -169,7 +169,17 @@ pub fn default_global_config() -> GlobalConfig {
 }
 
 #[cfg(test)]
+pub fn default_internal_config() -> InternalConfig {
+    use app::configuration::{ClusterConfig, InternalConfig};
+
+    InternalConfig::new(
+        ClusterConfig::default().create("test"),
+        default_global_config(),
+    )
+}
+
+#[cfg(test)]
 pub fn default_state() -> State {
     use crate::Theme;
-    State::new("localhost", Theme::light(), &default_global_config())
+    State::new("localhost", Theme::light(), &default_internal_config())
 }

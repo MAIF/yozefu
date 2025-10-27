@@ -146,7 +146,7 @@ where
     /// Returns the kafka client config
     pub fn yozefu_config(&self) -> Result<YozefuConfig, Error> {
         let cluster_config = self.cluster_config(&self.cluster)?;
-        Ok(YozefuConfig::new(cluster_config))
+        Ok(cluster_config.create(&self.cluster.to_string()))
     }
 
     /// Returns the search query to use.
@@ -223,6 +223,7 @@ where
                 }
             }
         }
+
         Ok(config.clusters.get(&cluster.to_string()).unwrap().clone())
     }
 
@@ -267,18 +268,27 @@ where
         Ok(theme.clone())
     }
 
+    fn internal_config(&self, yozefu_config: &YozefuConfig) -> Result<InternalConfig, Error> {
+        let config = self.config(yozefu_config)?;
+        Ok(InternalConfig::new(yozefu_config.clone(), config))
+    }
+
     /// Starts the app in TUI mode
     async fn tui(&self, yozefu_config: &YozefuConfig) -> Result<(), TuiError> {
         let cluster = self.cluster();
-        let config = self.config(yozefu_config)?;
-        let query = self.query(&config)?;
+        let internal_config = self.internal_config(yozefu_config)?;
+        let query = self.query(&internal_config.global)?;
 
-        let _ = init_logging_file(self.debug, &config.logs_file());
-        let theme_name = self.theme.clone().unwrap_or(config.theme.clone());
-        let color_palette = Self::load_theme(&config.themes_file(), &theme_name).await?;
-        let state = State::new(&cluster.to_string(), color_palette, &config);
+        let _ = init_logging_file(self.debug, &internal_config.global.logs_file());
+        let theme_name = self
+            .theme
+            .clone()
+            .unwrap_or(internal_config.global.theme.clone());
+        let color_palette =
+            Self::load_theme(&internal_config.global.themes_file(), &theme_name).await?;
+        let state = State::new(&cluster.to_string(), color_palette, &internal_config);
         let mut ui = Ui::new(
-            self.app(&query, yozefu_config)?,
+            self.app(&query, internal_config)?,
             &query,
             self.topics.clone(),
             state.clone(),
@@ -294,24 +304,18 @@ where
     }
 
     /// Creates the App
-    fn app(&self, query: &str, yozefu_config: &YozefuConfig) -> Result<App, Error> {
-        debug!("{yozefu_config:?}");
-        let config = self.config(yozefu_config)?;
-        let search_query = ValidSearchQuery::from(query, &config.filters_dir())?;
+    fn app(&self, query: &str, config: InternalConfig) -> Result<App, Error> {
+        debug!("{config:?}");
+        let search_query = ValidSearchQuery::from(query, &config.global.filters_dir())?;
 
-        let internal_config = InternalConfig::new(yozefu_config.clone(), config);
         //let output_file = internal_config.output_file();
-        Ok(App::new(
-            self.cluster().to_string(),
-            internal_config,
-            search_query,
-        ))
+        Ok(App::new(self.cluster().to_string(), config, search_query))
     }
 
     /// Starts the app in headless mode
     async fn headless(&self, yozefu_config: &YozefuConfig) -> Result<(), Error> {
-        let config = self.config(yozefu_config)?;
-        let query = self.query(&config)?;
+        let internal_config = self.internal_config(yozefu_config)?;
+        let query = self.query(&internal_config.global)?;
 
         let progress = ProgressBar::new(0);
         let date = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
@@ -328,7 +332,7 @@ where
             progress.set_draw_target(ProgressDrawTarget::stderr());
         }
         let app = Headless::new(
-            self.app(&query, yozefu_config)?,
+            self.app(&query, internal_config)?,
             &topics,
             self.formatter(),
             self.export,

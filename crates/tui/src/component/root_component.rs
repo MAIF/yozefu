@@ -325,7 +325,7 @@ impl Component for RootComponent {
                         self.focus_order
                             .first()
                             .unwrap_or_else(|| {
-                                panic!("I think you forgot to define focus order of '{action}'")
+                                panic!("I think you forgot to define focus order of '{action}'. Please update the 'focus_order_of' function in root_component.rs")
                             })
                             .clone(),
                     ),
@@ -437,6 +437,12 @@ pub fn focus_order_of(component: &ComponentName) -> Vec<ComponentName> {
         ],
         ComponentName::TopicDetails => vec![ComponentName::TopicDetails, ComponentName::Search],
         ComponentName::Help => vec![ComponentName::Help, ComponentName::Search],
-        _ => vec![],
+        ComponentName::Dialog
+        | ComponentName::Search
+        | ComponentName::Main
+        | ComponentName::RecordsView
+        | ComponentName::Footer
+        | ComponentName::Header
+        | ComponentName::Topics => vec![],
     }
 }

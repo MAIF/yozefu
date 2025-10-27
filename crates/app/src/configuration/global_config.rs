@@ -13,9 +13,12 @@ use lib::Error;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::{APPLICATION_NAME, configuration::ConsumerConfig};
+use crate::{
+    APPLICATION_NAME,
+    configuration::{ClusterConfig, ConsumerConfig},
+};
 
-use super::cluster_config::{ClusterConfig, SchemaRegistryConfig};
+use super::cluster_config::SchemaRegistryConfig;
 
 const EXAMPLE_PROMPTS: &[&str] = &[
     r#"timestamp between "2 hours ago" and "1 hour ago" limit 100 from beginning"#,

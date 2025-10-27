@@ -95,6 +95,7 @@
           ]
         },
         "kafka": {
+          "description": "Kafka consumer properties for this cluster, see <https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md> for more details",
           "type": "object",
           "additionalProperties": {
             "type": "string"

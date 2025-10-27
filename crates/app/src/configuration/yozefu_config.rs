@@ -8,22 +8,32 @@ use std::{collections::HashMap, path::PathBuf};
 /// an optional user-specific configuration.
 #[derive(Debug, Clone)]
 pub struct YozefuConfig {
+    cluster: String,
     cluster_config: ClusterConfig,
     pub logs_file: Option<PathBuf>,
     pub export_directory: Option<PathBuf>,
 }
 
 impl YozefuConfig {
-    pub fn new(cluster_config: ClusterConfig) -> Self {
+    pub(super) fn new(cluster: &str, cluster_config: ClusterConfig) -> Self {
         Self {
-            cluster_config: cluster_config.normalize_paths(),
+            cluster: cluster.to_string(),
+            cluster_config,
             logs_file: None,
             export_directory: None,
         }
     }
 
+    pub fn cluster(&self) -> &str {
+        &self.cluster
+    }
+
     pub fn url_template(&self) -> Option<String> {
         self.cluster_config.url_template.clone()
+    }
+
+    pub fn config(&self) -> &ClusterConfig {
+        &self.cluster_config
     }
 
     pub fn schema_registry(&self) -> Option<SchemaRegistryConfig> {
@@ -32,6 +42,7 @@ impl YozefuConfig {
 
     pub fn with_exported_directory(self, exported_directory: PathBuf) -> Self {
         Self {
+            cluster: self.cluster,
             cluster_config: self.cluster_config,
             logs_file: self.logs_file,
             export_directory: Some(exported_directory),
@@ -40,6 +51,7 @@ impl YozefuConfig {
 
     pub fn with_logs_file(self, logs_file: PathBuf) -> Self {
         Self {
+            cluster: self.cluster,
             cluster_config: self.cluster_config,
             logs_file: Some(logs_file),
             export_directory: self.export_directory,
@@ -47,20 +59,14 @@ impl YozefuConfig {
     }
 
     pub fn set_kafka_property(&mut self, key: &str, value: &str) {
-        self.cluster_config
-            .kafka
-            .insert(key.to_string(), value.to_string());
+        self.cluster_config.set_kafka_property(key, value);
     }
 
     /// Overrides the kafka properties with the properties provided by the user
     pub fn update_kafka_properties(self, kafka_properties: HashMap<String, String>) -> Self {
         Self {
-            cluster_config: ClusterConfig {
-                url_template: None,
-                schema_registry: None,
-                kafka: indexmap::IndexMap::from_iter(kafka_properties),
-                consumer: self.cluster_config.consumer,
-            },
+            cluster: self.cluster,
+            cluster_config: self.cluster_config.with_kafka_properties(kafka_properties),
             logs_file: self.logs_file,
             export_directory: self.export_directory,
         }

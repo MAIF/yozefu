@@ -1,6 +1,6 @@
 //! The state is a struct containing various information.
 //! It is passed to all components.
-use app::configuration::GlobalConfig;
+use app::configuration::InternalConfig;
 use std::path::PathBuf;
 
 use crate::{highlighter::Highlighter, theme::Theme};
@@ -18,10 +18,11 @@ pub struct State {
     pub logs_file: PathBuf,
     pub themes_file: PathBuf,
     pub filters_dir: PathBuf,
+    pub config: InternalConfig,
 }
 
 impl State {
-    pub fn new(cluster: &str, theme: Theme, config: &GlobalConfig) -> Self {
+    pub fn new(cluster: &str, theme: Theme, config: &InternalConfig) -> Self {
         let temp = theme.highlighter_theme.clone();
         Self {
             focused: ComponentName::default(),
@@ -29,13 +30,14 @@ impl State {
             theme,
             highlighter_theme: Highlighter::theme(
                 temp.as_deref(),
-                config.highlighter_theme.as_deref(),
+                config.global.highlighter_theme.as_deref(),
             ),
-            themes: config.themes(),
-            themes_file: config.themes_file(),
-            configuration_file: config.path.clone(),
-            logs_file: config.logs_file(),
-            filters_dir: config.filters_dir(),
+            themes: config.global.themes(),
+            themes_file: config.global.themes_file(),
+            configuration_file: config.global.path.clone(),
+            logs_file: config.global.logs_file(),
+            filters_dir: config.global.filters_dir(),
+            config: config.clone(),
         }
     }
 
