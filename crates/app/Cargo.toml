@@ -19,7 +19,7 @@ serde_json = { workspace = true }
 lib = { workspace = true, features = ["native"] }
 itertools = "0.14.0"
 thousands = "0.2.0"
-indexmap = "2.11.4"
+indexmap = "2.12.0"
 rdkafka = { version = "0.38.0", features = ["cmake-build"] }
 extism = { version = "1.12.0", features = [] }
 url = { version = "2.5.7", features = ["serde"] }
