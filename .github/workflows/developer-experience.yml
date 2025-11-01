@@ -94,7 +94,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup JS ${{ env.JS_VERSION }}
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.JS_VERSION }}
       - name: Setup Go ${{ env.GOLANG_VERSION }}
