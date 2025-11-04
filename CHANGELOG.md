@@ -1,3 +1,13 @@
+## What's Changed in 0.0.18
+* Develop by @Mcdostone in [#160](https://github.com/MAIF/yozefu/pull/160)
+* build: update dependencies by @Mcdostone
+* Show configuration in the help dialog by @Mcdostone
+* build(deps): bump indexmap from 2.11.4 to 2.12.0 by @dependabot[bot]
+* build(deps-dev): bump esbuild in /crates/wasm-blueprints/js by @dependabot[bot]
+* Changelog for v0.0.17 by @github-actions[bot] in [#148](https://github.com/MAIF/yozefu/pull/148)
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.17...v0.0.18
+
 ## What's Changed in 0.0.17
 * Develop by @Mcdostone in [#131](https://github.com/MAIF/yozefu/pull/131)
 * refactor: clippy pedantic by @Mcdostone
