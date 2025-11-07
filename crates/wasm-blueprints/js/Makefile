@@ -23,7 +23,7 @@ test: $(TARGET) ## Run the tests
 	cat "tests/no-match.json" | extism call --stdin $(TARGET) matches | grep -q '"match":false'
 
 clean: ## Clean the wasm file and the target directory
-	rm -rf dist
+	rm -rf dist $(TARGET)
 
 help: ## Show this help
 	@echo "Variables:"

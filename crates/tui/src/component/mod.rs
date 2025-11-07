@@ -47,9 +47,10 @@ pub(crate) type ConcurrentRecordsBuffer = LazyLock<Arc<Mutex<RecordsBuffer>>>;
 static BUFFER: ConcurrentRecordsBuffer =
     LazyLock::new(|| Arc::new(Mutex::new(RecordsBuffer::new())));
 
-#[derive(Debug, Clone, Display, Hash, PartialEq, Eq, Deserialize, PartialOrd, Ord)]
+#[derive(Debug, Clone, Display, Hash, PartialEq, Eq, Deserialize, PartialOrd, Ord, Default)]
 pub(crate) enum ComponentName {
     Records,
+    #[default]
     Topics,
     Header,
     Footer,
@@ -71,12 +72,6 @@ impl ComponentName {
             ComponentName::TopicDetails => "Topic".to_string(),
             _ => self.to_string(),
         }
-    }
-}
-
-impl Default for ComponentName {
-    fn default() -> Self {
-        Self::Topics
     }
 }
 

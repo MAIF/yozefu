@@ -16,6 +16,8 @@ pub use cluster_config::SchemaRegistryConfig;
 pub use consumer_config::ConsumerConfig;
 pub use global_config::GlobalConfig;
 pub use internal_config::InternalConfig;
+use tracing::debug;
+use tracing::enabled;
 pub use yozefu_config::YozefuConfig;
 
 pub trait Configuration {
@@ -39,6 +41,13 @@ pub trait Configuration {
         config.set_log_level(rdkafka::config::RDKafkaLogLevel::Emerg);
         for (key, value) in kafka_properties {
             config.set(key, value);
+        }
+
+        if enabled!(tracing::Level::DEBUG) {
+            config.set("debug", "consumer,cgrp,topic");
+            for (k, v) in config.config_map().iter() {
+                debug!("'{}' set to '{}'", k, v);
+            }
         }
 
         config

@@ -11,7 +11,7 @@
 //DEPS tech.allegro.schema.json2avro:converter:0.3.0
 //DEPS com.google.protobuf:protobuf-java:4.32.1
 //DEPS info.picocli:picocli:4.7.7
-
+//DEPS org.slf4j:slf4j-api:2.0.17
 
 //FILES avro/key-schema.json=avro/key-schema.json
 //FILES avro/value-schema.json=avro/value-schema.json
