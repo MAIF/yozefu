@@ -1,0 +1,6 @@
+*
+!src
+!tests
+!Makefile
+!package.json
+!esbuild.js

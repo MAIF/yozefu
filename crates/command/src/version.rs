@@ -8,7 +8,6 @@
 //! Yann Prono <yann.prono@maif.fr>
 //! ```
 use const_format::{formatcp, str_index};
-use std::env::consts::{ARCH, OS};
 
 #[cfg(debug_assertions)]
 const BUILD_TYPE: &str = "debug";
@@ -27,13 +26,18 @@ const GIT_COMMIT: &str = match option_env!("GITHUB_SHA") {
 };
 
 pub(super) const VERSION_MESSAGE: &str = formatcp!(
-    "{} ({}:{}, {} build, {} [{}]) \n{}\n{}",
+    r#"
+    Version     {}
+    Profile     {}
+    Commit      {} on branch {}
+    Target      {}
+    Repository  {}
+    Authors     {}"#,
     env!("CARGO_PKG_VERSION"),
-    GIT_BRANCH,
-    str_index!(GIT_COMMIT, 0..7),
     BUILD_TYPE,
-    OS,
-    ARCH,
+    str_index!(GIT_COMMIT, 0..7),
+    GIT_BRANCH,
+    current_platform::CURRENT_PLATFORM,
     env!("CARGO_PKG_REPOSITORY"),
     env!("CARGO_PKG_AUTHORS"),
 );

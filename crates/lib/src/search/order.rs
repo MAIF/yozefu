@@ -20,27 +20,17 @@ pub struct OrderBy {
     pub keyword: OrderKeyword,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub enum OrderKeyword {
     Desc,
+    #[default]
     Asc,
 }
 
-impl Default for Order {
-    fn default() -> Self {
-        Self::Timestamp
-    }
-}
-
-impl Default for OrderKeyword {
-    fn default() -> Self {
-        Self::Asc
-    }
-}
-
 /// You can order kafka records by the following fields.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub enum Order {
+    #[default]
     Timestamp,
     Key,
     Value,

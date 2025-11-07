@@ -28,7 +28,7 @@ clap = { version = "4.5.51", features = [
 serde_json = { workspace = true }
 chrono = "0.4.42"
 strum = { workspace = true, features = ["derive", "strum_macros"] }
-indicatif = { version = "0.18.2", features = ["tokio"] }
+indicatif = { version = "0.18.3", features = ["tokio"] }
 tempfile = "3.23.0"
 tokio-util = "0.7.17"
 futures = "0.3.31"
@@ -51,6 +51,7 @@ tracing = { workspace = true }
 tracing-subscriber = { version = "0.3.20", features = ["env-filter"]}
 futures-batch = "0.7.0"
 thousands = "0.2.0"
+current_platform = "0.2.0"
 
 [features]
 ssl-vendored = ["rdkafka/ssl-vendored", "tui/ssl-vendored", "app/ssl-vendored"]

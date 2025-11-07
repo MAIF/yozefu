@@ -2,40 +2,48 @@ version: 2
 updates:
   - package-ecosystem: "cargo"
     directory: "/"
+    target-branch: "develop"
     schedule:
       interval: "weekly"
 
   - package-ecosystem: "cargo"
     directory: "/crates/app/tests/http_search_filter"
+    target-branch: "develop"
     schedule:
       interval: "weekly"
 
   - package-ecosystem: "cargo"
     directory: "/crates/wasm-blueprints/rust/"
+    target-branch: "develop"
     schedule:
       interval: "weekly"
 
   - package-ecosystem: "github-actions"
     directory: "/"
+    target-branch: "develop"
     schedule:
       interval: "monthly"
 
   - package-ecosystem: "docker"
     directory: "/"
+    target-branch: "develop"
     schedule:
       interval: "weekly"
 
   - package-ecosystem: "gomod"
     directory: "/crates/wasm-blueprints/golang/"
+    target-branch: "develop"
     schedule:
       interval: "weekly"
 
   - package-ecosystem: "rust-toolchain"
     directory: "/"
+    target-branch: "develop"
     schedule:
       interval: "weekly"
 
   - package-ecosystem: "npm"
     directory: "/crates/wasm-blueprints/js/"
+    target-branch: "develop"
     schedule:
       interval: "weekly"

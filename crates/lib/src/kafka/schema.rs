@@ -11,7 +11,9 @@ pub struct SchemaId(pub u32);
 #[derive(Clone, Debug, Deserialize, Serialize, Hash, PartialEq, Eq)]
 #[serde(rename_all = "UPPERCASE")]
 #[cfg_attr(test, derive(schemars::JsonSchema))]
+#[derive(Default)]
 pub enum SchemaType {
+    #[default]
     Json,
     Avro,
     Protobuf,
@@ -52,12 +54,6 @@ impl Display for SchemaType {
 impl SchemaId {
     pub fn new(id: u32) -> Self {
         Self(id)
-    }
-}
-
-impl Default for SchemaType {
-    fn default() -> Self {
-        Self::Json
     }
 }
 
