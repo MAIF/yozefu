@@ -61,10 +61,15 @@ impl crate::command::Command for ConfigureCommand {
         fs::copy(&file, &temp_file)?;
 
         let editor = default_editor(self.editor.as_deref());
-        Command::new(editor)
-            .arg(&temp_file)
-            .status()
-            .expect("Something went wrong");
+
+        if let Err(e) = Command::new(&editor).arg(&temp_file).status() {
+            return Err(Error::Error(format!(
+                "Failed to find the editor '{}': {}.\nSpecify another editor with the option '--editor' or edit the configuration file manually '{}'",
+                editor,
+                e,
+                file.display()
+            )));
+        }
 
         let new_config = fs::read_to_string(&temp_file)?;
         fs::remove_file(temp_file)?;
