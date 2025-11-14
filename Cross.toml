@@ -11,6 +11,17 @@ image = "ghcr.io/cross-rs/x86_64-unknown-linux-gnu:main"
 [target.x86_64-pc-windows-gnu]
 image = "ghcr.io/cross-rs/x86_64-pc-windows-gnu:main"
 
+[target.x86_64-unknown-linux-musl]
+image = "ghcr.io/cross-rs/x86_64-unknown-linux-musl:main"
+pre-build = [
+    "apk add musl-gcc",
+    "ln -s '/usr/bin/g++' '/usr/bin/musl-g++'"
+]
+
+[target.x86_64-pc-windows-musl]
+image = "ghcr.io/cross-rs/x86_64-pc-windows-musl:main"
+
+
 [target.x86_64-pc-windows-msvc]
 image = "ghcr.io/cross-rs/x86_64-pc-windows-msvc:main"
 
