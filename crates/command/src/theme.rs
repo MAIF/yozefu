@@ -1,6 +1,6 @@
 use std::{fs, path::PathBuf};
 
-use app::configuration::GlobalConfig;
+use app::configuration::Workspace;
 use indexmap::IndexMap;
 use lib::Error;
 use tracing::{info, warn};
@@ -11,10 +11,8 @@ const THEMES_URL: &str =
 
 /// Initializes a default configuration file if it does not exist.
 /// The default cluster is `localhost`.
-pub(crate) async fn init_themes_file() -> Result<PathBuf, Error> {
-    let path = GlobalConfig::path()?;
-    let config = GlobalConfig::read(&path)?;
-    let path = config.themes_file();
+pub(crate) async fn init_themes_file(workspace: &Workspace) -> Result<PathBuf, Error> {
+    let path = workspace.themes_file();
     if fs::metadata(&path).is_ok() {
         return Ok(path);
     }
@@ -51,12 +49,10 @@ pub(crate) async fn init_themes_file() -> Result<PathBuf, Error> {
 }
 
 /// Update the themes file with the latest themes from the repository.
-pub(crate) async fn update_themes() -> Result<PathBuf, Error> {
-    let path = GlobalConfig::path()?;
-    let config = GlobalConfig::read(&path)?;
-    let path = config.themes_file();
+pub(crate) async fn update_themes(workspace: &Workspace) -> Result<PathBuf, Error> {
+    let path = workspace.themes_file();
     if fs::metadata(&path).is_err() {
-        return init_themes_file().await;
+        return init_themes_file(workspace).await;
     }
 
     let content = fs::read_to_string(&path)?;

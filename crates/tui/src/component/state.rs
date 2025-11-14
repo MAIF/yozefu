@@ -1,6 +1,6 @@
 //! The state is a struct containing various information.
 //! It is passed to all components.
-use app::configuration::InternalConfig;
+use app::configuration::{InternalConfig, Workspace};
 use std::path::PathBuf;
 
 use crate::{highlighter::Highlighter, theme::Theme};
@@ -13,11 +13,9 @@ pub struct State {
     pub cluster: String,
     pub themes: Vec<String>,
     pub theme: Theme,
+    pub internal_config: InternalConfig,
     pub highlighter_theme: Option<syntect::highlighting::Theme>,
     pub configuration_file: PathBuf,
-    pub logs_file: PathBuf,
-    pub themes_file: PathBuf,
-    pub filters_dir: PathBuf,
     pub config: InternalConfig,
 }
 
@@ -32,13 +30,15 @@ impl State {
                 temp.as_deref(),
                 config.global.highlighter_theme.as_deref(),
             ),
-            themes: config.global.themes(),
-            themes_file: config.global.themes_file(),
+            internal_config: config.clone(),
+            themes: config.workspace().themes(),
             configuration_file: config.global.path.clone(),
-            logs_file: config.global.logs_file(),
-            filters_dir: config.global.filters_dir(),
             config: config.clone(),
         }
+    }
+
+    pub fn workspace(&self) -> &Workspace {
+        self.config.workspace()
     }
 
     pub(crate) fn is_focused(&self, component_name: &ComponentName) -> bool {

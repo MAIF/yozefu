@@ -9,7 +9,6 @@ fn check_backwards_compatibility() {
     let config = GlobalConfig {
         clusters: IndexMap::new(),
         default_url_template: String::new(),
-        yozefu_directory: PathBuf::new(),
         path: PathBuf::new(),
         logs: PathBuf::from("./yozefu.log").into(),
         initial_query: "from end - 10".to_string(),

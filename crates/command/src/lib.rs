@@ -4,19 +4,19 @@
 mod cli;
 mod cluster;
 mod command;
+mod global_args;
 mod headless;
 mod log;
 mod theme;
 mod version;
-use app::configuration::GlobalConfig;
 pub use clap::Parser;
 pub use cli::Cli;
 pub use cluster::Cluster;
-use lib::Error;
+pub use global_args::GlobalArgs;
 pub use tui::TuiError;
 
 pub use app::APPLICATION_NAME;
 
-pub fn read_config() -> Result<GlobalConfig, Error> {
-    GlobalConfig::read(&GlobalConfig::path()?)
-}
+//pub fn read_config() -> Result<GlobalConfig, Error> {
+//    GlobalConfig::read(&GlobalConfig::path()?)
+//}

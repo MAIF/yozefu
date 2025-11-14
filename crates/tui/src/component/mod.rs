@@ -20,7 +20,7 @@ pub mod ui;
 mod vertical_scrollable_block;
 
 #[cfg(test)]
-use app::configuration::{GlobalConfig, InternalConfig};
+use app::configuration::{GlobalConfig, InternalConfig, Workspace};
 use crossterm::event::{KeyEvent, MouseEvent};
 use ratatui::prelude::Stylize;
 use ratatui::{
@@ -148,7 +148,6 @@ pub fn default_global_config() -> GlobalConfig {
 
     GlobalConfig {
         path: temp_path.clone().join("config.json"),
-        yozefu_directory: temp_path.join("config"),
         logs: None,
         default_url_template: String::new(),
         initial_query: String::new(),
@@ -164,12 +163,23 @@ pub fn default_global_config() -> GlobalConfig {
 }
 
 #[cfg(test)]
+pub fn default_workspace() -> Workspace {
+    use app::configuration::Workspace;
+
+    let temp_dir = tempfile::tempdir().unwrap();
+    let temp_path = temp_dir.path().to_path_buf();
+
+    Workspace::new(&temp_path, &temp_path.join(Workspace::CONFIG_FILENAME))
+}
+
+#[cfg(test)]
 pub fn default_internal_config() -> InternalConfig {
     use app::configuration::{ClusterConfig, InternalConfig};
 
     InternalConfig::new(
         ClusterConfig::default().create("test"),
         default_global_config(),
+        default_workspace(),
     )
 }
 

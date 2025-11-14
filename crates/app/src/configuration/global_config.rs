@@ -1,17 +1,14 @@
 //! module defining the configuration structure of the application
 
 use std::{
-    collections::HashMap,
     fs,
     path::{Path, PathBuf},
 };
 
-use directories::ProjectDirs;
 use indexmap::IndexMap;
 use itertools::Itertools;
 use lib::Error;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 
 use crate::{
     APPLICATION_NAME,
@@ -33,9 +30,6 @@ pub struct GlobalConfig {
     /// Path of this config
     #[serde(skip)]
     pub path: PathBuf,
-    /// Path to the Yozefu directory containing themes, config, filters...
-    #[serde(skip)]
-    pub yozefu_directory: PathBuf,
     /// The file to write logs to
     #[serde(skip)]
     pub logs: Option<PathBuf>,
@@ -91,7 +85,6 @@ impl TryFrom<&PathBuf> for GlobalConfig {
     fn try_from(path: &PathBuf) -> Result<Self, Self::Error> {
         Ok(Self {
             path: path.clone(),
-            yozefu_directory: Self::yozefu_directory()?,
             logs: None,
             default_url_template: default_url_template(),
             history: EXAMPLE_PROMPTS
@@ -111,20 +104,6 @@ impl TryFrom<&PathBuf> for GlobalConfig {
 }
 
 impl GlobalConfig {
-    /// The default config file path
-    pub fn path() -> Result<PathBuf, Error> {
-        Self::yozefu_directory().map(|d| d.join("config.json"))
-    }
-
-    /// The default yozefu directory containing themes, filters, config...
-    pub fn yozefu_directory() -> Result<PathBuf, Error> {
-        ProjectDirs::from("io", "maif", APPLICATION_NAME)
-            .ok_or(Error::Error(
-                "Failed to find the yozefu configuration directory".to_string(),
-            ))
-            .map(|e| e.config_dir().to_path_buf())
-    }
-
     /// Reads a configuration file.
     pub fn read(file: &Path) -> Result<Self, Error> {
         let content = fs::read_to_string(file);
@@ -144,7 +123,6 @@ impl GlobalConfig {
                 e
             ))
         })?;
-        config.yozefu_directory = Self::yozefu_directory()?;
         config.path = file.to_path_buf();
         Ok(config)
     }
@@ -154,29 +132,6 @@ impl GlobalConfig {
         self.logs
             .clone()
             .unwrap_or(self.path.parent().unwrap().join("application.log"))
-    }
-
-    /// Returns the name of the logs file
-    pub fn themes_file(&self) -> PathBuf {
-        self.yozefu_directory.join("themes.json")
-    }
-
-    /// Returns the list of available theme names.
-    pub fn themes(&self) -> Vec<String> {
-        let file = self.themes_file();
-        let content = fs::read_to_string(file).unwrap_or("{}".to_string());
-        let themes: HashMap<String, Value> = serde_json::from_str(&content).unwrap_or_default();
-        themes
-            .keys()
-            .map(std::string::ToString::to_string)
-            .collect_vec()
-    }
-
-    /// Returns the name of the directory containing wasm filters
-    pub fn filters_dir(&self) -> PathBuf {
-        let dir = self.yozefu_directory.join("filters");
-        let _ = fs::create_dir_all(&dir);
-        dir
     }
 
     /// web URL template for a given cluster

@@ -46,3 +46,6 @@ ENTRYPOINT ["/bin/yozf"]
 #
 # docker run --rm -it ghcr.io/maif/yozefu:latest -c localhost
 # configuration is located at '/home/yozefu/.config/yozefu/config.json'
+# 
+# If you need to build the project with an alpine image:
+# apk add perl musl-dev build-base clang-dev cmake git openssl-dev pkgconfig
