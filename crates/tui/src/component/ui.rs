@@ -137,7 +137,7 @@ impl Ui {
         let mut schema_registry = app.schema_registry().clone();
         let token_cloned = token.clone();
 
-        let filters_directory = self.app.config.global.filters_dir();
+        let filters_directory = self.app.config.workspace().filters_dir();
         tokio::task::Builder::new()
             .name("search-engine")
         .spawn(async move {

@@ -2,7 +2,7 @@
 
 use std::fs;
 
-use crate::command::Command as CliCommand;
+use crate::{GlobalArgs, command::Command as CliCommand};
 use app::configuration::GlobalConfig;
 use clap::Args;
 use lib::Error;
@@ -15,11 +15,13 @@ pub struct ConfigureSetCommand {
     property: String,
     /// Its new value
     value: String,
+    #[clap(flatten)]
+    pub global: GlobalArgs,
 }
 
 impl CliCommand for ConfigureSetCommand {
     async fn execute(&self) -> Result<(), Error> {
-        let file = GlobalConfig::path()?;
+        let file = self.global.workspace().config_file();
 
         let content = fs::read_to_string(&file)?;
         let mut config = serde_json::from_str::<Value>(&content)?;

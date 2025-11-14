@@ -4,7 +4,7 @@ use std::{collections::HashMap, path::PathBuf};
 
 use chrono::Local;
 
-use crate::configuration::{ConsumerConfig, GlobalConfig, SchemaRegistryConfig};
+use crate::configuration::{ConsumerConfig, GlobalConfig, SchemaRegistryConfig, Workspace};
 
 use super::{Configuration, yozefu_config::YozefuConfig};
 
@@ -12,6 +12,7 @@ use super::{Configuration, yozefu_config::YozefuConfig};
 pub struct InternalConfig {
     pub specific: YozefuConfig,
     pub global: GlobalConfig,
+    workspace: Workspace,
     output_file: PathBuf,
 }
 
@@ -29,7 +30,7 @@ impl Configuration for InternalConfig {
 }
 
 impl InternalConfig {
-    pub fn new(specific: YozefuConfig, global: GlobalConfig) -> Self {
+    pub fn new(specific: YozefuConfig, global: GlobalConfig, workspace: Workspace) -> Self {
         let directory = match &specific.export_directory {
             Some(e) => e,
             None => &global.export_directory,
@@ -51,6 +52,7 @@ impl InternalConfig {
             specific,
             global,
             output_file,
+            workspace,
         }
     }
 
@@ -82,5 +84,9 @@ impl InternalConfig {
     /// Returns the output file path for exported kafka records.
     pub fn output_file(&self) -> &PathBuf {
         &self.output_file
+    }
+
+    pub fn workspace(&self) -> &Workspace {
+        &self.workspace
     }
 }

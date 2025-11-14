@@ -313,6 +313,8 @@ jobs:
       contents: read
     container:
       image: archlinux:latest
+      volumes:
+        - /tmp/yozefu-read-only:/tmp/yozefu-readonly:ro
     needs: [check]
     steps:
       - name: Checkout Actions Repository

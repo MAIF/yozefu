@@ -1,16 +1,13 @@
 //! Command to import a search filter.
 use std::{fs, path::PathBuf};
 
-use app::{
-    configuration::GlobalConfig,
-    search::filter::{MATCHES_FUNCTION_NAME, PARSE_PARAMETERS_FUNCTION_NAME},
-};
+use app::search::filter::{MATCHES_FUNCTION_NAME, PARSE_PARAMETERS_FUNCTION_NAME};
 use clap::Args;
 use extism::{Manifest, Plugin, Wasm};
 use lib::Error;
 use tracing::info;
 
-use crate::command::Command;
+use crate::{GlobalArgs, command::Command};
 
 /// Import a search filter.
 /// It also checks that it complies with the tool requirements.
@@ -24,6 +21,8 @@ pub(crate) struct ImportFilterCommand {
     /// Overwrite the search filter file if it already exists
     #[clap(long)]
     force: bool,
+    #[command(flatten)]
+    global: GlobalArgs,
 }
 
 /// Wasm functions a search filter must expose.
@@ -54,8 +53,8 @@ impl ImportFilterCommand {
     /// Returns the path to the wasm file.
     pub fn destination(&self) -> Result<PathBuf, Error> {
         let name = self.name();
-        let config = GlobalConfig::read(&GlobalConfig::path()?)?;
-        let dir = config.filters_dir();
+        let workspace = self.global.workspace();
+        let dir = workspace.filters_dir();
         fs::create_dir_all(&dir)?;
         Ok(dir.join(format!("{name}.wasm")))
     }
@@ -100,6 +99,7 @@ async fn test_name() {
     let command = ImportFilterCommand {
         file: temp_dir.path().join("my_filter.wasm"),
         filter_name: Some("my-filter".to_string()),
+        global: GlobalArgs::default(),
         force: false,
     };
     assert_eq!(command.name(), "my-filter");
@@ -112,6 +112,7 @@ async fn test_name_from_file_path() {
         file: temp_dir.path().join("random.wasm"),
         filter_name: None,
         force: false,
+        global: GlobalArgs::default(),
     };
     assert_eq!(command.name(), "random");
 }
