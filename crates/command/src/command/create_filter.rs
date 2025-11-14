@@ -142,6 +142,15 @@ async fn test_success() {
 
     tracing_subscriber::fmt().init();
 
+    // check if connected to the internet first
+    if let Err(e) = reqwest::get("https://www.google.com").await {
+        eprintln!(
+            "Skipping test_success because there is no internet connection: {}",
+            e
+        );
+        return;
+    }
+
     let temp_dir = tempfile::tempdir().expect("Failed to create temp directory");
     let command = CreateFilterCommand {
         language: SupportedLanguages::Rust,

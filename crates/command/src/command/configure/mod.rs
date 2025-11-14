@@ -17,6 +17,8 @@ mod set_command;
 pub use get_command::ConfigureGetCommand;
 pub use set_command::ConfigureSetCommand;
 
+use crate::GlobalArgs;
+
 use super::default_editor;
 
 /// Command to edit the configuration file.
@@ -27,6 +29,8 @@ pub struct ConfigureCommand {
     pub editor: Option<String>,
     #[command(subcommand)]
     pub subcommand: Option<ConfigureSubCommand>,
+    #[command(flatten)]
+    global: GlobalArgs,
 }
 
 #[derive(Debug, Subcommand, Clone)]
@@ -52,7 +56,7 @@ impl crate::command::Command for ConfigureCommand {
             return subcommand.execute().await;
         }
 
-        let file = GlobalConfig::path()?;
+        let file = self.global.workspace().config_file();
         let temp_file =
             tempdir()?.path().join(file.file_name().expect(
                 "the configuration path should be a file, not a directory or something else",

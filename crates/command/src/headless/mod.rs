@@ -69,7 +69,7 @@ impl Headless {
         let mut schema_registry = self.app.schema_registry().clone();
         let token_cloned = token.clone();
 
-        let filters_directory = self.app.config.global.filters_dir();
+        let filters_directory = self.app.config.workspace().filters_dir();
         tokio::task::Builder::new()
             .name("headless-search-engine")
             .spawn(async move {

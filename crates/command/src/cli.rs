@@ -3,8 +3,10 @@ use crate::cluster::Cluster;
 use crate::command::{Command, MainCommand, UtilityCommands};
 use crate::theme::init_themes_file;
 use crate::version::VERSION_MESSAGE;
-use app::APPLICATION_NAME;
-use app::configuration::{ClusterConfig, GlobalConfig, SchemaRegistryConfig, YozefuConfig};
+use app::configuration::{
+    ClusterConfig, GlobalConfig, SchemaRegistryConfig, Workspace, YozefuConfig,
+};
+use app::{APPLICATION_NAME, BINARY_NAME};
 use clap::command;
 use lib::Error;
 use reqwest::Url;
@@ -23,7 +25,7 @@ use indexmap::IndexMap;
     version = VERSION_MESSAGE,
     about = "A terminal user interface to navigate Kafka topics and search for Kafka records.", 
     name = APPLICATION_NAME,
-    bin_name = APPLICATION_NAME,
+    bin_name = BINARY_NAME,
     display_name = APPLICATION_NAME,
     long_about = None,
     propagate_version = true,
@@ -76,7 +78,7 @@ where
     }
 
     async fn run(&self, yozefu_config: Option<YozefuConfig>) -> Result<(), TuiError> {
-        init_files().await?;
+        self.init_files().await?;
         match &self.subcommands {
             Some(c) => c.execute().await.map_err(std::convert::Into::into),
             None => {
@@ -91,23 +93,30 @@ where
             }
         }
     }
+
+    /// Initializes a default configuration file if it does not exist.
+    /// The default cluster is `localhost`.
+    async fn init_files(&self) -> Result<(), Error> {
+        let workspace = match &self.subcommands {
+            Some(UtilityCommands::Config(c)) => &c.global,
+            _ => &self.default_command.global,
+        }
+        .workspace();
+
+        init_config_file(&workspace)?;
+        init_themes_file(&workspace).await?;
+        Ok(())
+    }
 }
 
 /// Initializes a default configuration file if it does not exist.
 /// The default cluster is `localhost`.
-async fn init_files() -> Result<(), Error> {
-    init_config_file()?;
-    init_themes_file().await?;
-    Ok(())
-}
-
-/// Initializes a default configuration file if it does not exist.
-/// The default cluster is `localhost`.
-fn init_config_file() -> Result<PathBuf, Error> {
-    let path = GlobalConfig::path()?;
+fn init_config_file(workspace: &Workspace) -> Result<PathBuf, Error> {
+    let path = workspace.config_file();
     if fs::metadata(&path).is_ok() {
         return Ok(path);
     }
+
     let mut config = GlobalConfig::try_from(&path)?;
     let mut localhost_config = IndexMap::new();
     localhost_config.insert(
@@ -132,8 +141,28 @@ fn init_config_file() -> Result<PathBuf, Error> {
         },
     );
 
-    fs::create_dir_all(config.filters_dir())?;
-    fs::write(&path, serde_json::to_string_pretty(&config).unwrap()).unwrap();
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(|e| {
+            std::io::Error::new(
+                e.kind(),
+                format!("Failed to create the configuration directory '{}': {}. Check you have write permissions.", parent.display(), e)
+            )
+        })?;
+        fs::create_dir_all(workspace.filters_dir()).map_err(|e| {
+            std::io::Error::new(
+                e.kind(),
+                format!("Failed to create the filters directory '{}': {}. Check you have write permissions.", workspace.filters_dir().display(), e)
+            )
+        })?;
+    }
+    fs::write(&path, serde_json::to_string_pretty(&config).unwrap())
+        .map_err(|e| {
+        std::io::Error::new(
+            e.kind(),
+            format!("Failed to initialize the configuration file '{}': {}. Check you have write permissions.", path.display(), e)
+        )
+    })?;
+
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
@@ -158,4 +187,27 @@ fn test_valid_themes() {
     let content = include_str!("../themes.json");
     let themes: HashMap<String, Theme> = serde_json::from_str(content).unwrap();
     assert!(themes.keys().len() >= 3)
+}
+
+#[test]
+fn initialize_config_file_on_readonly_root_partition() {
+    let workspace = Workspace::new(
+        &PathBuf::from("/tmp/yozefu-readonly"),
+        &PathBuf::from("/tmp/yozefu-readonly/config.json"),
+    );
+    let directory = &workspace.path;
+
+    let _ = fs::remove_dir_all(directory);
+    fs::create_dir_all(directory).unwrap();
+    // change permissions of temp_dir to read-only
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let mut perms: fs::Permissions = fs::metadata(directory).unwrap().permissions();
+        perms.set_mode(0o000);
+        let _ = fs::set_permissions(directory, perms);
+        // suppose to return an error
+        let result = init_config_file(&workspace);
+        assert!(result.is_err());
+    }
 }

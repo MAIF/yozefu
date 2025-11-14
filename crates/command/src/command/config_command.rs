@@ -9,7 +9,7 @@ use clap::Args;
 use lib::Error;
 use tracing::info;
 
-use crate::command::Command;
+use crate::{GlobalArgs, command::Command};
 
 use super::configure::ConfigureSubCommand;
 
@@ -17,6 +17,8 @@ use super::configure::ConfigureSubCommand;
 pub struct ConfigCommand {
     #[command(subcommand)]
     pub subcommand: Option<ConfigureSubCommand>,
+    #[command(flatten)]
+    pub global: GlobalArgs,
 }
 
 impl Command for ConfigCommand {
@@ -25,7 +27,7 @@ impl Command for ConfigCommand {
             return subcommand.execute().await;
         }
 
-        let path = GlobalConfig::path()?;
+        let path = self.global.workspace().config_file();
         info!("The configuration file is located at '{}'", path.display());
 
         let config = GlobalConfig::read(&path)?;

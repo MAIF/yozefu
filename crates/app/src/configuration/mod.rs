@@ -7,6 +7,7 @@ mod cluster_config;
 mod consumer_config;
 mod global_config;
 mod internal_config;
+mod workspace;
 mod yozefu_config;
 
 pub use cluster_config::ClusterConfig;
@@ -18,6 +19,7 @@ pub use global_config::GlobalConfig;
 pub use internal_config::InternalConfig;
 use tracing::debug;
 use tracing::enabled;
+pub use workspace::Workspace;
 pub use yozefu_config::YozefuConfig;
 
 pub trait Configuration {

@@ -205,15 +205,15 @@ impl Component for HelpComponent {
             ]),
             Line::from(vec![
                 Span::from("                                                          Logs").bold(),
-                Span::from(format!("      '{}'", state.logs_file.display()))
+                Span::from(format!("      '{}'", state.workspace().logs_file().display()))
             ]),
             Line::from(vec![
                 Span::from("                                                       Filters").bold(),
-                Span::from(format!("      '{}'", state.filters_dir.display()))
+                Span::from(format!("      '{}'", state.workspace().filters_dir().display()))
             ]),
             Line::from(vec![
                 Span::from("                                                        Themes").bold(),
-                Span::from(format!("      '{}'", state.themes_file.display()))
+                Span::from(format!("      '{}'", state.workspace().themes_file().display()))
             ]),
             Line::from(vec![
                 Span::from("                                                       Version").bold(),

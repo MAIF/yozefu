@@ -10,7 +10,7 @@ use std::str::FromStr;
 use std::{fs, io};
 
 use app::configuration::{
-    ClusterConfig, Configuration, GlobalConfig, InternalConfig, YozefuConfig,
+    ClusterConfig, Configuration, GlobalConfig, InternalConfig, Workspace, YozefuConfig,
 };
 use app::search::ValidSearchQuery;
 
@@ -33,7 +33,7 @@ use crate::headless::formatter::{
 };
 use crate::log::{init_logging_file, init_logging_stderr};
 use crate::theme::update_themes;
-use crate::{APPLICATION_NAME, Cli, Cluster};
+use crate::{APPLICATION_NAME, Cli, Cluster, GlobalArgs};
 
 fn parse_cluster<T>(s: &str) -> Result<T, Error>
 where
@@ -56,7 +56,7 @@ where
     /// The cluster to use
     cluster: T,
     #[clap(long)]
-    /// Topics to consume
+    /// Topics to consume, separated by commas
     #[clap(
         short,
         long,
@@ -89,9 +89,8 @@ where
     #[clap(short, long)]
     /// Name of the file to export kafka records
     pub output: Option<PathBuf>,
-    #[clap(long)]
-    /// Use a specific config file
-    pub config: Option<PathBuf>,
+    #[command(flatten)]
+    pub global: GlobalArgs,
     #[clap(skip)]
     pub(crate) logs_file: Option<PathBuf>,
 }
@@ -179,7 +178,7 @@ where
     }
 
     fn config(&self, yozefu_config: &YozefuConfig) -> Result<GlobalConfig, Error> {
-        let path = self.config.clone().unwrap_or(GlobalConfig::path()?);
+        let path = self.global.workspace().config_file();
         let mut config = GlobalConfig::read(&path)?;
         config.logs.clone_from(&yozefu_config.logs_file);
         Ok(config)
@@ -228,7 +227,9 @@ where
     }
 
     fn read_config(&self) -> Result<GlobalConfig, Error> {
-        match GlobalConfig::read(&GlobalConfig::path()?) {
+        let workspace = self.global.workspace();
+
+        match GlobalConfig::read(workspace.config_file().as_path()) {
             Ok(mut config) => {
                 config.logs.clone_from(&self.logs_file);
                 Ok(config)
@@ -237,19 +238,20 @@ where
         }
     }
 
-    async fn load_theme(file: &Path, name: &str) -> Result<Theme, Error> {
+    async fn load_theme(workspace: &Workspace, name: &str) -> Result<Theme, Error> {
+        let file = &workspace.themes_file();
         let mut themes = Self::themes(file)?;
 
         if !themes.contains_key(name) {
             info!("Theme '{name}' not found. About to update theme file.");
-            let _ = update_themes().await;
+            let _ = update_themes(workspace).await;
             themes = Self::themes(file)?;
         }
 
         let theme = match themes.get(name) {
             Some(theme) => theme,
             None => {
-                update_themes().await?;
+                update_themes(workspace).await?;
                 warn!(
                     "Theme '{}' not found. Available themes are [{}]. Make sure it is defined in '{}'",
                     name,
@@ -270,7 +272,11 @@ where
 
     fn internal_config(&self, yozefu_config: &YozefuConfig) -> Result<InternalConfig, Error> {
         let config = self.config(yozefu_config)?;
-        Ok(InternalConfig::new(yozefu_config.clone(), config))
+        Ok(InternalConfig::new(
+            yozefu_config.clone(),
+            config,
+            self.global.workspace().clone(),
+        ))
     }
 
     /// Starts the app in TUI mode
@@ -284,8 +290,7 @@ where
             .theme
             .clone()
             .unwrap_or(internal_config.global.theme.clone());
-        let color_palette =
-            Self::load_theme(&internal_config.global.themes_file(), &theme_name).await?;
+        let color_palette = Self::load_theme(internal_config.workspace(), &theme_name).await?;
         let state = State::new(&cluster.to_string(), color_palette, &internal_config);
         let mut ui = Ui::new(
             self.app(&query, internal_config)?,
@@ -306,7 +311,7 @@ where
     /// Creates the App
     fn app(&self, query: &str, config: InternalConfig) -> Result<App, Error> {
         debug!("{config:?}");
-        let search_query = ValidSearchQuery::from(query, &config.global.filters_dir())?;
+        let search_query = ValidSearchQuery::from(query, &config.workspace().filters_dir())?;
 
         //let output_file = internal_config.output_file();
         Ok(App::new(self.cluster().to_string(), config, search_query))
