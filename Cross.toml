@@ -11,11 +11,21 @@ image = "ghcr.io/cross-rs/x86_64-unknown-linux-gnu:main"
 [target.x86_64-pc-windows-gnu]
 image = "ghcr.io/cross-rs/x86_64-pc-windows-gnu:main"
 
+
+# Musl is though 
+# https://github.com/fede1024/kafka-view/blob/master/Dockerfile
+# https://github.com/fede1024/rust-rdkafka/issues/88
 [target.x86_64-unknown-linux-musl]
 image = "ghcr.io/cross-rs/x86_64-unknown-linux-musl:main"
 pre-build = [
-    "apk add musl-gcc",
+    "apk add musl-gcc musl-tools curl musl-dev make python g++",
     "ln -s '/usr/bin/g++' '/usr/bin/musl-g++'"
+]
+
+[target.x86_64-unknown-linux-musl.build.env]
+passthrough = [
+    "CC='musl-gcc -static -Os'",
+    "CXX='/usr/bin/g++'"
 ]
 
 [target.x86_64-pc-windows-musl]

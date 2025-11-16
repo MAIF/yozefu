@@ -104,7 +104,7 @@ jobs:
             features: ""
           - os: ubuntu-24.04-arm
             target: aarch64-unknown-linux-musl
-            features: "--no-default-features --features ssl-vendored"
+            features: "--no-default-features --features ssl-vendored,cmake-build"
           - os: windows-latest
             target: x86_64-pc-windows-gnu
             features: "--no-default-features --features cmake-build"
