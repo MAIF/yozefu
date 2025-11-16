@@ -15,6 +15,7 @@ image = "ghcr.io/cross-rs/x86_64-pc-windows-gnu:main"
 # Musl is though 
 # https://github.com/fede1024/kafka-view/blob/master/Dockerfile
 # https://github.com/fede1024/rust-rdkafka/issues/88
+# https://github.com/Licenser/rust-rdkafka-musl/commit/bbaa8a391f2a32f36eb06e36f840c7989d0bf592
 [target.x86_64-unknown-linux-musl]
 image = "ghcr.io/cross-rs/x86_64-unknown-linux-musl:main"
 pre-build = [
@@ -22,10 +23,11 @@ pre-build = [
     "ln -s '/usr/bin/g++' '/usr/bin/musl-g++'"
 ]
 
-[target.x86_64-unknown-linux-musl.build.env]
+[target.x86_64-unknown-linux-musl.env]
 passthrough = [
     "CC='musl-gcc -static -Os'",
-    "CXX='/usr/bin/g++'"
+    "CXX='/usr/bin/g++'",
+    "CFLAGS=-I/usr/local/musl/include"
 ]
 
 [target.x86_64-pc-windows-musl]
