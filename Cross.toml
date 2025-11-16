@@ -27,7 +27,8 @@ pre-build = [
 passthrough = [
     "CC='musl-gcc -static -Os'",
     "CXX='/usr/bin/g++'",
-    "CFLAGS=-I/usr/local/musl/include"
+    "CFLAGS=-I/usr/local/musl/include",
+    "RUSTFLAGS='-C target-feature=-crt-static'"
 ]
 
 [target.x86_64-pc-windows-musl]
