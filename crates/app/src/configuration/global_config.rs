@@ -30,9 +30,6 @@ pub struct GlobalConfig {
     /// Path of this config
     #[serde(skip)]
     pub path: PathBuf,
-    /// The file to write logs to
-    #[serde(skip)]
-    pub logs: Option<PathBuf>,
     /// A placeholder url that will be used when you want to open a kafka record in the browser
     #[serde(default = "default_url_template")]
     pub default_url_template: String,
@@ -57,6 +54,8 @@ pub struct GlobalConfig {
     pub show_shortcuts: bool,
     #[serde(default = "default_export_directory")]
     pub export_directory: PathBuf,
+    /// The file to write logs to
+    pub log_file: Option<PathBuf>,
 }
 
 fn default_url_template() -> String {
@@ -79,13 +78,10 @@ fn default_show_shortcuts() -> bool {
     true
 }
 
-impl TryFrom<&PathBuf> for GlobalConfig {
-    type Error = Error;
-
-    fn try_from(path: &PathBuf) -> Result<Self, Self::Error> {
-        Ok(Self {
-            path: path.clone(),
-            logs: None,
+impl GlobalConfig {
+    pub fn new(path: &Path) -> Self {
+        Self {
+            path: path.to_path_buf(),
             default_url_template: default_url_template(),
             history: EXAMPLE_PROMPTS
                 .iter()
@@ -99,11 +95,10 @@ impl TryFrom<&PathBuf> for GlobalConfig {
             show_shortcuts: true,
             export_directory: default_export_directory(),
             consumer: ConsumerConfig::default(),
-        })
+            log_file: None,
+        }
     }
-}
 
-impl GlobalConfig {
     /// Reads a configuration file.
     pub fn read(file: &Path) -> Result<Self, Error> {
         let content = fs::read_to_string(file);
@@ -128,10 +123,8 @@ impl GlobalConfig {
     }
 
     /// Returns the name of the logs file
-    pub fn logs_file(&self) -> PathBuf {
-        self.logs
-            .clone()
-            .unwrap_or(self.path.parent().unwrap().join("application.log"))
+    pub fn log_file(&self) -> Option<PathBuf> {
+        self.log_file.clone()
     }
 
     /// web URL template for a given cluster

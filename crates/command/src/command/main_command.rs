@@ -149,10 +149,10 @@ where
     }
 
     /// Returns the search query to use.
-    fn query(&self, config: &GlobalConfig) -> Result<String, Error> {
+    fn query(&self, initial_query: &str) -> Result<String, Error> {
         let q = self.query.join(" ").trim().to_string();
         if q.is_empty() {
-            return Ok(config.initial_query.clone());
+            return Ok(initial_query.to_string());
         }
 
         if q == "-" {
@@ -177,11 +177,17 @@ where
         }
     }
 
-    fn config(&self, yozefu_config: &YozefuConfig) -> Result<GlobalConfig, Error> {
-        let path = self.global.workspace().config_file();
-        let mut config = GlobalConfig::read(&path)?;
-        config.logs.clone_from(&yozefu_config.logs_file);
-        Ok(config)
+    fn workspace(&self, yozefu_config: &YozefuConfig) -> Result<Workspace, Error> {
+        let workspace = self.global.workspace();
+
+        Ok(Workspace::new(
+            &workspace.path,
+            workspace.config().clone(),
+            yozefu_config
+                .log_file
+                .clone()
+                .unwrap_or(workspace.log_file()),
+        ))
     }
 
     fn themes(file: &Path) -> Result<HashMap<String, Theme>, Error> {
@@ -230,8 +236,8 @@ where
         let workspace = self.global.workspace();
 
         match GlobalConfig::read(workspace.config_file().as_path()) {
-            Ok(mut config) => {
-                config.logs.clone_from(&self.logs_file);
+            Ok(config) => {
+                //config.logs.clone_from(&self.logs_file);
                 Ok(config)
             }
             Err(e) => Err(e),
@@ -271,25 +277,21 @@ where
     }
 
     fn internal_config(&self, yozefu_config: &YozefuConfig) -> Result<InternalConfig, Error> {
-        let config = self.config(yozefu_config)?;
-        Ok(InternalConfig::new(
-            yozefu_config.clone(),
-            config,
-            self.global.workspace().clone(),
-        ))
+        let workspace = self.workspace(yozefu_config)?;
+        Ok(InternalConfig::new(yozefu_config.clone(), workspace))
     }
 
     /// Starts the app in TUI mode
     async fn tui(&self, yozefu_config: &YozefuConfig) -> Result<(), TuiError> {
         let cluster = self.cluster();
         let internal_config = self.internal_config(yozefu_config)?;
-        let query = self.query(&internal_config.global)?;
+        let query = self.query(internal_config.initial_query())?;
 
-        let _ = init_logging_file(self.debug, &internal_config.global.logs_file());
+        let _ = init_logging_file(self.debug, &internal_config.workspace().log_file());
         let theme_name = self
             .theme
             .clone()
-            .unwrap_or(internal_config.global.theme.clone());
+            .unwrap_or(internal_config.theme().to_string());
         let color_palette = Self::load_theme(internal_config.workspace(), &theme_name).await?;
         let state = State::new(&cluster.to_string(), color_palette, &internal_config);
         let mut ui = Ui::new(
@@ -320,7 +322,7 @@ where
     /// Starts the app in headless mode
     async fn headless(&self, yozefu_config: &YozefuConfig) -> Result<(), Error> {
         let internal_config = self.internal_config(yozefu_config)?;
-        let query = self.query(&internal_config.global)?;
+        let query = self.query(internal_config.initial_query())?;
 
         let progress = ProgressBar::new(0);
         let date = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);

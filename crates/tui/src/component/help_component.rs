@@ -205,7 +205,7 @@ impl Component for HelpComponent {
             ]),
             Line::from(vec![
                 Span::from("                                                          Logs").bold(),
-                Span::from(format!("      '{}'", state.workspace().logs_file().display()))
+                Span::from(format!("      '{}'", state.workspace().log_file().display()))
             ]),
             Line::from(vec![
                 Span::from("                                                       Filters").bold(),
