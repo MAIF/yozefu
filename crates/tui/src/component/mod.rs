@@ -140,47 +140,37 @@ pub mod records_component_test;
 pub mod root_component_test;
 
 #[cfg(test)]
-pub fn default_global_config() -> GlobalConfig {
-    use app::configuration::{ConsumerConfig, GlobalConfig};
-
-    let temp_dir = tempfile::tempdir().unwrap();
-    let temp_path = temp_dir.path().to_path_buf();
-
-    GlobalConfig {
-        path: temp_path.clone().join("config.json"),
-        logs: None,
-        default_url_template: String::new(),
-        initial_query: String::new(),
-        theme: "light".to_string(),
-        highlighter_theme: None,
-        clusters: indexmap::IndexMap::default(),
-        default_kafka_config: indexmap::IndexMap::default(),
-        history: vec![],
-        show_shortcuts: true,
-        export_directory: std::path::PathBuf::from(""),
-        consumer: ConsumerConfig::default(),
-    }
-}
-
-#[cfg(test)]
 pub fn default_workspace() -> Workspace {
-    use app::configuration::Workspace;
+    use app::configuration::{ConsumerConfig, Workspace};
 
     let temp_dir = tempfile::tempdir().unwrap();
     let temp_path = temp_dir.path().to_path_buf();
 
-    Workspace::new(&temp_path, &temp_path.join(Workspace::CONFIG_FILENAME))
+    Workspace::new(
+        &temp_path,
+        GlobalConfig {
+            path: temp_path.clone().join(Workspace::CONFIG_FILENAME),
+            log_file: None,
+            default_url_template: String::new(),
+            initial_query: String::new(),
+            theme: "light".to_string(),
+            highlighter_theme: None,
+            clusters: indexmap::IndexMap::default(),
+            default_kafka_config: indexmap::IndexMap::default(),
+            history: vec![],
+            show_shortcuts: true,
+            export_directory: std::path::PathBuf::from(""),
+            consumer: ConsumerConfig::default(),
+        },
+        temp_path.join(Workspace::LOGS_FILENAME),
+    )
 }
 
 #[cfg(test)]
 pub fn default_internal_config() -> InternalConfig {
     use app::configuration::{ClusterConfig, InternalConfig};
 
-    InternalConfig::new(
-        ClusterConfig::default().create("test"),
-        default_global_config(),
-        default_workspace(),
-    )
+    InternalConfig::new(ClusterConfig::default().create("test"), default_workspace())
 }
 
 #[cfg(test)]

@@ -1,0 +1,16 @@
+{
+  "default_url_template": "",
+  "initial_query": "from end - 10",
+  "theme": "default",
+  "highlighter_theme": null,
+  "clusters": {},
+  "consumer": {
+    "buffer_capacity": 1000,
+    "timeout_in_ms": 10
+  },
+  "default_kafka_config": {},
+  "history": [],
+  "show_shortcuts": false,
+  "export_directory": "./yozefu-exports",
+  "log_file": null
+}

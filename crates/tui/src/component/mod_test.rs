@@ -1,13 +1,11 @@
 #[macro_export]
 macro_rules! assert_draw {
     ($component:expr, $width:expr, $height:expr) => {{
-        use app::configuration::GlobalConfig;
         use app::configuration::InternalConfig;
         use app::configuration::ClusterConfig;
         use insta::assert_snapshot;
-        use indexmap::IndexMap;
         use $crate::component::default_workspace;
-        use app::configuration::ConsumerConfig;
+
         use ratatui::{Terminal, backend::TestBackend};
         use $crate::{State, Theme};
 
@@ -25,20 +23,6 @@ macro_rules! assert_draw {
             Theme::light(),
             &InternalConfig::new(
                 ClusterConfig::default().create("test").with_exported_directory(dir.clone()),
-                GlobalConfig {
-                    path: workspace.config_file(),
-                    logs: None,
-                    default_url_template: String::new(),
-                    initial_query: String::new(),
-                    theme: "light".to_string(),
-                    highlighter_theme: None,
-                    clusters: IndexMap::default(),
-                    default_kafka_config: IndexMap::default(),
-                    history: Vec::default(),
-                    show_shortcuts: true,
-                    export_directory: dir.clone(),
-                    consumer: ConsumerConfig::default()
-                },
                 workspace
             )
         );

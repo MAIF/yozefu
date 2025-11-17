@@ -10,7 +10,7 @@ use std::{collections::HashMap, path::PathBuf};
 pub struct YozefuConfig {
     cluster: String,
     cluster_config: ClusterConfig,
-    pub logs_file: Option<PathBuf>,
+    pub log_file: Option<PathBuf>,
     pub export_directory: Option<PathBuf>,
 }
 
@@ -19,7 +19,7 @@ impl YozefuConfig {
         Self {
             cluster: cluster.to_string(),
             cluster_config,
-            logs_file: None,
+            log_file: None,
             export_directory: None,
         }
     }
@@ -44,7 +44,7 @@ impl YozefuConfig {
         Self {
             cluster: self.cluster,
             cluster_config: self.cluster_config,
-            logs_file: self.logs_file,
+            log_file: self.log_file,
             export_directory: Some(exported_directory),
         }
     }
@@ -53,7 +53,7 @@ impl YozefuConfig {
         Self {
             cluster: self.cluster,
             cluster_config: self.cluster_config,
-            logs_file: Some(logs_file),
+            log_file: Some(logs_file),
             export_directory: self.export_directory,
         }
     }
@@ -67,7 +67,7 @@ impl YozefuConfig {
         Self {
             cluster: self.cluster,
             cluster_config: self.cluster_config.with_kafka_properties(kafka_properties),
-            logs_file: self.logs_file,
+            log_file: self.log_file,
             export_directory: self.export_directory,
         }
     }

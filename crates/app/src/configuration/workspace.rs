@@ -9,7 +9,7 @@ use itertools::Itertools;
 use lib::Error;
 use serde_json::Value;
 
-use crate::APPLICATION_NAME;
+use crate::{APPLICATION_NAME, configuration::GlobalConfig};
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 #[cfg_attr(test, derive(schemars::JsonSchema))]
@@ -18,16 +18,21 @@ pub struct Workspace {
     /// Config directory of Yozefu, the `path` is a directory
     pub path: PathBuf,
     /// Specific config file of Yozefu
-    config_file: PathBuf,
+    pub(super) config: GlobalConfig,
+    /// Specific log file of Yozefu
+    log_file: PathBuf,
 }
 
 impl Default for Workspace {
     fn default() -> Self {
         Self {
             path: Self::yozefu_directory().unwrap(),
-            config_file: Self::yozefu_directory()
-                .unwrap()
-                .join(Self::CONFIG_FILENAME),
+            config: GlobalConfig::new(
+                &Workspace::yozefu_directory()
+                    .unwrap()
+                    .join(Self::CONFIG_FILENAME),
+            ),
+            log_file: Self::yozefu_directory().unwrap().join(Self::LOGS_FILENAME),
         }
     }
 }
@@ -38,10 +43,11 @@ impl Workspace {
     pub const THEMES_FILENAME: &str = "themes.json";
     pub const FILTERS_DIRECTORY: &str = "filters";
 
-    pub fn new(directory: &Path, config_file: &Path) -> Self {
+    pub fn new(directory: &Path, config: GlobalConfig, log_file: PathBuf) -> Self {
         Self {
             path: directory.to_path_buf(),
-            config_file: config_file.to_path_buf(),
+            config,
+            log_file,
         }
     }
 
@@ -56,12 +62,16 @@ impl Workspace {
 
     /// Returns the name of config file
     pub fn config_file(&self) -> PathBuf {
-        self.config_file.clone()
+        self.config.path.clone()
     }
 
     /// Returns the name of the logs file
-    pub fn logs_file(&self) -> PathBuf {
-        self.path.join(Self::LOGS_FILENAME)
+    pub fn log_file(&self) -> PathBuf {
+        self.log_file.clone()
+    }
+
+    pub fn config(&self) -> &GlobalConfig {
+        &self.config
     }
 
     /// Returns the name of the logs file

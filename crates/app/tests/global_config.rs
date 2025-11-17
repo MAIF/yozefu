@@ -10,7 +10,7 @@ fn check_backwards_compatibility() {
         clusters: IndexMap::new(),
         default_url_template: String::new(),
         path: PathBuf::new(),
-        logs: PathBuf::from("./yozefu.log").into(),
+        log_file: None,
         initial_query: "from end - 10".to_string(),
         theme: "default".to_string(),
         default_kafka_config: IndexMap::new(),
