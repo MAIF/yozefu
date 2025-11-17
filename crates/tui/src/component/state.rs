@@ -28,11 +28,11 @@ impl State {
             theme,
             highlighter_theme: Highlighter::theme(
                 temp.as_deref(),
-                config.global.highlighter_theme.as_deref(),
+                config.workspace().config().highlighter_theme.as_deref(),
             ),
             internal_config: config.clone(),
             themes: config.workspace().themes(),
-            configuration_file: config.global.path.clone(),
+            configuration_file: config.workspace().config_file(),
             config: config.clone(),
         }
     }

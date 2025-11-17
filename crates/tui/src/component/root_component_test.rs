@@ -1,7 +1,7 @@
 use crate::assert_draw;
 use crate::component::Component;
 use crate::{
-    component::{ConcurrentRecordsBuffer, RootComponent, default_global_config, default_state},
+    component::{ConcurrentRecordsBuffer, RootComponent, default_state},
     records_buffer::RecordsBuffer,
 };
 use std::sync::{Arc, LazyLock, Mutex};
@@ -12,11 +12,9 @@ static BUFFER: ConcurrentRecordsBuffer =
 #[test]
 fn test_draw() {
     BUFFER.lock().unwrap().reset();
-    let config = default_global_config();
     let mut component = RootComponent::new(
         "from begin",
         vec!["topic1".to_string(), "topic2".to_string()],
-        &config,
         &BUFFER,
         default_state(),
     );

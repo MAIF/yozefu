@@ -56,7 +56,7 @@ impl CliCommand for ConfigureGetCommand {
                     | "functions_dir" | "function_dir" => {
                         println!("{}", workspace.filters_dir().display());
                     }
-                    "log" | "logs" => println!("{}", config.logs_file().display()),
+                    "log" | "logs" => println!("{}", workspace.log_file().display()),
                     "configuration_file" | "configuration-file" | "config" | "conf" => {
                         println!("{}", file.display());
                     }

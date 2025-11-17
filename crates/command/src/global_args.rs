@@ -1,4 +1,4 @@
-use app::configuration::Workspace;
+use app::configuration::{GlobalConfig, Workspace};
 use clap::Args;
 use std::path::PathBuf;
 use tracing::debug;
@@ -11,25 +11,37 @@ pub struct GlobalArgs {
     #[arg(long, env = "YOZEFU_CONFIG_DIR", global = true)]
     /// Use a specific config directory to store the configuration, logs, search filters.
     pub config_dir: Option<PathBuf>,
+    #[arg(long, env = "YOZEFU_LOG_FILE", global = true)]
+    /// Append logs to a specific log file
+    pub log_file: Option<PathBuf>,
 }
 
 impl GlobalArgs {
     pub fn workspace(&self) -> Workspace {
         let default_workspace = Workspace::default();
-        let workspace = match (&self.config_dir, &self.config_file) {
-            (Some(dir), Some(file)) => Workspace::new(dir, file),
-            (Some(dir), None) => Workspace::new(dir, &dir.join(Workspace::CONFIG_FILENAME)),
-            (None, Some(file)) => Workspace::new(&default_workspace.path, file),
-            (None, None) => default_workspace,
+
+        let (workspace_dir, config_file) = match (&self.config_dir, &self.config_file) {
+            (Some(dir), Some(file)) => (dir, file),
+            (Some(dir), None) => (dir, &dir.join(Workspace::CONFIG_FILENAME)),
+            (None, Some(file)) => (&default_workspace.path, file),
+            (None, None) => (&default_workspace.path, &default_workspace.config_file()),
         };
 
+        let config = GlobalConfig::read(config_file).unwrap_or(GlobalConfig::new(config_file));
+
+        let log_file = match &self.log_file {
+            Some(log_file) => log_file.clone(),
+            None => config
+                .log_file
+                .as_ref()
+                .unwrap_or(&workspace_dir.join(Workspace::LOGS_FILENAME))
+                .clone(),
+        };
+
+        let workspace = Workspace::new(workspace_dir, config, log_file);
         debug!("Using config directory: {}", workspace.path.display());
         workspace
     }
-
-    //pub fn config_file(&self) -> PathBuf {
-    //    self.config_dir().global_config()
-    //}
 }
 
 #[cfg(test)]
@@ -42,6 +54,7 @@ mod tests {
         let args = GlobalArgs {
             config_dir: Some(PathBuf::from("/tmp/config_dir")),
             config_file: Some(PathBuf::from("/tmp/config_dir/config.json")),
+            log_file: None,
         };
         let ws = args.workspace();
         assert_eq!(ws.path, PathBuf::from("/tmp/config_dir"));
@@ -56,6 +69,7 @@ mod tests {
         let args = GlobalArgs {
             config_dir: Some(PathBuf::from("/tmp/config_dir")),
             config_file: None,
+            log_file: None,
         };
         let ws = args.workspace();
         assert_eq!(ws.path, PathBuf::from("/tmp/config_dir"));
@@ -64,11 +78,14 @@ mod tests {
             ws.config_file(),
             Workspace::new(
                 &PathBuf::from("/tmp/config_dir"),
-                args.config_dir
-                    .as_ref()
-                    .unwrap()
-                    .join(Workspace::CONFIG_FILENAME)
-                    .as_path(),
+                GlobalConfig::new(
+                    &args
+                        .config_dir
+                        .as_ref()
+                        .unwrap()
+                        .join(Workspace::CONFIG_FILENAME)
+                ),
+                PathBuf::from("/tmp/config_dir/application.log")
             )
             .config_file()
         );
@@ -80,6 +97,7 @@ mod tests {
         let args = GlobalArgs {
             config_dir: None,
             config_file: Some(PathBuf::from("/tmp/config_dir/config.json")),
+            log_file: None,
         };
         let ws = args.workspace();
         assert_eq!(ws.path, default_ws.path);
@@ -95,6 +113,7 @@ mod tests {
         let args = GlobalArgs {
             config_dir: None,
             config_file: None,
+            log_file: None,
         };
         let ws = args.workspace();
         assert_eq!(ws.path, default_ws.path);
@@ -106,6 +125,7 @@ mod tests {
         let args = GlobalArgs {
             config_dir: Some(PathBuf::from("/tmp/config_dir")),
             config_file: Some(PathBuf::from("/tmp/config_dir/config.json")),
+            log_file: None,
         };
         assert_eq!(
             args.workspace().config_file(),

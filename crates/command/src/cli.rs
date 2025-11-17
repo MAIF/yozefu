@@ -117,7 +117,7 @@ fn init_config_file(workspace: &Workspace) -> Result<PathBuf, Error> {
         return Ok(path);
     }
 
-    let mut config = GlobalConfig::try_from(&path)?;
+    let mut config = GlobalConfig::new(&path);
     let mut localhost_config = IndexMap::new();
     localhost_config.insert(
         "bootstrap.servers".to_string(),
@@ -193,7 +193,8 @@ fn test_valid_themes() {
 fn initialize_config_file_on_readonly_root_partition() {
     let workspace = Workspace::new(
         &PathBuf::from("/tmp/yozefu-readonly"),
-        &PathBuf::from("/tmp/yozefu-readonly/config.json"),
+        GlobalConfig::new(&PathBuf::from("/tmp/yozefu-readonly/config.json")),
+        PathBuf::from("/tmp/yozefu-readonly").join(Workspace::LOGS_FILENAME),
     );
     let directory = &workspace.path;
 

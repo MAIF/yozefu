@@ -13,7 +13,6 @@ use rdkafka::Message;
 use rdkafka::consumer::{Consumer, StreamConsumer};
 use rdkafka::message::OwnedMessage;
 use std::collections::HashSet;
-use std::fs;
 use std::time::Duration;
 use tokio::sync::mpsc::{self, UnboundedSender};
 use tokio::time::Instant;
@@ -42,29 +41,16 @@ pub struct Ui {
 
 impl Ui {
     pub fn new(app: App, query: &str, selected_topics: Vec<String>, state: State) -> Self {
-        let config = app.config.clone();
         Self {
             should_quit: false,
             worker: CancellationToken::new(),
             app,
             records: &BUFFER,
             topics: vec![],
-            root: RootComponent::new(query, selected_topics, &config.global, &BUFFER, state),
+            root: RootComponent::new(query, selected_topics, &BUFFER, state),
             records_sender: None,
             last_tick_key_events: Vec::new(),
         }
-    }
-
-    pub fn save_config(&self) -> Result<(), TuiError> {
-        let mut config = self.app.config.clone();
-        if config.global.history.len() > 1000 {
-            config.global.history = config.global.history.into_iter().skip(500).collect();
-        }
-        fs::write(
-            &self.app.config.global.path,
-            serde_json::to_string_pretty(&self.app.config.global)?,
-        )?;
-        Ok(())
     }
 
     pub(crate) fn create_consumer(
@@ -340,9 +326,8 @@ impl Ui {
             while let Ok(action) = action_rx.try_recv() {
                 match action {
                     Action::NewSearchPrompt(ref prompt) => {
-                        self.app.config.global.history.push(prompt.to_string());
-                        self.app.config.global.history.dedup();
-                        self.save_config()?;
+                        self.app.config.push_history(prompt);
+                        self.app.config.save_config()?;
                     }
                     Action::RequestTopicDetails(ref topics) => {
                         self.topics_details(topics.clone(), action_tx.clone());

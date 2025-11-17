@@ -63,6 +63,13 @@
     "export_directory": {
       "type": "string",
       "default": "./yozefu-exports"
+    },
+    "log_file": {
+      "description": "The file to write logs to",
+      "type": [
+        "string",
+        "null"
+      ]
     }
   },
   "required": [
