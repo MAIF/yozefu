@@ -1,3 +1,18 @@
+## What's Changed in 0.0.19
+* develop by @Mcdostone in [#162](https://github.com/MAIF/yozefu/pull/162)
+* feat: log file can be specified via the CLI or an environment variable by @Mcdostone
+* fix: improve the error message if yozefu can't initialize the configuration file (readonly dir) by @Mcdostone
+* ci: ignore wasmtime vuln for now by @Mcdostone
+* docs: add SECURITY.md by @Mcdostone
+* build: upgrade github runners to macos-15 by @Mcdostone
+* fix: better error message when the editor cannot be found by @Mcdostone
+* style: update `--version` output by @Mcdostone
+* build(deps): bump actions/setup-node from 5 to 6 by @dependabot[bot]
+* ci: do not install unused rust components by @Mcdostone
+* Changelog for v0.0.18 by @github-actions[bot] in [#161](https://github.com/MAIF/yozefu/pull/161)
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.18...v0.0.19
+
 ## What's Changed in 0.0.18
 * Develop by @Mcdostone in [#160](https://github.com/MAIF/yozefu/pull/160)
 * build: update dependencies by @Mcdostone
