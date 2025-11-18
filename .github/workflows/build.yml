@@ -79,7 +79,7 @@ jobs:
 
   build-for-targets:
     name: Build for targets
-    needs: check
+    # needs: check
     runs-on: ${{ matrix.platforms.os }}
     continue-on-error: true
     permissions:
@@ -96,15 +96,21 @@ jobs:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             features: ""
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            features: "--no-default-features --features ssl-vendored"
           - os: ubuntu-24.04-arm
             target: aarch64-unknown-linux-gnu
             features: ""
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-musl
+            features: "--no-default-features --features ssl-vendored,cmake-build"
           - os: windows-latest
             target: x86_64-pc-windows-gnu
-            features: "--no-default-features"
+            features: "--no-default-features --features cmake-build"
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            features: "--no-default-features --features ssl-vendored"
+            features: "--no-default-features --features ssl-vendored,cmake-build"
     steps:
       - uses: actions/checkout@v5
         with:

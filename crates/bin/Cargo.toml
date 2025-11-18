@@ -2,11 +2,7 @@
 name = "yozefu"
 description.workspace = true
 keywords = ["kafka", "consumer", "avro", "tui", "ratatui"]
-categories = [
-    "command-line-utilities",
-    "gui",
-    "development-tools",
-]
+categories = ["command-line-utilities", "gui", "development-tools"]
 documentation.workspace = true
 version.workspace = true
 authors.workspace = true
@@ -27,16 +23,11 @@ command = { workspace = true }
 console-subscriber = "0.5.0"
 
 [features]
-default = ["ssl-vendored", "gssapi-vendored", "libz-static"]
-ssl-vendored = [
-    "command/ssl-vendored"
-]
-gssapi-vendored = [
-    "command/gssapi-vendored"
-]
-libz-static = [
-    "command/libz-static"
-]
+default = ["ssl-vendored", "gssapi-vendored", "libz-static", "cmake-build"]
+ssl-vendored = ["command/ssl-vendored"]
+gssapi-vendored = ["command/gssapi-vendored"]
+libz-static = ["command/libz-static"]
+cmake-build = ["command/cmake-build"]
 
 
 [package.metadata.cargo-machete]
