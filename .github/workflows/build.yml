@@ -22,25 +22,10 @@ concurrency:
 
 jobs:
   check:
-    name: Check ${{ matrix.package.name }}
+    name: Check
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    strategy:
-      matrix:
-        package:
-          - name: yozefu-lib
-            command: cargo check --locked --package yozefu-lib
-          - name: yozefu-app
-            command: cargo check --locked --package yozefu-app
-          - name: yozefu-command
-            command: cargo check --locked --package yozefu-command
-          - name: yozefu-tui
-            command: cargo check --locked --package yozefu-tui
-          - name: yozefu-wasm-types
-            command: cargo check --locked --package yozefu-wasm-types
-          - name: yozefu
-            command: cargo run --locked -- --version
     steps:
       - uses: actions/checkout@v5
         with:
@@ -52,7 +37,24 @@ jobs:
         with:
           cache-all-crates: true
       - name: Run cargo check
-        run: ${{ matrix.package.command }}
+        run: cargo check --locked
+
+  hack:
+    name: Cargo hack
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v2  
+      - uses: taiki-e/install-action@cargo-hack
+      - run: cargo hack check --feature-powerset --no-dev-deps
 
   build:
     name: Build w/o features
