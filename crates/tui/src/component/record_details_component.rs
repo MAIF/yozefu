@@ -193,10 +193,10 @@ impl Component for RecordDetailsComponent<'_> {
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Result<Option<Action>, TuiError> {
         match key.code {
-            KeyCode::Char('k') => {
+            KeyCode::Char('j') => {
                 self.scroll.scroll_to_next_line();
             }
-            KeyCode::Char('j') => {
+            KeyCode::Char('k') => {
                 self.scroll.scroll_to_previous_line();
             }
             KeyCode::Char('[') => {
