@@ -300,7 +300,7 @@ impl Ui {
         let records_channel = mpsc::unbounded_channel::<KafkaRecord>();
         self.records_sender = Some(records_channel.0);
         self.load_topics(action_tx.clone());
-        let mut tui = tui::Tui::new()?;
+        let mut tui: tui::Tui = tui::Tui::new()?;
         tui.enter()?;
         self.root.register_action_handler(action_tx.clone());
         self.root.init()?;
