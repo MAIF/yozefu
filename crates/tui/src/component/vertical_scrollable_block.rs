@@ -69,10 +69,10 @@ where
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Result<Option<Action>, TuiError> {
         match key.code {
-            KeyCode::Char('k') | KeyCode::Down => {
+            KeyCode::Char('j') | KeyCode::Down => {
                 self.scroll = (self.scroll + 1).min(self.scroll_length);
             }
-            KeyCode::Char('j') | KeyCode::Up => {
+            KeyCode::Char('k') | KeyCode::Up => {
                 self.scroll = self.scroll.saturating_sub(1);
             }
             KeyCode::Char('[') => {

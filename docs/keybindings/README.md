@@ -15,8 +15,8 @@ The choices I made are completely personal. I use a qwerty Apple keyboard for yo
 | <kbd>Ctrl</kbd> + <kbd>O</kbd>    | Show/Hide topics                       |
 | <kbd>[</kbd>                      | Scroll to top                          |
 | <kbd>]</kbd>                      | Scroll to bottom                       |
-| <kbd>J</kbd>                      | Move to upward direction by one line   |
-| <kbd>K</kbd>                      | Move to downward direction by one line |
+| <kbd>K</kbd>                      | Move to upward direction by one line   |
+| <kbd>J</kbd>                      | Move to downward direction by one line |
 
 
 <br />
