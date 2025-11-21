@@ -1,3 +1,12 @@
+## What's Changed in 0.0.20
+* Develop by @Mcdostone in [#175](https://github.com/MAIF/yozefu/pull/175)
+* build: refactor schemars dependency by @Mcdostone
+* fix: wrong direction when scrolling with 'j' and 'k' #174 by @Mcdostone
+* build(deps-dev): bump esbuild in /crates/wasm-blueprints/js by @dependabot[bot]
+* Changelog for v0.0.19 by @github-actions[bot] in [#173](https://github.com/MAIF/yozefu/pull/173)
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.19...v0.0.20
+
 ## What's Changed in 0.0.19
 * develop by @Mcdostone in [#162](https://github.com/MAIF/yozefu/pull/162)
 * feat: log file can be specified via the CLI or an environment variable by @Mcdostone
