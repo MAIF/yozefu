@@ -29,7 +29,7 @@ assert_cmd = "2.1.1"
 testcontainers = { version = "0.25.0", features = ["blocking"] }
 
 [features]
-default = ["ssl-vendored", "gssapi-vendored", "libz-static"]
+default = ["ssl-vendored", "libz-static"]
 ssl-vendored = [
     "command/ssl-vendored"
 ]
