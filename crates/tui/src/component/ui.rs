@@ -243,7 +243,12 @@ impl Ui {
             .name("topics-details")
             .spawn(async move {
                 match app.topic_details(topics) {
-                    Ok(details) => action_tx.send(Action::TopicDetails(details)).unwrap(),
+                    Ok(mut details) => {
+                        for detail in &mut details.iter_mut() {
+                            detail.config = app.topic_config_of(&detail.name).await.ok().flatten();
+                        }
+                        action_tx.send(Action::TopicDetails(details)).unwrap();
+                    }
                     Err(e) => action_tx
                         .send(Action::Notification(Notification::new(
                             Level::Error,
