@@ -1,6 +1,6 @@
 //! This app is both a kafka consumer and a kafka admin client.
 use lib::{
-    ConsumerGroupDetail, Error, ExportedKafkaRecord, KafkaRecord, TopicDetail,
+    ConsumerGroupDetail, Error, ExportedKafkaRecord, KafkaRecord, TopicConfig, TopicDetail,
     kafka::SchemaRegistryClient, search::offset::FromOffset,
 };
 use rdkafka::{
@@ -15,6 +15,7 @@ use std::{collections::HashSet, fs, time::Duration};
 use itertools::Itertools;
 
 use crate::{
+    AdminClient,
     configuration::{Configuration, ConsumerConfig, InternalConfig, YozefuConfig},
     search::{Search, ValidSearchQuery},
 };
@@ -201,6 +202,7 @@ impl App {
                 partitions: metadata.partitions().len(),
                 consumer_groups: vec![],
                 count: self.count_records_in_topic(&topic)?,
+                config: None,
             };
             let mut consumer_groups = vec![];
             let metadata = consumer.fetch_group_list(None, Duration::from_secs(10))?;
@@ -211,12 +213,17 @@ impl App {
                     state: g.state().parse()?,
                 });
             }
-
             detail.consumer_groups = consumer_groups;
             results.push(detail);
         }
 
         Ok(results)
+    }
+
+    pub async fn topic_config_of(&self, topic: &str) -> Result<Option<TopicConfig>, Error> {
+        AdminClient::new(self.config.client_config())?
+            .topic_config(topic)
+            .await
     }
 
     pub fn count_records_in_topic(&self, topic: &str) -> Result<i64, Error> {

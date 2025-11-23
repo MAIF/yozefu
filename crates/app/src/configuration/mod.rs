@@ -31,9 +31,14 @@ pub trait Configuration {
     where
         T: FromClientConfig,
     {
-        Self::kafka_client_config_from_properties(self.kafka_config_map().clone())
+        self.client_config()
             .create()
             .map_err(std::convert::Into::into)
+    }
+
+    /// Properties you can set for the kafka consumer: <https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md>
+    fn client_config(&self) -> ClientConfig {
+        Self::kafka_client_config_from_properties(self.kafka_config_map().clone())
     }
 
     fn kafka_client_config_from_properties(
