@@ -2,10 +2,12 @@
 //! - List topics, and consume records,
 //! - Fetch information about a given topic,
 //! - Consume records.
+pub mod admin;
 mod app;
 pub mod configuration;
 pub mod search;
 
+pub use admin::*;
 pub use app::App;
 /// Name of the application
 pub const APPLICATION_NAME: &str = "yozefu";
