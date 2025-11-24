@@ -344,9 +344,9 @@ jobs:
     strategy:
       matrix:
         platforms:
-          - os: macos-14
+          - os: macos-15
             target: aarch64-apple-darwin
-          - os: macos-14-large
+          - os: macos-15-large
             target: x86_64-apple-darwin
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
