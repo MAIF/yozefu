@@ -1,3 +1,13 @@
+## What's Changed in 0.0.21
+* Develop by @Mcdostone in [#180](https://github.com/MAIF/yozefu/pull/180)
+* ci: use `macos-15` for nix by @Mcdostone
+* feat: show topic configuration in the TopicDetailComponent by @Mcdostone
+* build: some default features are not compatible with windows. I removed from the default enabled features #177 by @Mcdostone
+* fix: integration tests with testcontainers by @Mcdostone
+* Changelog for v0.0.20 by @github-actions[bot] in [#176](https://github.com/MAIF/yozefu/pull/176)
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.20...v0.0.21
+
 ## What's Changed in 0.0.20
 * Develop by @Mcdostone in [#175](https://github.com/MAIF/yozefu/pull/175)
 * build: refactor schemars dependency by @Mcdostone
