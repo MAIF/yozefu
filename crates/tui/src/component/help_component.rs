@@ -153,7 +153,7 @@ impl Component for HelpComponent {
             Line::from(""),
 
             Line::from("                                                      Variable      Type                        Alias       Description").bold(),
-            Line::from(vec![Span::raw("                                                         topic      "), Span::from("String").fg(state.theme.green), Span::from("                          t").fg(state.theme.blue), Span::from("        Kafka topic")]),
+            Line::from(vec![Span::raw("                                                         topic      "), Span::from("String").fg(state.theme.green), Span::from("                          t").fg(state.theme.blue), Span::from("       Kafka topic")]),
             Line::from(vec![Span::raw("                                                        offset      "), Span::from("Number").fg(state.theme.green), Span::from("                          o").fg(state.theme.blue), Span::from("       Offset of the record")]),
             Line::from(vec![Span::raw("                                                           key      "), Span::from(""), Span::from("                                k").fg(state.theme.blue), Span::from("       Key of the record")]),
             Line::from(vec![Span::raw("                                                         value      "), Span::from(""), Span::from("                                v").fg(state.theme.blue), Span::from("       Value of the record")]),

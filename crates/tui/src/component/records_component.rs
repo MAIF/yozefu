@@ -1,12 +1,12 @@
 //! Component showing in real time incoming kafka records.
 
-use app::search::ValidSearchQuery;
+use app::{configuration::TimestampFormat, search::ValidSearchQuery};
 use copypasta::{ClipboardContext, ClipboardProvider};
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use lib::ExportedKafkaRecord;
 use ratatui::{
     Frame,
-    layout::{Alignment, Constraint, Rect},
+    layout::{Alignment, Constraint, Layout, Rect},
     style::{Style, Stylize},
     text::{Span, Text},
     widgets::{Block, BorderType, Borders, Cell, Row, Table, TableState},
@@ -20,7 +20,7 @@ use crate::{
     Action,
     action::{Level, Notification},
     error::TuiError,
-    records_buffer::{BufferAction, Stats},
+    records_buffer::{BUFFER_SIZE, BufferAction, Stats},
 };
 
 use super::{Component, ComponentName, ConcurrentRecordsBuffer, Shortcut, State, styles};
@@ -37,10 +37,12 @@ pub(crate) struct RecordsComponent<'a> {
     buffer_tx: Receiver<BufferAction>,
     selected_topics: usize,
     key_events_buffer: Vec<KeyEvent>,
+    column_size: u16,
+    timestamp_format: TimestampFormat,
 }
 
 impl<'a> RecordsComponent<'a> {
-    pub fn new(records: &'a ConcurrentRecordsBuffer) -> Self {
+    pub fn new(records: &'a ConcurrentRecordsBuffer, timestamp_format: TimestampFormat) -> Self {
         let buffer_tx = records.lock().map(|e| e.channels.clone().1).ok().unwrap();
 
         Self {
@@ -55,6 +57,8 @@ impl<'a> RecordsComponent<'a> {
             buffer_tx,
             selected_topics: 0,
             key_events_buffer: Vec::default(),
+            column_size: 0,
+            timestamp_format,
         }
     }
 
@@ -197,10 +201,9 @@ impl<'a> RecordsComponent<'a> {
         Ok(())
     }
 
-    fn truncate_value(value: &str, rect: Rect) -> String {
-        let split_at = rect.width.checked_sub(68).unwrap_or(3) as usize;
-        match value.len() > split_at {
-            true => value.chars().take(split_at).collect(),
+    fn truncate_value(value: &str, width: usize) -> String {
+        match value.len() > width {
+            true => value.chars().take(width).collect(),
             false => value.to_string(),
         }
     }
@@ -263,6 +266,12 @@ impl Component for RecordsComponent<'_> {
                         .send(Action::Open(record.clone()))?;
                 }
             }
+            KeyCode::Char('t') => {
+                self.timestamp_format = match self.timestamp_format {
+                    TimestampFormat::Ago => TimestampFormat::DateTime,
+                    TimestampFormat::DateTime => TimestampFormat::Ago,
+                };
+            }
             KeyCode::Char('[') => {
                 self.follow(false)?;
                 self.first();
@@ -280,6 +289,12 @@ impl Component for RecordsComponent<'_> {
                 self.follow(false)?;
                 self.previous();
                 self.set_event_dialog()?;
+            }
+            KeyCode::Left => {
+                self.column_size = self.column_size.saturating_sub(1);
+            }
+            KeyCode::Right => {
+                self.column_size = self.column_size.saturating_add(1).min(100);
             }
             KeyCode::Char('g' | 'G') => self.buffer_key_event(key)?,
             _ => (),
@@ -320,6 +335,19 @@ impl Component for RecordsComponent<'_> {
 
         let block = self.make_block_focused_with_state(state, block);
 
+        let constraints = [
+            Constraint::Length(match self.timestamp_format {
+                TimestampFormat::Ago => 15,
+                TimestampFormat::DateTime => 29,
+            }),
+            Constraint::Min(19 + self.column_size),
+            Constraint::Length(7),
+            Constraint::Length(10 + self.column_size),
+            Constraint::Percentage(100),
+        ];
+
+        let lll = Layout::horizontal(constraints).split(rect);
+
         let normal_style = Style::default();
         let header_cells = vec![
             Cell::new(Text::from("Timestamp")).bold(),
@@ -333,7 +361,7 @@ impl Component for RecordsComponent<'_> {
             .height(1)
             .bottom_margin(1);
 
-        let mut records = Vec::with_capacity(500);
+        let mut records = Vec::with_capacity(BUFFER_SIZE);
         {
             let r = self.records.lock().unwrap();
             records.extend(r.iter().cloned());
@@ -350,48 +378,47 @@ impl Component for RecordsComponent<'_> {
             }
 
             let cells = vec![
-                Cell::new(styles::colorize_timestamp(item, &state.theme)),
+                Cell::new(
+                    styles::colorize_timestamp(item, &state.theme, &self.timestamp_format)
+                        .alignment(match self.timestamp_format {
+                            TimestampFormat::Ago => Alignment::Right,
+                            TimestampFormat::DateTime => Alignment::Left,
+                        }),
+                ),
                 Cell::new(
                     Text::from(styles::colorize_and_shorten_topic(
                         &item.topic,
                         item.partition,
                         &state.theme,
+                        lll[1].width as usize,
                     ))
                     .alignment(Alignment::Right),
                 ),
                 Cell::new(Text::from(item.offset.to_string()).alignment(Alignment::Right)),
                 Cell::new(
-                    styles::colorize_key(&item.key_as_string, &state.theme)
+                    styles::colorize_key(&item.key_as_string, &state.theme, lll[3].width as usize)
                         .alignment(Alignment::Right),
                 ),
                 Cell::new(Text::from(Self::truncate_value(
                     &item.value_as_string,
-                    rect,
+                    lll[4].width as usize,
                 ))),
             ];
             Row::new(cells).height(1_u16)
         });
-        let table = Table::new(
-            rows,
-            [
-                Constraint::Min(29),
-                Constraint::Min(12),
-                Constraint::Min(7),
-                Constraint::Min(10),
-                Constraint::Percentage(100),
-            ],
-        )
-        .header(header)
-        .column_spacing(2)
-        .row_highlight_style(match focused {
-            true => Style::default()
-                .bg(state.theme.bg_focused_selected)
-                .fg(state.theme.fg_focused_selected)
-                .bold(),
-            false => Style::default()
-                .bg(state.theme.bg_unfocused_selected)
-                .fg(state.theme.fg_unfocused_selected),
-        });
+
+        let table = Table::new(rows, constraints)
+            .header(header)
+            .column_spacing(2)
+            .row_highlight_style(match focused {
+                true => Style::default()
+                    .bg(state.theme.bg_focused_selected)
+                    .fg(state.theme.fg_focused_selected)
+                    .bold(),
+                false => Style::default()
+                    .bg(state.theme.bg_unfocused_selected)
+                    .fg(state.theme.fg_unfocused_selected),
+            });
 
         let metrics = Span::styled(
             format!(
@@ -463,7 +490,8 @@ impl Component for RecordsComponent<'_> {
                     false => "Follow",
                 },
             ),
-            //Shortcut::new("↑↓", "Scroll"),
+            Shortcut::new("T", "Timestamp format"),
+            Shortcut::new("⇄", "Resize"),
         ];
 
         shortcuts

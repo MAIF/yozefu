@@ -1,7 +1,7 @@
 use std::{fs, hash::DefaultHasher, path::PathBuf};
 
 use indexmap::IndexMap;
-use yozefu_app::configuration::{ConsumerConfig, GlobalConfig};
+use yozefu_app::configuration::{ConsumerConfig, GlobalConfig, TimestampFormat};
 
 #[test]
 fn check_backwards_compatibility() {
@@ -19,6 +19,7 @@ fn check_backwards_compatibility() {
         export_directory: PathBuf::from("./yozefu-exports"),
         consumer: ConsumerConfig::default(),
         highlighter_theme: None,
+        timestamp_format: TimestampFormat::DateTime,
     };
 
     let json = serde_json::to_string_pretty(&config).unwrap();

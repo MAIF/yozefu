@@ -141,7 +141,7 @@ pub mod root_component_test;
 
 #[cfg(test)]
 pub fn default_workspace() -> Workspace {
-    use app::configuration::{ConsumerConfig, Workspace};
+    use app::configuration::{ConsumerConfig, TimestampFormat, Workspace};
 
     let temp_dir = tempfile::tempdir().unwrap();
     let temp_path = temp_dir.path().to_path_buf();
@@ -161,6 +161,7 @@ pub fn default_workspace() -> Workspace {
             show_shortcuts: true,
             export_directory: std::path::PathBuf::from(""),
             consumer: ConsumerConfig::default(),
+            timestamp_format: TimestampFormat::DateTime,
         },
         temp_path.join(Workspace::LOGS_FILENAME),
     )

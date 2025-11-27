@@ -23,6 +23,14 @@ const EXAMPLE_PROMPTS: &[&str] = &[
     r#"key == "ABC" and timestamp >= "2 days ago""#,
 ];
 
+#[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Default)]
+#[cfg_attr(test, derive(schemars::JsonSchema))]
+pub enum TimestampFormat {
+    #[default]
+    DateTime,
+    Ago,
+}
+
 /// Configuration of the application
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone)]
 #[cfg_attr(test, derive(schemars::JsonSchema))]
@@ -56,6 +64,9 @@ pub struct GlobalConfig {
     pub export_directory: PathBuf,
     /// The file to write logs to
     pub log_file: Option<PathBuf>,
+    /// Show the timestamp as a date time or as "X minutes ago"
+    #[serde(default = "TimestampFormat::default")]
+    pub timestamp_format: TimestampFormat,
 }
 
 fn default_url_template() -> String {
@@ -96,6 +107,7 @@ impl GlobalConfig {
             export_directory: default_export_directory(),
             consumer: ConsumerConfig::default(),
             log_file: None,
+            timestamp_format: TimestampFormat::default(),
         }
     }
 

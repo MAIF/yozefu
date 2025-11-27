@@ -76,6 +76,7 @@ use crate::assert_draw;
 fn test_draw() {
     use std::collections::BTreeMap;
 
+    use app::configuration::TimestampFormat;
     use lib::{DataType, KafkaRecord};
     use serde_json::json;
 
@@ -84,7 +85,7 @@ fn test_draw() {
     };
 
     let topics_component = TopicsComponent::new(vec!["topic1".to_string()]);
-    let records_component = RecordsComponent::new(&BUFFER);
+    let records_component = RecordsComponent::new(&BUFFER, TimestampFormat::DateTime);
     BUFFER.lock().unwrap().reset();
     BUFFER.lock().unwrap().push(KafkaRecord {
         topic: "movie-trailers".into(),
