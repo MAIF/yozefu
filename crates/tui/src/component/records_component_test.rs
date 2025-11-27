@@ -14,7 +14,7 @@ fn test_draw() {
 
     use serde_json::json;
 
-    let mut component = RecordsComponent::new(&BUFFER);
+    let mut component = RecordsComponent::new(&BUFFER, Default::default());
     BUFFER.lock().unwrap().reset();
     BUFFER.lock().unwrap().push(KafkaRecord {
         topic: "movie-trailers".into(),

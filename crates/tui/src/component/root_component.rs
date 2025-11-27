@@ -59,7 +59,10 @@ impl RootComponent {
 
         let mut components: [Arc<Mutex<dyn Component>>; 10] = [
             topics_component.clone(),
-            Arc::new(Mutex::new(RecordsComponent::new(records))),
+            Arc::new(Mutex::new(RecordsComponent::new(
+                records,
+                state.workspace().config().timestamp_format.clone(),
+            ))),
             Arc::new(Mutex::new(TopicDetailsComponent::default())),
             Arc::new(Mutex::new(RecordDetailsComponent::new(highlighter.clone()))),
             Arc::new(Mutex::new(SearchComponent::new(
