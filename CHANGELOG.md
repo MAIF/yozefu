@@ -1,3 +1,16 @@
+## What's Changed in 0.0.22
+* Develop by @Mcdostone in [#191](https://github.com/MAIF/yozefu/pull/191)
+* build: update dependencies by @Mcdostone
+* feat: Allow to resize columns by @Mcdostone
+* build(deps): bump extism from 1.12.0 to 1.13.0 by @dependabot[bot]
+* build(deps): bump bytesize from 2.3.0 to 2.3.1 by @dependabot[bot]
+* build(deps): bump insta from 1.44.1 to 1.44.3 by @dependabot[bot]
+* build(deps): bump tracing from 0.1.41 to 0.1.43 by @dependabot[bot]
+* build(deps): bump actions/checkout from 5 to 6 by @dependabot[bot]
+* Changelog for v0.0.21 by @github-actions[bot] in [#184](https://github.com/MAIF/yozefu/pull/184)
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.21...v0.0.22
+
 ## What's Changed in 0.0.21
 * Develop by @Mcdostone in [#180](https://github.com/MAIF/yozefu/pull/180)
 * ci: use `macos-15` for nix by @Mcdostone
