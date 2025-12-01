@@ -239,6 +239,16 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Build documentation
         run: cargo doc --no-deps --document-private-items --verbose
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache-dependency-path: docs/package-lock.json
+          cache: npm
+      - name: Install dependencies
+        run: npm install --prefix docs
+      - name: Build with VitePress
+        run: npm run build --prefix docs
 
   lychee:
     name: Lychee

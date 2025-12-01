@@ -1,7 +1,7 @@
 <p align="center" style="width: 150px">
 <picture>
-    <source width="150" media="(prefers-color-scheme: dark)" srcset="https://github.com/MAIF/yozefu/raw/main/docs/assets/logo.svg">
-    <img width="150" alt=" Pixel art portrait of a serious-faced person in grayscale above the text 'Yozefu'" src="https://github.com/MAIF/yozefu/raw/main/docs/assets/logo.svg">
+    <source width="150" media="(prefers-color-scheme: dark)" srcset="https://github.com/MAIF/yozefu/raw/main/docs/public/logo.svg">
+    <img width="150" alt=" Pixel art portrait of a serious-faced person in grayscale above the text 'Yozefu'" src="https://github.com/MAIF/yozefu/raw/main/docs/public/logo.svg">
   </picture>
 </p>
 
@@ -123,18 +123,18 @@ yozf -c localhost
 <table>
   <tr>
     <td>
-      <img alt=" A TUI displays a list of topics on the left, a search bar below, and records with timestamps and values in a table on the right. " src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/assets/topics.png">
+      <img alt=" A TUI displays a list of topics on the left, a search bar below, and records with timestamps and values in a table on the right. " src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/public/topics.png">
     </td>
     <td>
-      <img alt="A TUI listing the consumed kafka records with their timestamps, their partition, their offset and an excerpt of the key and the value." src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/assets/records.png">
+      <img alt="A TUI listing the consumed kafka records with their timestamps, their partition, their offset and an excerpt of the key and the value." src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/public/records.png">
     </td>
   </tr>
   <tr>
     <td>
-      <img alt="View of a selected kafka records" src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/assets/record.png">
+      <img alt="View of a selected kafka records" src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/public/record.png">
     </td>
     <td>
-      <img alt="View of the help page" src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/assets/help.png">
+      <img alt="View of the help page" src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/public/help.png">
     </td>
   </tr>
 </table>

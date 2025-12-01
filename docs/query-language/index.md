@@ -36,7 +36,7 @@ value contains "release"
 ```
 
 
-5. Records where the `md5(key)` is equals to the user-provided parameter. A [search filter](../search-filter/README.md) must be implemented for this example.
+5. Records where the `md5(key)` is equals to the user-provided parameter. A [search filter](../search-filter/index.md) must be implemented for this example.
 ```sql
 from begin md5-key-equals-to("d131dd02c5e6eec4693d9a0698aff95c2fcab58712467eab4004583eb8fb7f89")
 ```

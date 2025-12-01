@@ -1,7 +1,4 @@
-<div align="center">
-<img width="64px" src="https://upload.wikimedia.org/wikipedia/commons/1/1f/WebAssembly_Logo.svg" alt="logo of WebAssembly"/>
-  <h1>Creating a search filter.</h1>
-</div>
+# Creating a search filter
 
 Let's say you want to list all kafka records where the key ends with `1234`. 
 Currently, the query syntax doesn't offer such feature. Fortunately, you have the ability to extend the search engine and create your own search logic.
@@ -26,7 +23,7 @@ The name of the function corresponds to the name of the wasm file. In the exampl
 Yōzefu relies on [Extism](https://extism.org/) to develop and execute search filters.
 The WebAssembly module we're going to implement must export 2 functions, `parse_parameters` and `matches`.
 
-The first step is to choose your preferred programming language. Extism supports different programming languages. You can read more at [Extism Quickstart Guide](https://extism.org/docs/quickstart/plugin-quickstart). I'll choose [golang](../../crates/wasm-blueprints/golang) for this example. A [Rust example](../../crates/wasm-blueprints/rust) is also available.
+The first step is to choose your preferred programming language. Extism supports different programming languages. You can read more at [Extism Quickstart Guide](https://extism.org/docs/quickstart/plugin-quickstart). I'll choose [golang](https://github.com/MAIF/yozefu/blob/main/crates/wasm-blueprints/golang) for this example. A [Rust example](https://github.com/MAIF/yozefu/blob/main/crates/wasm-blueprints/rust) is also available.
 
 ```bash
 yozf create-filter --language golang key-ends-with --directory /tmp/my-filter
@@ -34,14 +31,14 @@ yozf create-filter --language golang key-ends-with --directory /tmp/my-filter
 $EDITOR /tmp/my-filter
 ```
 
-If you need more context about how WebAssembly is called from the Rust codebase, feel free to explore [filter.rs](../../crates/app/src/search/filter.rs).
+If you need more context about how WebAssembly is called from the Rust codebase, feel free to explore [filter.rs](https://github.com/MAIF/yozefu/blob/main/crates/app/src/search/filter.rs).
 
 ### Function `parse_parameters`
 
 This function ensures that user-provided parameters are valid. This function is called once at parsing time.
 The function must return a status code `0` when it's valid. Another status code means the parameters are invalid.
 
-```golang
+```go
 // golang example
 // https://github.com/MAIF/yozefu/blob/main/crates/wasm-blueprints/golang/main.go
 
@@ -69,7 +66,7 @@ This function receives a [JSON object](./filter-input.json) containing both the 
 
 
 
-```golang
+```go
 // golang example
 // https://github.com/MAIF/yozefu/blob/main/crates/wasm-blueprints/golang/main.go
 

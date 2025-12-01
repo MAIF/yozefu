@@ -1,6 +1,6 @@
-# Themes.
+# Themes
 
-A theme is a [set of colors](https://github.com/MAIF/yozefu/blob/main/crates/command/themes.json) defining the appearance of UI. By default, Yozefu comes with 3 built-in themes:
+A theme is a [set of colors](https://github.com/MAIF/yozefu/blob/main/crates/command/themes.json) defining the appearance of UI. By default, Yōzefu comes with 3 built-in themes:
  - `light`
  - `dark`
  - `solarized-dark-higher-contrast`
@@ -12,10 +12,10 @@ yozf config get themes_file
 ```
 
 
-## How to select a theme
+### How to select a theme
 
 You have 2 options:
- 1. Use the `--theme <name>` flag when launching yozefu.
+ 1. Use the `--theme <name>` flag when launching yōzefu.
  2. Or update your configuration: `yozf config set /theme solarized-dark-higher-contrast`
 
 🖌️ You can also create, update and share your own themes by editing `themes.json`.
@@ -23,7 +23,7 @@ You have 2 options:
 
 ## Highlighter
 
-For syntax highlighting, Yozefu uses [Syntect](https://github.com/trishume/syntect)
+For syntax highlighting, Yōzefu uses [Syntect](https://github.com/trishume/syntect)
 Syntect includes [7 built-in themes](https://github.com/trishume/syntect/blob/2a3a09d54710a2d6a9b7724784e2a412d22a2375/src/dumps.rs#L208-L217):
  - `base16-ocean.dark`
  - `base16-eighties.dark`
@@ -34,7 +34,7 @@ Syntect includes [7 built-in themes](https://github.com/trishume/syntect/blob/2a
  - `Solarized (light)`
 
 
-## How to select a highlighter theme
+### How to select a highlighter theme?
 
 You can configure it in two ways:
  1. In `config.json`, under the `/highlighter_theme` property.
@@ -42,12 +42,12 @@ You can configure it in two ways:
 
 
 
-## Using a custom highlighter theme
+### Using a custom highlighter theme
 
 
 `syntect` supports [Sublime Text `.tmTheme` format](https://www.sublimetext.com/docs/color_schemes_tmtheme.html). For example, to use [`Srcery TextMate`](https://github.com/srcery-colors/srcery-textmate):
 
- 1. Go to your Yozefu configuration directory: `cd $(yozf config get dir)`
+ 1. Go to your Yōzefu configuration directory: `cd $(yozf config get dir)`
  2. Download the theme: `git clone https://github.com/srcery-colors/srcery-textmate.git`.
  3. Edit your configuration to point to the theme file:
 ```bash
@@ -64,7 +64,7 @@ yozf configure
 }
 ```
 
- 1. Save the file and restart Yozefu for the changes to take effect.
+ 1. Save the file and restart Yōzefu for the changes to take effect.
 
 
 > [!NOTE]

@@ -1,0 +1,17 @@
+html.dark .light-only {
+  display: none !important;
+}
+
+html:not(.dark) .dark-only {
+  display: none !important;
+}
+
+.gif {
+  border-radius: 12px;
+}
+
+
+.footer-maif {
+  height: 2rem;
+  margin: 0 auto;
+}
