@@ -1,6 +1,6 @@
-# URL templates to switch to web applications
+# URL templates
 
-In certain situations, you may need to view a Kafka record in a web browser. `yozefu` allows you to do so: select the Kafka record and press the <kbd>o</kbd> key (for **o**pen). This will open the corresponding URL in a new browser tab.
+In certain situations, you may need to view a Kafka record in a web browser. Yōzefu allows you to do so: select the Kafka record and press the <kbd>o</kbd> key (for **o**pen). This will open the corresponding URL in a new browser tab.
 
 The tool uses a URL template from the configuration file. this template is defined in the `.clusters.<name-of-your-cluster>.url_template` property, where `<name-of-your-cluster>` is the specific cluster name you're using.
 
