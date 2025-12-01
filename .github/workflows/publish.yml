@@ -32,7 +32,7 @@ jobs:
     outputs:
       version: ${{ steps.release.outputs.version }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
       - name: Install Rust
@@ -46,7 +46,7 @@ jobs:
     name: Create release
     needs: version
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
       - name: Create github release
@@ -87,7 +87,7 @@ jobs:
             target: x86_64-pc-windows-msvc
             features: "--no-default-features --features ssl-vendored"
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
       - uses: houseabsolute/actions-rust-cross@v1
@@ -186,7 +186,7 @@ jobs:
         id-token: write
     steps:
     - name: Checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         persist-credentials: false
     - name: Set up Docker Buildx
@@ -240,7 +240,7 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
       # https://crates.io/docs/trusted-publishing
