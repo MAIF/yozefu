@@ -1,10 +1,4 @@
-# TLS encryption and authentication
-<p>
-<a href="https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md">
-        <img alt="Link to librdkakfa configuration" src="https://img.shields.io/badge/librdkafka-Global_configuration_properties-black.svg?logo=github"></a>
-        <a href="https://github.com/confluentinc/librdkafka/wiki/Using-SSL-with-librdkafka#configure-librdkafka-client">
-        <img alt="How to configure the librdkakfa client" src="https://img.shields.io/badge/librdkafka-Configure_librdkafka_client-black.svg?logo=github"></a>
-</p>
+# TLS
 
 
 This page helps you configure TLS settings for different providers.
@@ -108,8 +102,12 @@ For more details, refer to the documentation: https://docs.aws.amazon.com/msk/la
 
 ## Mutual TLS
 
-For more details about Mutual TLS, refer to the documentation: https://docs.confluent.io/platform/current/kafka/configure-mds/mutual-tls-auth-rbac.html.Certificates.
-Please note that, according to [the documentation](https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md), certificates must be in PEM format.
+For more details about Mutual TLS, refer to the documentation: [Configure mTLS Authentication and RBAC for Kafka Brokers](https://docs.confluent.io/platform/current/kafka/configure-mds/mutual-tls-auth-rbac.html). 
+
+
+> [!INFO]
+> Please note that, according to [the documentation](https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md), certificates must be in PEM format.
+
 ```json
 {
   "clusters": {
