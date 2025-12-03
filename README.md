@@ -7,7 +7,7 @@
 
 <p align="center">
 <a href="https://crates.io/crates/yozefu/"><img alt="Yozefu crate.io page" src="https://img.shields.io/crates/v/yozefu?logo=Rust"></a>
-<a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/MSRV-1.85.0+-lightgray.svg?logo=rust" alt="Minimum supported Rust version: 1.85.0 or plus"/></a>
+<a href="https://rust-lang.org/"><img src="https://img.shields.io/badge/MSRV-1.85.0+-lightgray.svg?logo=rust" alt="Minimum supported Rust version: 1.85.0 or plus"/></a>
 <a href="https://github.com/MAIF/yozefu/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="Licence"/></a>
 <a href="https://ratatui.rs/"><img src="https://ratatui.rs/built-with-ratatui/badge.svg" alt="Built With Ratatui"/></a>
 
@@ -19,9 +19,9 @@ It is an alternative tool to [AKHQ](https://akhq.io/), [redpanda console](https:
 
 The tool offers the following features:
  - A real-time access to data published to topics.
- - A [search query language](https://github.com/MAIF/yozefu/tree/main/docs/query-language/README.md) inspired from SQL providing a fine-grained way filtering capabilities.
+ - A [search query language](https://maif.github.io/yozefu/query-language/) inspired from SQL providing a fine-grained way filtering capabilities.
  - Ability to search kafka records across multiple topics.
- - Support for extending the search engine with [user-defined filters](https://github.com/MAIF/yozefu/tree/main/docs/search-filter/README.md) written in WebAssembly ([Extism](https://extism.org/)).
+ - Support for extending the search engine with [user-defined filters](https://maif.github.io/yozefu/search-filter/) written in WebAssembly ([Extism](https://extism.org/)).
  - The tool can be used as a terminal user interface or a CLI with the `--headless` flag.
  - One keystroke to export kafka records for further analysis.
  - Support for registering multiple kafka clusters, each with specific kafka consumer properties.
@@ -39,7 +39,7 @@ By default, [the kafka consumer is configured](https://github.com/MAIF/yozefu/bl
 ## Limitations
 
  - The tool is designed only to consume kafka records. There is no feature to produce records or manage a cluster.
- - Serialization formats such as `json`, `xml` or plain text are supported. [Avro](https://avro.apache.org/) support is [experimental for now](https://github.com/MAIF/yozefu/tree/main/docs/schema-registry/README.md). [Protobuf](https://protobuf.dev/) is not supported.
+ - Serialization formats such as `json`, `xml` or plain text are supported. [Avro](https://avro.apache.org/) support is [experimental for now](https://maif.github.io/yozefu/schema-registry/). [Protobuf](https://protobuf.dev/) is not supported.
  - The tool uses a ring buffer to store the [last 500 kafka records](https://github.com/MAIF/yozefu/blob/main/crates/tui/src/records_buffer.rs#L17).
  - There is probably room for improvement regarding the throughput (lot of `clone()` and deserialization).
  - Yozefu has been tested on macOS Silicon but not on Windows or Linux. Feedback or contributions are welcome.

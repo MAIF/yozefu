@@ -15,10 +15,32 @@
 
 //FILES avro/key-schema.json=avro/key-schema.json
 //FILES avro/value-schema.json=avro/value-schema.json
+//FILES avro/point-schema.json=avro/point-schema.json
 //FILES json-schema/value-schema.json=json-schema/value-schema.json
 //FILES json-schema/key-schema.json=json-schema/key-schema.json
 //FILES protobuf/key-schema.proto=protobuf/key-schema.proto
 //FILES protobuf/value-schema.proto=protobuf/value-schema.proto
+
+//SOURCES serializers/Into.java
+//SOURCES serializers/IntoText.java
+//SOURCES serializers/IntoJson.java
+//SOURCES serializers/IntoJsonSchema.java
+//SOURCES serializers/IntoAvro.java
+//SOURCES serializers/IntoXml.java
+//SOURCES serializers/IntoProtobuf.java
+//SOURCES serializers/IntoMalformed.java
+//SOURCES serializers/IntoInvalidJson.java
+
+
+import serializers.Into;
+import serializers.IntoText;
+import serializers.IntoJson;
+import serializers.IntoJsonSchema;
+import serializers.IntoAvro;
+import serializers.IntoXml;
+import serializers.IntoProtobuf;
+import serializers.IntoMalformed;
+import serializers.IntoInvalidJson;
 
 // jbang run ./MyProducer.java --type avro --topic public-french-addresses Nimes
 
@@ -61,6 +83,10 @@ import java.util.stream.Collectors;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
+import serializers.IntoMalformed;
+import serializers.IntoProtobuf;
+import serializers.IntoText;
+import serializers.IntoXml;
 import tech.allegro.schema.json2avro.converter.JsonAvroConverter;
 
 
@@ -253,134 +279,4 @@ class MyProducer implements Callable<Integer> {
         System.exit(exitCode);
     }
 
-}
-
-
-interface Into<K, V> {
-    ProducerRecord<K, V> into(final String value, final String topic) throws Exception;
-
-    default String generateKey() {
-        return UUID.randomUUID().toString();
-    }
-
-    default String readResource(String path) throws Exception {
-        try(var in = Into.class.getResourceAsStream(path)) {
-            return new String(in.readAllBytes(), StandardCharsets.UTF_8);
-        }
-    }
-}
-
-class IntoText implements Into<String, String> {
-    public ProducerRecord<String, String> into(final String value, final String topic) throws JsonProcessingException {
-        var objectMapper = new ObjectMapper();
-        var object = objectMapper.readTree(value);
-        return new ProducerRecord<>(topic, this.generateKey(), object.get("properties").get("label").asText());
-    }
-}
-
-class IntoJson implements Into<String, String> {
-    public ProducerRecord<String, String> into(final String value, final String topic) {
-        return new ProducerRecord<>(topic, generateKey(), value);
-    }
-}
-
-class IntoJsonSchema implements Into<JsonNode, JsonNode> {
-    public ProducerRecord<JsonNode, JsonNode> into(final String input, final String topic) throws Exception {
-        var objectMapper = new ObjectMapper();
-        var keySchemaString = readResource("/json-schema/key-schema.json");
-        var valueSchemaString = readResource("/json-schema/value-schema.json");
-        var keySchema = objectMapper.readTree(keySchemaString);
-        var valueSchema = objectMapper.readTree(valueSchemaString);
-
-        var key = TextNode.valueOf(generateKey());
-        var keyEnvelope = JsonSchemaUtils.envelope(keySchema, key);
-
-        var value = objectMapper.readTree(input);
-        var valueEnvelope = JsonSchemaUtils.envelope(valueSchema, value);
-
-        return new ProducerRecord<>(topic, keyEnvelope, valueEnvelope);
-    }
-}
-
-class IntoAvro implements Into<GenericRecord, GenericRecord> {
-    public ProducerRecord<GenericRecord, GenericRecord> into(final String input, final String topic) throws Exception {
-        var keySchemaString = readResource("/avro/key-schema.json");
-        var valueSchemaString = readResource("/avro/value-schema.json");
-
-        Schema.Parser schemaParser = new Schema.Parser();
-        Schema keySchema = schemaParser.parse(keySchemaString);
-        Schema valueSchema = schemaParser.parse(valueSchemaString);
-        JsonAvroConverter converter = new JsonAvroConverter();
-
-        var keyString = String.format("{ \"id\": \"%s\", \"sunny\": %s }", generateKey(), new Random().nextBoolean());
-        GenericData.Record key = converter.convertToGenericDataRecord(keyString.getBytes(), keySchema);
-        GenericData.Record value = converter.convertToGenericDataRecord(input.getBytes(), valueSchema);
-        return new ProducerRecord<>(topic, key, value);
-    }
-}
-
-// TODO work in progress
-class IntoProtobuf implements Into<Object, Object> {
-    public ProducerRecord<Object, Object> into(final String input, final String topic) throws Exception {
-        var keySchemaString = readResource("/protobuf/key-schema.proto");
-        var valueSchemaString = readResource("/protobuf/value-schema.proto");
-
-        ProtobufSchema keySchema = new ProtobufSchema(keySchemaString);
-        var keyString = String.format("{\"id\": \"%s\"}", this.generateKey());
-        var key = (DynamicMessage) ProtobufSchemaUtils.toObject(keyString, keySchema);
-
-        ProtobufSchema valueSchema = new ProtobufSchema(valueSchemaString);
-        var value = (DynamicMessage) ProtobufSchemaUtils.toObject(input, valueSchema);
-
-        return new ProducerRecord<>(topic, key, value);
-    }
-}
-
-class IntoMalformed implements Into<byte[], byte[]> {
-    public ProducerRecord<byte[], byte[]> into(final String input, final String topic) throws Exception {
-        byte randomSchemaId = (byte) ((Math.random() * (127 - 1)) + 1);
-        var header = new byte[]{0, 0, 0, 0, randomSchemaId};
-
-        ByteArrayOutputStream keyOutput = new ByteArrayOutputStream();
-        keyOutput.write(header);
-        keyOutput.write((generateKey() + " key").getBytes());
-
-        randomSchemaId = (byte) ((Math.random() * (127 - 1)) + 1);
-        header = new byte[]{0, 0, 0, 0, randomSchemaId};
-        ByteArrayOutputStream valueOutput = new ByteArrayOutputStream();
-        valueOutput.write(header);
-        var objectMapper = new ObjectMapper();
-        var object = objectMapper.readTree(input);
-        valueOutput.write(object.get("properties").get("context").asText().getBytes(StandardCharsets.UTF_8));
-
-        return new ProducerRecord<>(topic, keyOutput.toByteArray(), valueOutput.toByteArray());
-    }
-}
-
-class IntoInvalidJson implements Into<JsonNode, JsonNode> {
-    public ProducerRecord<JsonNode, JsonNode> into(final String input, final String topic) throws Exception {
-        var objectMapper = new ObjectMapper();
-        var keySchemaString = readResource("/json-schema/key-schema.json");
-        var valueSchemaString = readResource("/json-schema/value-schema.json");
-        var keySchema = objectMapper.readTree(keySchemaString);
-        var valueSchema = objectMapper.readTree(valueSchemaString);
-
-        var key = TextNode.valueOf(generateKey());
-        var keyEnvelope = JsonSchemaUtils.envelope(keySchema, key);
-
-        var value = objectMapper.readTree(input);
-        ((ObjectNode) value).put("updatedAt", "2007");
-        var valueEnvelope = JsonSchemaUtils.envelope(valueSchema, value);
-
-        return new ProducerRecord<>(topic, keyEnvelope, valueEnvelope);
-    }
-}
-
-class IntoXml implements Into<String, String> {
-    public ProducerRecord<String, String> into(final String input, final String topic) throws Exception {
-        var objectMapper = new ObjectMapper();
-        var xmlMapper = new XmlMapper();
-        var value = objectMapper.readTree(input);
-        return new ProducerRecord<>(topic, generateKey(), xmlMapper.writeValueAsString(value));
-    }
 }

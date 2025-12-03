@@ -1,0 +1,26 @@
+{
+  "name": "Point",
+  "namespace": "io.maif.yozefu",
+  "doc": "Describes a point geometry",
+  "type": "record",
+  "fields": [
+    {
+      "name": "type",
+      "type": {
+        "type": "enum",
+        "name": "PointType",
+        "symbols": [
+          "Point"
+        ]
+      },
+      "default": "Point"
+    },
+    {
+      "name": "coordinates",
+      "type": {
+        "type": "array",
+        "items": "double"
+      }
+    }
+  ]
+}

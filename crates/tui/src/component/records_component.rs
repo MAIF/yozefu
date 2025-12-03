@@ -101,11 +101,12 @@ impl<'a> RecordsComponent<'a> {
 
     fn set_event_dialog(&mut self) -> Result<(), TuiError> {
         if let Some(s) = self.state.selected() {
-            let record = self.records.lock().unwrap().get(s).unwrap().clone();
-            self.action_tx
-                .as_ref()
-                .unwrap()
-                .send(Action::ShowRecord(record))?;
+            if let Some(record) = self.records.lock().unwrap().get(s) {
+                self.action_tx
+                    .as_ref()
+                    .unwrap()
+                    .send(Action::ShowRecord(record.clone()))?;
+            };
         }
         Ok(())
     }
