@@ -47,7 +47,7 @@ You can configure it in two ways:
 
 `syntect` supports [Sublime Text `.tmTheme` format](https://www.sublimetext.com/docs/color_schemes_tmtheme.html). For example, to use [`Srcery TextMate`](https://github.com/srcery-colors/srcery-textmate):
 
- 1. Go to your Yōzefu configuration directory: `cd $(yozf config get dir)`
+ 1. Go to your Yōzefu configuration directory: `cd "$(yozf config get dir)"`
  2. Download the theme: `git clone https://github.com/srcery-colors/srcery-textmate.git`.
  3. Edit your configuration to point to the theme file:
 ```bash

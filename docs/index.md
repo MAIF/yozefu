@@ -6,7 +6,7 @@ hero:
   name: "Yōzefu,"
   text: "A TUI to explore Kafka clusters"
   image:
-    src: /dd.svg
+    src: /logo-without-name.svg
     alt: Yozefu
 
   actions:
@@ -18,6 +18,7 @@ features:
   - icon: 🔌
     title: Real-time + Multi-topic
     details: Live access to records and search across multiple topics.
+    link: /what-is-yozefu
   - icon: 🔎
     title: Powerful Querying
     details: SQL-inspired query language with fine-grained filters, extensible via WebAssembly.
@@ -29,6 +30,7 @@ features:
   - icon: 📤
     title: One-key Export
     details: Quickly export Kafka records for deeper analysis.
+    link: /keybindings/
 ---
 
 
