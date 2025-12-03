@@ -30,6 +30,7 @@ The tool offers the following features:
 By default, [the kafka consumer is configured](https://github.com/MAIF/yozefu/blob/main/crates/command/src/command/main_command.rs#L318-L325) with the property `enable.auto.commit` set to `false`, meaning no kafka consumer offset will be published to kafka.
 
 
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://vhs.charm.sh/vhs-UpIJD2h92vKkj01XSS0r0.gif">
   <img alt="Demo of Yozefu: The user selects a topic and sees and real time new records published to Kafka." src="https://vhs.charm.sh/vhs-1oh0ovd0DaUfvKLTx4iZTo.gif">
@@ -106,18 +107,8 @@ yozf -c localhost
 
 ## Documentation
 
- - [The query language.](https://github.com/MAIF/yozefu/tree/main/docs/query-language/README.md)
- - [Creating a search filter.](https://github.com/MAIF/yozefu/tree/main/docs/search-filter/README.md)
- - [TLS encryption and authentication.](https://github.com/MAIF/yozefu/tree/main/docs/tls/README.md)
- - [URL templates to switch to web applications.](https://github.com/MAIF/yozefu/tree/main/docs/url-templates/README.md)
- - [Schema registry.](https://github.com/MAIF/yozefu/tree/main/docs/schema-registry/README.md)
- - [Themes.](https://github.com/MAIF/yozefu/tree/main/docs/themes/README.md)
- - [Internal JSON schemas.](https://github.com/MAIF/yozefu/tree/main/docs/json-schemas/)
- - [Keybindings.](https://github.com/MAIF/yozefu/tree/main/docs/keybindings/README.md)
- - [Releasing a new version.](https://github.com/MAIF/yozefu/tree/main/docs/release/README.md)
+To check out docs, visit [https://maif.github.io/yozefu/](https://maif.github.io/yozefu/).
  
-
-
 ## Screenshots
 
 <table>
