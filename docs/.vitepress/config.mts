@@ -5,7 +5,7 @@ export default defineConfig({
   
   title: "Yōzefu",
   description: "Interactive TUI to explore Kafka clusters and data",
-   
+  base: '/yozefu/',
   themeConfig: {
     search: {
       provider: 'local'
@@ -17,7 +17,7 @@ export default defineConfig({
     ],
      footer: {
       message: `
-      <a href="https://maif.github.io/"><img class="footer-maif" src="/maif.svg" /></a><br /><a href="https://maif.github.io/">OSS by MAIF</a>, released under Apache License, Version 2.0</p>`,
+      <a href="https://maif.github.io/"><img class="footer-maif" src="https://maif.github.io/yozefu/maif.svg" /></a><br /><a href="https://maif.github.io/">OSS by MAIF</a>, released under Apache License, Version 2.0</p>`,
     },
     sidebar: [
       {

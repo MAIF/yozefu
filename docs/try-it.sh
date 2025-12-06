@@ -201,7 +201,7 @@ then
     fi
 else
     echo " 🎉 Finally, start the tool"
-    echo "    cargo run --manifest-path \"${repo}/Cargo.toml\" -- -c localhost"
+    echo "    RUSTFLAGS='--cfg tokio_unstable' cargo run --manifest-path \"${repo}/Cargo.toml\" -- -c localhost"
     echo "    or"
-    echo "    cargo run --manifest-path \"${repo}/Cargo.toml\" -- -c localhost --headless --topics ${topic} 'from begin'"
+    echo "    RUSTFLAGS='--cfg tokio_unstable' cargo run --manifest-path \"${repo}/Cargo.toml\" -- -c localhost --headless --topics ${topic} 'from begin'"
 fi

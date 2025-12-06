@@ -63,11 +63,11 @@
           }:
           rustPlatform.buildRustPackage (finalAttrs: rec {
             pname = "yozefu";
-            version = "v0.0.15";
+            version = "v0.0.22";
             src = fetchgit {
               url = "https://github.com/MAIF/yozefu";
               rev = finalAttrs.version;
-              hash = "sha256-frfZo9rGN5AJqz5y3i7FB4Y5jfijcm42jjmq5S9se+M=";
+              hash = "sha256-LvYU9p4Izh9I+/gtgpDbae8WtXpEq8H86IryuNfBQT8=";
             };
             nativeBuildInputs = buildInputs;
 
@@ -80,7 +80,7 @@
               };
 
             doCheck = false;
-            cargoHash = "sha256-FrwwrCewVjZnLY2i6MZxBE8WxQ1/LKA5KFf9YpSm10s=";
+            cargoHash = "sha256-xVUh78x1QMA71eabm3JANkVTQJ/bxR8O8Ht7AXnoG2A=";
 
             meta = {
               description = cargoToml.workspace.package.description;

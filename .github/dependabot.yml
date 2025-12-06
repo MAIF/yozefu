@@ -47,3 +47,9 @@ updates:
     target-branch: "develop"
     schedule:
       interval: "weekly"
+
+  - package-ecosystem: "npm"
+    directory: "/docs"
+    target-branch: "develop"
+    schedule:
+      interval: "weekly"
