@@ -1,0 +1,21 @@
+{
+    "subject": "public-french-addresses-value",
+    "version": 1,
+    "guid": "ade4eed9-4aa6-b8a3-3689-4fc47ea62d4f",
+    "schemaType": "AVRO",
+    "schema": "{\"type\":\"record\",\"name\":\"Feature\",\"namespace\":\"io.maif.yozefu\",\"doc\":\"A GeoJSON Feature object.\",\"fields\":[{\"name\":\"type\",\"type\":{\"type\":\"enum\",\"name\":\"FeatureType\",\"symbols\":[\"Feature\"]},\"default\":\"Feature\"},{\"name\":\"geometry\",\"type\":[\"Point\",\"LineString\"]}]}",
+    "references": [
+        {
+            "name": "io.maif.yozefu.Point",
+            "subject": "io.maif.yozefu.Point",
+            "version": 2
+        },
+        {
+            "name": "io.maif.yozefu.LineString",
+            "subject": "io.maif.yozefu.LineString",
+            "version": 1
+        }
+    ],
+    "ts": 1765149283199,
+    "deleted": false
+}
