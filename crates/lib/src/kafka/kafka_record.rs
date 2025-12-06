@@ -1,4 +1,3 @@
-#[cfg(feature = "native")]
 use super::SchemaRegistryClient;
 #[cfg(feature = "native")]
 use super::avro::avro_to_json;
@@ -9,11 +8,11 @@ use super::schema::SchemaId;
 #[cfg(feature = "native")]
 use super::schema::SchemaType;
 #[cfg(feature = "native")]
-use super::schema_registry_client::SchemaResponse;
+use super::schema_registry_client::MessageSchema;
 #[cfg(feature = "native")]
 use crate::kafka::internal::extract_key_and_value_from_consumer_offsets_topics;
 #[cfg(feature = "native")]
-use apache_avro::from_avro_datum;
+use apache_avro::from_avro_datum_schemata;
 #[cfg(feature = "native")]
 use chrono::{DateTime, Local, Utc};
 #[cfg(feature = "native")]
@@ -23,6 +22,8 @@ use serde::Serialize;
 #[cfg(feature = "native")]
 use serde_json::Error;
 use std::collections::BTreeMap;
+#[cfg(feature = "native")]
+use std::fs;
 
 /// Inspired of the `[rdkafka::Message]` struct.
 /// Currently, we only support utf-8 string keys/values/headers.
@@ -122,7 +123,7 @@ impl KafkaRecord {
         }
     }
 
-    fn payload_to_data_type(payload: Option<&[u8]>, schema: Option<&SchemaResponse>) -> DataType {
+    fn payload_to_data_type(payload: Option<&[u8]>, schema: Option<&MessageSchema>) -> DataType {
         if schema.is_none() {
             return Self::deserialize_json(payload);
         }
@@ -130,8 +131,10 @@ impl KafkaRecord {
         let schema = schema.as_ref().unwrap();
         match schema.schema_type {
             Some(SchemaType::Json) => Self::deserialize_json(payload),
-            Some(SchemaType::Avro) => Self::deserialize_avro(payload, &schema.schema),
-            Some(SchemaType::Protobuf) => Self::deserialize_protobuf(payload, &schema.schema),
+            Some(SchemaType::Avro) => Self::deserialize_avro(payload, &schema),
+            Some(SchemaType::Protobuf) => {
+                Self::deserialize_protobuf(payload, &schema.schemas.first().unwrap())
+            }
             None => Self::deserialize_json(payload),
         }
     }
@@ -157,9 +160,10 @@ impl KafkaRecord {
         }
     }
 
-    fn deserialize_avro(payload: Option<&[u8]>, schema: &str) -> DataType {
+    fn deserialize_avro(payload: Option<&[u8]>, schema: &MessageSchema) -> DataType {
         let mut payload = payload.unwrap_or_default();
-        let parsed_schema = apache_avro::Schema::parse_str(schema);
+        let parsed_schema = apache_avro::Schema::parse_list(&schema.schemas);
+
         if let Err(e) = &parsed_schema {
             return DataType::String(format!(
                 "  Yozefu Error: The avro schema could not be parsed. Please check the schema in the schema registry.\n       Error: {}\n       Payload: {:?}\n        String: {}",
@@ -168,8 +172,16 @@ impl KafkaRecord {
                 String::from_utf8(payload.to_vec()).unwrap_or_default()
             ));
         }
-        let parsed_schema = parsed_schema.unwrap();
-        match from_avro_datum(&parsed_schema, &mut payload, None) {
+        let mut parsed_schema = parsed_schema.unwrap();
+        let main_schema = parsed_schema.remove(0);
+        //Order is important since from_avro_datum_schemata needs to read first the schemas that will be used by other schemas
+        parsed_schema.reverse();
+        match from_avro_datum_schemata(
+            &main_schema,
+            parsed_schema.iter().collect(),
+            &mut payload,
+            None,
+        ) {
             Ok(value) => DataType::Json(avro_to_json(value)),
             Err(e) => DataType::String(format!(
                 "  Yozefu Error: According to the schema registry, the record is serialized as avro but there was an issue deserializing the payload: {:?}\n       Payload: {:?}\n        String: {}",
@@ -231,6 +243,7 @@ impl KafkaRecord {
             }
             (Some(s), Some(schema_registry)) => {
                 let p = payload.unwrap_or_default();
+
                 let (schema_response, schema) = match schema_registry.schema(s.0).await {
                     Ok(Some(d)) => (Some(d.clone()), Some(Schema::new(s, d.schema_type))),
                     Ok(None) => (None, Some(Schema::new(s, None))),
