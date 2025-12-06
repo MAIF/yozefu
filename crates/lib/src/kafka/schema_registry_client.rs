@@ -1,7 +1,14 @@
-use reqwest::header::{self, HeaderMap, HeaderName, HeaderValue};
+use reqwest::{
+    Response,
+    header::{self, HeaderMap, HeaderName, HeaderValue},
+};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::{collections::HashMap, str::FromStr, time::Duration};
+use std::{
+    collections::{HashMap, HashSet, VecDeque},
+    str::FromStr,
+    time::Duration,
+};
 use url::Url;
 
 use crate::Error;
@@ -69,7 +76,7 @@ impl SimpleSchemaRegistryClient {
         }
     }
 
-    async fn schema(&self, id: u32) -> Result<Option<SchemaResponse>, Error> {
+    async fn schema(&self, id: u32) -> Result<Option<Schema>, Error> {
         // TODO https://github.com/servo/rust-url/issues/333
         let url = self.schema_url(id);
         let response = self.client.get(&url).send().await;
@@ -77,15 +84,84 @@ impl SimpleSchemaRegistryClient {
         match response {
             Ok(response) => {
                 if response.status().is_success() {
-                    let mut json = response.json::<SchemaResponse>().await.unwrap();
-                    json.schema_type = Self::compute_schema_type(&json);
-                    return Ok(Some(json));
+                    return self.response_to_schema(response).await;
                 }
                 Ok(None)
             }
-
             Err(e) => Err(Error::SchemaRegistry(e.to_string())),
         }
+    }
+
+    async fn response_to_schema(&self, response: Response) -> Result<Option<Schema>, Error> {
+        let mut json = response.json::<SchemaResponse>().await.unwrap();
+        json.schema_type = Self::compute_schema_type(&json);
+
+        let mut schemas = vec![json.schema];
+        if let Some(referenced_subjects) = json.references.take() {
+            if let Some(ref_schemas) = self.referenced_subjects(referenced_subjects).await? {
+                schemas.extend(ref_schemas);
+            }
+        }
+        Ok(Some(Schema {
+            schemas,
+            schema_type: json.schema_type,
+        }))
+    }
+
+    async fn referenced_subjects(
+        &self,
+        referenced_subjects: Vec<SchemaReference>,
+    ) -> Result<Option<Vec<String>>, Error> {
+        //Avro-rs does not like multiples of the same schema
+        let mut seen: HashSet<String> = HashSet::new();
+        let mut schemas = vec![];
+
+        let mut ref_subjects_to_fetch = VecDeque::from(referenced_subjects);
+        while let Some(subject) = ref_subjects_to_fetch.pop_front() {
+            if !seen.contains(&subject.subject) {
+                let subject_response = self.subject_schema(&subject).await;
+                seen.insert(subject.subject);
+                match subject_response {
+                    Ok(Some(subject_response)) => {
+                        if let Some(mut references) = subject_response.references {
+                            ref_subjects_to_fetch.extend(references.drain(..));
+                        }
+                        schemas.push(subject_response.schema);
+                    }
+                    Ok(None) => return Ok(None),
+                    Err(e) => return Err(Error::SchemaRegistry(e.to_string())),
+                };
+            }
+        }
+        Ok(Some(schemas))
+    }
+
+    async fn subject_schema(
+        &self,
+        referenced: &SchemaReference,
+    ) -> Result<Option<SchemaResponse>, Error> {
+        let url = self.subject_schema_url(&referenced.subject, referenced.version);
+        let response = self.client.get(url.clone()).send().await;
+
+        match response {
+            Ok(response) => {
+                if response.status().is_success() {
+                    let schema_response = response.json::<SchemaResponse>().await.unwrap();
+                    return Ok(Some(schema_response));
+                }
+                Ok(None)
+            }
+            Err(e) => Err(Error::SchemaRegistry(e.to_string())),
+        }
+    }
+
+    fn subject_schema_url(&self, subject_name: &str, id: u16) -> String {
+        // TODO https://github.com/servo/rust-url/issues/333
+        let mut url = self.url.clone();
+        if let Ok(mut segments) = url.path_segments_mut() {
+            segments.extend(vec!["subjects", subject_name, "versions", &id.to_string()]);
+        }
+        url.to_string()
     }
 
     fn schema_url(&self, id: u32) -> String {
@@ -103,7 +179,7 @@ impl SimpleSchemaRegistryClient {
 /// All schemas are cached
 pub struct SchemaRegistryClient {
     client: SimpleSchemaRegistryClient,
-    cache: HashMap<u32, SchemaResponse>,
+    cache: HashMap<u32, Schema>,
 }
 
 impl SchemaRegistryClient {
@@ -114,12 +190,12 @@ impl SchemaRegistryClient {
         }
     }
 
-    pub async fn schema(&mut self, id: u32) -> Result<Option<SchemaResponse>, Error> {
+    pub async fn schema(&mut self, id: u32) -> Result<Option<Schema>, Error> {
         match self.cache.get(&id) {
             Some(schema) => Ok(Some(schema.clone())),
             None => {
                 let schema = self.client.schema(id).await?;
-                if let Some(schema) = schema.clone() {
+                if let Some(schema) = &schema {
                     self.cache.insert(id, schema.clone());
                 }
                 Ok(schema)
@@ -133,21 +209,35 @@ impl SchemaRegistryClient {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, Hash, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct SchemaResponse {
-    pub schema: String,
+pub struct Schema {
+    pub schemas: Vec<String>,
     pub schema_type: Option<SchemaType>,
 }
 
-impl SchemaResponse {
+#[derive(Clone, Debug, Deserialize, Serialize, Hash, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+struct SchemaResponse {
+    pub schema: String,
+    pub references: Option<Vec<SchemaReference>>,
+    pub schema_type: Option<SchemaType>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, Hash, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+struct SchemaReference {
+    pub subject: String,
+    pub version: u16,
+}
+
+impl Schema {
     pub fn schema_to_string_pretty(&self) -> String {
         match self.schema_type {
             Some(SchemaType::Avro | SchemaType::Json) => {
-                let json = serde_json::from_str::<Value>(&self.schema)
+                let json = serde_json::from_str::<Value>(self.schemas.first().unwrap())
                     .unwrap_or(Value::String(String::new()));
                 serde_json::to_string_pretty(&json).unwrap()
             }
-            _ => self.schema.clone(),
+            _ => self.schemas.first().unwrap().clone(),
         }
     }
 }

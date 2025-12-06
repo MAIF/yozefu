@@ -3,17 +3,17 @@ use super::SchemaRegistryClient;
 #[cfg(feature = "native")]
 use super::avro::avro_to_json;
 use super::data_type::DataType;
-use super::schema::Schema;
+use super::schema::Schema as SchemaRef;
 #[cfg(feature = "native")]
 use super::schema::SchemaId;
 #[cfg(feature = "native")]
 use super::schema::SchemaType;
 #[cfg(feature = "native")]
-use super::schema_registry_client::SchemaResponse;
+use super::schema_registry_client::Schema;
 #[cfg(feature = "native")]
 use crate::kafka::internal::extract_key_and_value_from_consumer_offsets_topics;
 #[cfg(feature = "native")]
-use apache_avro::from_avro_datum;
+use apache_avro::from_avro_datum_schemata;
 #[cfg(feature = "native")]
 use chrono::{DateTime, Local, Utc};
 #[cfg(feature = "native")]
@@ -36,9 +36,9 @@ pub struct KafkaRecord {
     pub offset: i64,
     pub headers: BTreeMap<String, String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub key_schema: Option<Schema>,
+    pub key_schema: Option<SchemaRef>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub value_schema: Option<Schema>,
+    pub value_schema: Option<SchemaRef>,
     /// Number of bytes for the key + the value
     #[serde(default)]
     pub size: usize,
@@ -122,7 +122,7 @@ impl KafkaRecord {
         }
     }
 
-    fn payload_to_data_type(payload: Option<&[u8]>, schema: Option<&SchemaResponse>) -> DataType {
+    fn payload_to_data_type(payload: Option<&[u8]>, schema: Option<&Schema>) -> DataType {
         if schema.is_none() {
             return Self::deserialize_json(payload);
         }
@@ -130,8 +130,10 @@ impl KafkaRecord {
         let schema = schema.as_ref().unwrap();
         match schema.schema_type {
             Some(SchemaType::Json) => Self::deserialize_json(payload),
-            Some(SchemaType::Avro) => Self::deserialize_avro(payload, &schema.schema),
-            Some(SchemaType::Protobuf) => Self::deserialize_protobuf(payload, &schema.schema),
+            Some(SchemaType::Avro) => Self::deserialize_avro(payload, schema),
+            Some(SchemaType::Protobuf) => {
+                Self::deserialize_protobuf(payload, schema.schemas.first().unwrap())
+            }
             None => Self::deserialize_json(payload),
         }
     }
@@ -157,9 +159,10 @@ impl KafkaRecord {
         }
     }
 
-    fn deserialize_avro(payload: Option<&[u8]>, schema: &str) -> DataType {
+    fn deserialize_avro(payload: Option<&[u8]>, schema: &Schema) -> DataType {
         let mut payload = payload.unwrap_or_default();
-        let parsed_schema = apache_avro::Schema::parse_str(schema);
+        let parsed_schema = apache_avro::Schema::parse_list(&schema.schemas);
+
         if let Err(e) = &parsed_schema {
             return DataType::String(format!(
                 "  Yozefu Error: The avro schema could not be parsed. Please check the schema in the schema registry.\n       Error: {}\n       Payload: {:?}\n        String: {}",
@@ -168,8 +171,17 @@ impl KafkaRecord {
                 String::from_utf8(payload.to_vec()).unwrap_or_default()
             ));
         }
-        let parsed_schema = parsed_schema.unwrap();
-        match from_avro_datum(&parsed_schema, &mut payload, None) {
+        let mut parsed_schema = parsed_schema.unwrap();
+        //Order is important since from_avro_datum_schemata needs to read first the schemas that will be used by other schemas
+        parsed_schema.reverse();
+        let main_schema = &parsed_schema[parsed_schema.len() - 1];
+
+        match from_avro_datum_schemata(
+            &main_schema,
+            parsed_schema.iter().collect(),
+            &mut payload,
+            None,
+        ) {
             Ok(value) => DataType::Json(avro_to_json(value)),
             Err(e) => DataType::String(format!(
                 "  Yozefu Error: According to the schema registry, the record is serialized as avro but there was an issue deserializing the payload: {:?}\n       Payload: {:?}\n        String: {}",
@@ -203,7 +215,7 @@ impl KafkaRecord {
     async fn extract_data_and_schema(
         payload: Option<&[u8]>,
         schema_registry: &mut Option<SchemaRegistryClient>,
-    ) -> (DataType, Option<Schema>) {
+    ) -> (DataType, Option<SchemaRef>) {
         let schema_id = SchemaId::parse(payload);
         match (schema_id, schema_registry.as_mut()) {
             (None, _) => (Self::payload_to_data_type(payload, None), None),
@@ -215,7 +227,7 @@ impl KafkaRecord {
                         match Self::try_deserialize_json(
                             Self::extract_data_from_payload_with_schema_header(payload),
                         ) {
-                            Ok(e) => (e, Some(Schema::new(id, None))),
+                            Ok(e) => (e, Some(SchemaRef::new(id, None))),
                             Err(_e) => (
                                 DataType::String(format!(
                                     "Yozefu was not able to retrieve the schema {} because there is no schema registry configured. Please visit https://maif.github.io/yozefu/schema-registry/ for more details.\nPayload: {:?}\n String: {}",
@@ -223,7 +235,7 @@ impl KafkaRecord {
                                     payload,
                                     String::from_utf8(payload.to_vec()).unwrap_or_default()
                                 )),
-                                Some(Schema::new(id, None)),
+                                Some(SchemaRef::new(id, None)),
                             ),
                         }
                     }
@@ -231,9 +243,10 @@ impl KafkaRecord {
             }
             (Some(s), Some(schema_registry)) => {
                 let p = payload.unwrap_or_default();
+
                 let (schema_response, schema) = match schema_registry.schema(s.0).await {
-                    Ok(Some(d)) => (Some(d.clone()), Some(Schema::new(s, d.schema_type))),
-                    Ok(None) => (None, Some(Schema::new(s, None))),
+                    Ok(Some(d)) => (Some(d.clone()), Some(SchemaRef::new(s, d.schema_type))),
+                    Ok(None) => (None, Some(SchemaRef::new(s, None))),
                     Err(e) => {
                         let payload = payload.unwrap_or_default();
                         return (
@@ -244,7 +257,7 @@ impl KafkaRecord {
                                 payload,
                                 String::from_utf8(payload.to_vec()).unwrap_or_default()
                             )),
-                            Some(Schema::new(s, None)),
+                            Some(SchemaRef::new(s, None)),
                         );
                     }
                 };
