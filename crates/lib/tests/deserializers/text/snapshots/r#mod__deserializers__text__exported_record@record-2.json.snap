@@ -1,7 +1,7 @@
 ---
-source: crates/lib/tests/mod.rs
+source: crates/lib/tests/deserializers/text/mod.rs
 expression: "ExportedKafkaRecord::from(&record)"
-input_file: crates/lib/tests/inputs/parsed-records/record-1.json
+input_file: crates/lib/tests/deserializers/text/inputs/exported/record-2.json
 ---
 ExportedKafkaRecord {
     record: KafkaRecord {

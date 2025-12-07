@@ -1,7 +1,7 @@
 ---
-source: crates/lib/tests/mod.rs
+source: crates/lib/tests/deserializers/text/mod.rs
 expression: "KafkaRecord::parse(owned_message, &mut None).await"
-input_file: crates/lib/tests/inputs/raw-records/record-3.json
+input_file: crates/lib/tests/deserializers/text/inputs/record-3.json
 ---
 KafkaRecord {
     topic: "my-topic",

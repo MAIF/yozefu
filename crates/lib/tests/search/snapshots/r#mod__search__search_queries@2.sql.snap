@@ -1,7 +1,8 @@
 ---
-source: crates/lib/tests/mod.rs
+source: crates/lib/tests/search/mod.rs
+description: "from end - 5_000 where value contains \"uv\"   and k contains \"foobar\"    or t == \"french-recipes\"   and !(partition != 1) order by timestamp asc limit 100"
 expression: parse_search_query(input)
-input_file: crates/lib/tests/inputs/2.sql
+input_file: crates/lib/tests/search/inputs/2.sql
 ---
 Ok(
     (

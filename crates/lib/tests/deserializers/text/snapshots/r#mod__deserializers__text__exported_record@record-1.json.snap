@@ -1,0 +1,71 @@
+---
+source: crates/lib/tests/deserializers/text/mod.rs
+expression: "ExportedKafkaRecord::from(&record)"
+input_file: crates/lib/tests/deserializers/text/inputs/exported/record-1.json
+---
+ExportedKafkaRecord {
+    record: KafkaRecord {
+        topic: "public-french-addresses",
+        timestamp: Some(
+            1732481153241,
+        ),
+        partition: 0,
+        offset: 4,
+        headers: {},
+        key_schema: Some(
+            Schema {
+                id: SchemaId(
+                    1,
+                ),
+                schema_type: None,
+            },
+        ),
+        value_schema: Some(
+            Schema {
+                id: SchemaId(
+                    2,
+                ),
+                schema_type: None,
+            },
+        ),
+        size: 381,
+        key: Json(
+            String("381"),
+        ),
+        key_as_string: "",
+        value: Json(
+            Object {
+                "type": String("Feature"),
+                "geometry": Object {
+                    "type": String("Point"),
+                    "coordinates": Array [
+                        Number(4.0215),
+                        Number(49.211613),
+                    ],
+                },
+                "properties": Object {
+                    "label": String("Rue Franz Kafka 51100 Reims"),
+                    "score": Number(0.6992354545454544),
+                    "id": String("51454_3782"),
+                    "name": String("Rue Franz Kafka"),
+                    "postcode": String("51100"),
+                    "citycode": String("51454"),
+                    "x": Number(774438.44),
+                    "y": Number(6901804.03),
+                    "city": String("Reims"),
+                    "context": String("51, Marne, Grand Est"),
+                    "type": String("street"),
+                    "importance": Number(0.69159),
+                    "street": String("Rue Franz Kafka"),
+                },
+            },
+        ),
+        value_as_string: "",
+    },
+    date_time: Some(
+        2024-11-24T21:45:53.241+01:00,
+    ),
+    absolute_delta_in_ms: 0,
+    relative_delta_in_ms: 0,
+    search_query: "",
+}

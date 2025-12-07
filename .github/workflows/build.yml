@@ -264,7 +264,7 @@ jobs:
         name: Link Checker
         # https://github.com/lycheeverse/lychee/issues/1405
         with:
-          args: --accept '100..=103,200..=299,429' --exclude-loopback README.md './crates/app/README.md' './crates/command/README.md' './docs './crates/lib/README.md' './crates/wasm-types/README.md' './crates/bin/src/**' './crates/app/src/**' './crates/command/src/**' './crates/lib/src/**' './crates/wasm-types/src/**' './docs/**' --exclude-path ./docs/url-templates/README.md --exclude-path ./docs/node_modules --exclude-path ./docs/schema-registry/index.md  --exclude 'https://docs.rs'
+          args: --accept '100..=103,200..=299,429' --exclude-loopback README.md './crates/app/README.md' './crates/command/README.md' './docs' './crates/lib/README.md' './crates/wasm-types/README.md' './crates/bin/src/**' './crates/app/src/**' './crates/command/src/**' './crates/lib/src/**' './crates/wasm-types/src/**' './docs/**' --exclude-path './docs/url-templates/index.md' --exclude-path './docs/node_modules' --exclude-path './docs/schema-registry/index.md'  --exclude 'https://docs.rs'
 
   # https://docs.github.com/en/actions/use-cases-and-examples/publishing-packages/publishing-docker-images
   docker:

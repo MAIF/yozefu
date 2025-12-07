@@ -23,7 +23,7 @@ The name of the function corresponds to the name of the wasm file. In the exampl
 Yōzefu relies on [Extism](https://extism.org/) to develop and execute search filters.
 The WebAssembly module we're going to implement must export 2 functions, `parse_parameters` and `matches`.
 
-The first step is to choose your preferred programming language. Extism supports different programming languages. You can read more at [Extism Quickstart Guide](https://extism.org/docs/quickstart/plugin-quickstart). I'll choose [golang](https://github.com/MAIF/yozefu/blob/main/crates/wasm-blueprints/golang) for this example. A [Rust example](https://github.com/MAIF/yozefu/blob/main/crates/wasm-blueprints/rust) is also available.
+The first step is to choose your preferred programming language. Extism supports different programming languages. You can read more at [Extism Quickstart Guide](https://extism.org/docs/quickstart/plugin-quickstart/). I'll choose [golang](https://github.com/MAIF/yozefu/blob/main/crates/wasm-blueprints/golang) for this example. A [Rust example](https://github.com/MAIF/yozefu/blob/main/crates/wasm-blueprints/rust) is also available.
 
 ```bash
 yozf create-filter --language golang key-ends-with --directory /tmp/my-filter

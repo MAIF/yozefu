@@ -6,7 +6,7 @@
 /// key-ends-with("rust")
 /// ```
 ///
-/// This WebAssembly module relies on the [Extism SDK](https://extism.org/docs/quickstart/plugin-quickstart)
+/// This WebAssembly module relies on the [Extism SDK](https://extism.org/docs/quickstart/plugin-quickstart/)
 use extism_pdk::*;
 use json::Value;
 

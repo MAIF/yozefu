@@ -1,0 +1,4 @@
+{
+    "schemaType": "AVRO",
+    "schema": "{\"type\":\"record\",\"name\":\"Key\",\"namespace\":\"io.maif.yozefu\",\"fields\":[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"sunny\",\"type\":\"boolean\"}]}"
+}

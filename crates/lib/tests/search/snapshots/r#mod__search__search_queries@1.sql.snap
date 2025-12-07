@@ -1,7 +1,8 @@
 ---
-source: crates/lib/tests/mod.rs
+source: crates/lib/tests/search/mod.rs
+description: "from beginning  where my-wasm-filter(\"cool\", \"cat\")    or (timestamp between \"2024-05-28T17:55:08.145+02:00\" and now and value contains \"foundation\") order by key desc limit 1_000"
 expression: parse_search_query(input)
-input_file: crates/lib/tests/inputs/1.sql
+input_file: crates/lib/tests/search/inputs/1.sql
 ---
 Ok(
     (

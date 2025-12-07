@@ -88,7 +88,9 @@ import serializers.IntoProtobuf;
 import serializers.IntoText;
 import serializers.IntoXml;
 import tech.allegro.schema.json2avro.converter.JsonAvroConverter;
-
+import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
+import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
+import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 
 enum SerializerType {
     avro, json, jsonSchema, protobuf, text, malformed, invalidJson, xml
@@ -143,6 +145,8 @@ class MyProducer implements Callable<Integer> {
 
         props.putIfAbsent("bootstrap.servers", "localhost:9092");
         props.putIfAbsent("schema.registry.url", System.getenv().getOrDefault("YOZEFU_SCHEMA_REGISTRY_URL", "http://localhost:8081"));
+        props.putIfAbsent(KafkaAvroSerializerConfig.AUTO_REGISTER_SCHEMAS, false);
+        props.putIfAbsent("use.latest.version", true);
         var schemaRegistryUrl = props.getProperty("schema.registry.url");
         System.err.printf(" 📖 schema registry URL is %s\n", schemaRegistryUrl);
 
@@ -151,62 +155,65 @@ class MyProducer implements Callable<Integer> {
 
     public void produceOnce(Properties props, String url) throws Exception {
         var data = get(url, query);
+
+        var registryClient = new CachedSchemaRegistryClient(props.getProperty("schema.registry.url"), 100);
+
         switch (type) {
             case avro -> {
                 props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getName());
                 props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getName());
                 KafkaProducer<GenericRecord, GenericRecord> producer = new KafkaProducer<>(props);
-                produce(producer, new IntoAvro(), data, topic);
+                produce(producer, new IntoAvro(), data, topic, registryClient);
             }
             case json -> {
                 props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
                 props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
                 KafkaProducer<String, String> producer = new KafkaProducer<>(props);
-                produce(producer, new IntoJson(), data, topic);
+                produce(producer, new IntoJson(), data, topic, registryClient);
             }
             case jsonSchema -> {
                 props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaJsonSchemaSerializer.class.getName());
                 props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaJsonSchemaSerializer.class.getName());
                 KafkaProducer<JsonNode, JsonNode> producer = new KafkaProducer<>(props);
-                produce(producer, new IntoJsonSchema(), data, topic);
+                produce(producer, new IntoJsonSchema(), data, topic, registryClient);
             }
             case protobuf -> {
                 System.err.printf(" ⚠️ Protobuf serialization is experimental and may not work as expected\n");
                 props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaProtobufSerializer.class.getName());
                 props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaProtobufSerializer.class.getName());
                 KafkaProducer<Object, Object> producer = new KafkaProducer<>(props);
-                produce(producer, new IntoProtobuf(), data, topic);
+                produce(producer, new IntoProtobuf(), data, topic, registryClient);
             }
             case text -> {
                 props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
                 props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
                 KafkaProducer<String, String> producer = new KafkaProducer<>(props);
-                produce(producer, new IntoText(), data, topic);
+                produce(producer, new IntoText(), data, topic, registryClient);
             }
             case malformed -> {
                 props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class);
                 props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class);
                 KafkaProducer<byte[], byte[]> producer = new KafkaProducer<>(props);
-                produce(producer, new IntoMalformed(), data, topic);
+                produce(producer, new IntoMalformed(), data, topic, registryClient);
             }
             case invalidJson -> {
                 props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaJsonSchemaSerializer.class.getName());
                 props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaJsonSchemaSerializer.class.getName());
                 KafkaProducer<JsonNode, JsonNode> producer = new KafkaProducer<>(props);
-                produce(producer, new IntoInvalidJson(), data, topic);
+                produce(producer, new IntoInvalidJson(), data, topic, registryClient);
             }
             case xml -> {
                 props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
                 props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
                 KafkaProducer<String, String> producer = new KafkaProducer<>(props);
-                produce(producer, new IntoXml(), data, topic);
+                produce(producer, new IntoXml(), data, topic, registryClient);
             }
             default -> {
                 System.err.printf(" ❕ Format '%s' is unknown. Known formats are ['avro', 'json', 'json-schema', 'text', 'malformed']\n", type);
                 props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
                 props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
                 KafkaProducer<String, String> producer = new KafkaProducer<>(props);
-                produce(producer, new IntoText(), data, topic);
+                produce(producer, new IntoText(), data, topic, registryClient);
             }
         }
     }
@@ -224,7 +231,8 @@ class MyProducer implements Callable<Integer> {
         }
     }
 
-    public static <K, V> void produce(final KafkaProducer<K, V> producer, final Into<K, V> mapper, final List<String> addresses, final String topic) throws Exception {
+    public static <K, V> void produce(final KafkaProducer<K, V> producer, final Into<K, V> mapper, final List<String> addresses, final String topic, final SchemaRegistryClient registryClient) throws Exception {
+        mapper.registerSchemas(registryClient);
         for (var address : addresses) {
             var record = mapper.into(address, topic);
             producer.send(record, onSend());
