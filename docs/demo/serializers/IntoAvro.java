@@ -27,24 +27,66 @@ import org.apache.avro.generic.GenericData;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import tech.allegro.schema.json2avro.converter.JsonAvroConverter;
+import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
+import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaReference;
+import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 
 
 public class IntoAvro implements Into<GenericRecord, GenericRecord> {
+    
+    
+    public void registerSchemas(SchemaRegistryClient schemaRegistryClient) throws Exception {
+        var keySchemaString = readResource("/avro/key-schema.json");
+        var valueSchemaString = readResource("/avro/value-schema.json");
+        var pointSchemaString = readResource("/avro/point-schema.json");
+        var schemaParser = new Schema.Parser();
+
+        schemaRegistryClient.register("public-french-addresses-key", new AvroSchema(keySchemaString));
+
+        int pointSchemaId = schemaRegistryClient.register(
+            "io.maif.yozefu.Point", 
+            new AvroSchema(pointSchemaString)
+        );
+
+        var pointRef = new SchemaReference(
+            "io.maif.yozefu.Point",
+            "io.maif.yozefu.Point",
+            1
+        );
+
+        var parsedValue = schemaRegistryClient.parseSchema(
+          "AVRO",
+          valueSchemaString,
+          java.util.List.of(pointRef)
+          ).orElseThrow(() -> new IllegalStateException("Failed to parse value schema"));
+
+        schemaRegistryClient.register(
+            "public-french-addresses-value",
+            parsedValue
+        );
+    }
+
+    
     public ProducerRecord<GenericRecord, GenericRecord> into(final String input, final String topic) throws Exception {
         var keySchemaString = readResource("/avro/key-schema.json");
         var valueSchemaString = readResource("/avro/value-schema.json");
         var pointSchemaString = readResource("/avro/point-schema.json");
 
         Schema.Parser schemaParser = new Schema.Parser();
-        schemaParser.parse(pointSchemaString);
+        var pointSchema = schemaParser.parse(pointSchemaString);
+
+        GenericRecord child = new GenericData.Record(pointSchema);
         Schema keySchema = schemaParser.parse(keySchemaString);
         Schema valueSchema = schemaParser.parse(valueSchemaString);
 
         JsonAvroConverter converter = new JsonAvroConverter();
+        GenericData.Record point = converter.convertToGenericDataRecord("""
+            { "type": "Point", "coordinates": [40.23, 12.3] }""".getBytes(), pointSchema);
 
         var keyString = String.format("{ \"id\": \"%s\", \"sunny\": %s }", generateKey(), new Random().nextBoolean());
         GenericData.Record key = converter.convertToGenericDataRecord(keyString.getBytes(), keySchema);
         GenericData.Record value = converter.convertToGenericDataRecord(input.getBytes(), valueSchema);
+        value.put("geometry", point);
         return new ProducerRecord<>(topic, key, value);
     }
 }

@@ -218,7 +218,7 @@ impl KafkaRecord {
                             Ok(e) => (e, Some(Schema::new(id, None))),
                             Err(_e) => (
                                 DataType::String(format!(
-                                    "Yozefu was not able to retrieve the schema {} because there is no schema registry configured. Please visit https://github.com/MAIF/yozefu/blob/main/docs/schema-registry/README.md for more details.\nPayload: {:?}\n String: {}",
+                                    "Yozefu was not able to retrieve the schema {} because there is no schema registry configured. Please visit https://maif.github.io/yozefu/schema-registry/ for more details.\nPayload: {:?}\n String: {}",
                                     id,
                                     payload,
                                     String::from_utf8(payload.to_vec()).unwrap_or_default()

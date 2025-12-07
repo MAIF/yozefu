@@ -19,7 +19,7 @@
       "name": "geometry",
       "type": [
         {
-          "name": "Point",
+          "name": "point",
           "doc": "Describes a point geometry",
           "type": "io.maif.yozefu.Point"
         },

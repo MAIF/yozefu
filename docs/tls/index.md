@@ -131,7 +131,7 @@ For more details about Mutual TLS, refer to the documentation: [Configure mTLS A
 ## Cloud providers
 
 
-[Contributions are welcomed](https://github.com/MAIF/yozefu/edit/main/docs/tls.md) to improve this page.
+[Contributions are welcomed](https://github.com/MAIF/yozefu/blob/main/docs/tls/index.md) to improve this page.
 
 
 | Provider                | Compatible | Documentation                                                                                                                 |

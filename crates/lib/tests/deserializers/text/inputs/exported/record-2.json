@@ -1,0 +1,44 @@
+{
+   "value": {
+     "type": "Feature",
+     "geometry": {
+       "type": "Point",
+       "coordinates": [
+         4.0215,
+         49.211613
+       ]
+     },
+     "properties": {
+       "label": "Rue Franz Kafka 51100 Reims",
+       "score": 0.6992354545454544,
+       "id": "51454_3782",
+       "name": "Rue Franz Kafka",
+       "postcode": "51100",
+       "citycode": "51454",
+       "x": 774438.44,
+       "y": 6901804.03,
+       "city": "Reims",
+       "context": "51, Marne, Grand Est",
+       "type": "street",
+       "importance": 0.69159,
+       "street": "Rue Franz Kafka"
+     }
+   },
+   "key": "381",
+   "topic": "public-french-addresses",
+   "timestamp": 1732481153241,
+   "partition": 0,
+   "offset": 4,
+   "headers": {},
+   "key_schema": {
+     "id": 1
+   },
+   "value_schema": {
+     "id": 2
+   },
+   "size": 381,
+   "date_time": "2024-11-24T21:45:53.241+01:00",
+   "absolute_delta_in_ms": 0,
+   "relative_delta_in_ms": 0,
+   "search_query": ""
+ }

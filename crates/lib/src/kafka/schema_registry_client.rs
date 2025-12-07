@@ -72,7 +72,7 @@ impl SimpleSchemaRegistryClient {
     async fn schema(&self, id: u32) -> Result<Option<SchemaResponse>, Error> {
         // TODO https://github.com/servo/rust-url/issues/333
         let url = self.schema_url(id);
-        let response = self.client.get(url).send().await;
+        let response = self.client.get(&url).send().await;
 
         match response {
             Ok(response) => {

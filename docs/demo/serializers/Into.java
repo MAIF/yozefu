@@ -8,12 +8,17 @@ package serializers;
 import java.util.*;
 import java.nio.charset.StandardCharsets;
 import org.apache.kafka.clients.producer.*;
+import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
+import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaReference;
 
 public interface Into<K, V> {
     ProducerRecord<K, V> into(final String value, final String topic) throws Exception;
 
     default String generateKey() {
         return UUID.randomUUID().toString();
+    }
+
+    default void registerSchemas(SchemaRegistryClient schemaRegistryClient) throws Exception {
     }
 
     default String readResource(String path) throws Exception {

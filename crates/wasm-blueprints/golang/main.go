@@ -8,7 +8,7 @@ import (
 	"github.com/extism/go-pdk"
 )
 
-// This search filter shows how to write a search filter for Yozefu in Golang: https://extism.org/docs/quickstart/plugin-quickstart
+// This search filter shows how to write a search filter for Yozefu in Golang: https://extism.org/docs/quickstart/plugin-quickstart/
 //
 // This Extism WebAssembly plugin filter Kafka records based on a key suffix.
 // The plugin exports two functions:

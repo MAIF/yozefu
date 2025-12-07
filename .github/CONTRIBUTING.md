@@ -7,12 +7,13 @@ We encourage changes that make it easier to achieve our goals in an efficient wa
 
 ## Codebase
 
-* [lib](https://github.com/MAIF/yozefu/crates/lib): contains the core structures and the search module.
-* [app](https://github.com/MAIF/yozefu/crates/app): contains the kafka consumer with utility functions.
-* [tui](https://github.com/MAIF/yozefu/crates/tui): the glue code between `app` and Ratatui.
-* [wasm-types](https://github.com/MAIF/yozefu/crates/wasm-types): type definitions for defining WebAssembly modules.
-* [command](https://github.com/MAIF/yozefu/crates/command): commands for the CLI.
-* [bin](https://github.com/MAIF/yozefu/crates/bin): the binary.
+
+* [lib](https://github.com/MAIF/yozefu/tree/main/crates/lib): contains the core structures and the search module.
+* [app](https://github.com/MAIF/yozefu/tree/main/crates/app): contains the kafka consumer with utility functions.
+* [tui](https://github.com/MAIF/yozefu/tree/main/crates/tui): the glue code between `app` and Ratatui.
+* [wasm-types](https://github.com/MAIF/yozefu/tree/main/crates/wasm-types): type definitions for defining WebAssembly modules.
+* [command](https://github.com/MAIF/yozefu/tree/main/crates/command): commands for the CLI.
+* [bin](https://github.com/MAIF/yozefu/tree/main/crates/bin): the binary.
 
 ## Workflow
 

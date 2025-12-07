@@ -1,0 +1,50 @@
+---
+source: crates/lib/tests/deserializers/avro/mod.rs
+expression: record
+---
+{
+  "topic": "my-topic",
+  "timestamp": 0,
+  "partition": 0,
+  "offset": 0,
+  "headers": {},
+  "key_schema": {
+    "id": 1,
+    "schema_type": "AVRO"
+  },
+  "value_schema": {
+    "id": 2,
+    "schema_type": "AVRO"
+  },
+  "size": 371,
+  "key": {
+    "id": "2c78a422-fe06-4adb-9d88-ca4dfb941cbc",
+    "sunny": false
+  },
+  "value": {
+    "geometry": {
+      "coordinates": [
+        2.509794,
+        48.875
+      ],
+      "type": "Point"
+    },
+    "properties": {
+      "_type": "address",
+      "city": "Neuilly-Plaisance",
+      "citycode": "93049",
+      "context": "93, Seine-Saint-Denis, Île-de-France",
+      "id": "93049_0170",
+      "importance": 0,
+      "label": "Avenue des Caves d'Avron 93360 Neuilly-Plaisance",
+      "name": "Avenue des Caves d'Avron",
+      "postcode": "93360",
+      "score": 0,
+      "street": "Avenue des Caves d'Avron",
+      "type": "street",
+      "x": 664044,
+      "y": 6863997
+    },
+    "type": "Feature"
+  }
+}

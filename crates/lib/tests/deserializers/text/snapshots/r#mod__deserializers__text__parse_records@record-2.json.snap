@@ -1,0 +1,39 @@
+---
+source: crates/lib/tests/deserializers/text/mod.rs
+expression: "KafkaRecord::parse(owned_message, &mut None).await"
+input_file: crates/lib/tests/deserializers/text/inputs/record-2.json
+---
+KafkaRecord {
+    topic: "my-topic",
+    timestamp: Some(
+        0,
+    ),
+    partition: 0,
+    offset: 0,
+    headers: {},
+    key_schema: Some(
+        Schema {
+            id: SchemaId(
+                1,
+            ),
+            schema_type: None,
+        },
+    ),
+    value_schema: Some(
+        Schema {
+            id: SchemaId(
+                2,
+            ),
+            schema_type: None,
+        },
+    ),
+    size: 10,
+    key: String(
+        "Yozefu was not able to retrieve the schema 1 because there is no schema registry configured. Please visit https://maif.github.io/yozefu/schema-registry/ for more details.\nPayload: [0, 0, 0, 0, 1]\n String: \0\0\0\0\u{1}",
+    ),
+    key_as_string: "Yozefu was not able to retrieve the schema 1 because there is no schema registry configured. Please visit https://maif.github.io/yozefu/schema-registry/ for more details.\nPayload: [0, 0, 0, 0, 1]\n String: \0\0\0\0\u{1}",
+    value: String(
+        "Yozefu was not able to retrieve the schema 2 because there is no schema registry configured. Please visit https://maif.github.io/yozefu/schema-registry/ for more details.\nPayload: [0, 0, 0, 0, 2]\n String: \0\0\0\0\u{2}",
+    ),
+    value_as_string: "Yozefu was not able to retrieve the schema 2 because there is no schema registry configured. Please visit https://maif.github.io/yozefu/schema-registry/ for more details.\nPayload: [0, 0, 0, 0, 2]\n String: \0\0\0\0\u{2}",
+}
