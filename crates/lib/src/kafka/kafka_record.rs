@@ -22,8 +22,6 @@ use serde::Serialize;
 #[cfg(feature = "native")]
 use serde_json::Error;
 use std::collections::BTreeMap;
-#[cfg(feature = "native")]
-use std::fs;
 
 /// Inspired of the `[rdkafka::Message]` struct.
 /// Currently, we only support utf-8 string keys/values/headers.
@@ -131,9 +129,9 @@ impl KafkaRecord {
         let schema = schema.as_ref().unwrap();
         match schema.schema_type {
             Some(SchemaType::Json) => Self::deserialize_json(payload),
-            Some(SchemaType::Avro) => Self::deserialize_avro(payload, &schema),
+            Some(SchemaType::Avro) => Self::deserialize_avro(payload, schema),
             Some(SchemaType::Protobuf) => {
-                Self::deserialize_protobuf(payload, &schema.schemas.first().unwrap())
+                Self::deserialize_protobuf(payload, schema.schemas.first().unwrap())
             }
             None => Self::deserialize_json(payload),
         }

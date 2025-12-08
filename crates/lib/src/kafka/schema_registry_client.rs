@@ -1,4 +1,3 @@
-use nom::combinator::Opt;
 use reqwest::{
     Response,
     header::{self, HeaderMap, HeaderName, HeaderValue},
@@ -103,10 +102,10 @@ impl SimpleSchemaRegistryClient {
                 schemas.extend(ref_schemas);
             }
         }
-        return Ok(Some(MessageSchema {
-            schemas: schemas,
+        Ok(Some(MessageSchema {
+            schemas,
             schema_type: json.schema_type,
-        }));
+        }))
     }
 
     async fn referenced_subjects(
@@ -134,7 +133,7 @@ impl SimpleSchemaRegistryClient {
                 };
             }
         }
-        return Ok(Some(schemas));
+        Ok(Some(schemas))
     }
 
     async fn subject_schema(
@@ -150,7 +149,7 @@ impl SimpleSchemaRegistryClient {
                     let schema_response = response.json::<SchemaResponse>().await.unwrap();
                     return Ok(Some(schema_response));
                 }
-                return Ok(None);
+                Ok(None)
             }
             Err(e) => Err(Error::SchemaRegistry(e.to_string())),
         }
@@ -234,7 +233,7 @@ impl MessageSchema {
     pub fn schema_to_string_pretty(&self) -> String {
         match self.schema_type {
             Some(SchemaType::Avro | SchemaType::Json) => {
-                let json = serde_json::from_str::<Value>(&self.schemas.first().unwrap())
+                let json = serde_json::from_str::<Value>(self.schemas.first().unwrap())
                     .unwrap_or(Value::String(String::new()));
                 serde_json::to_string_pretty(&json).unwrap()
             }
