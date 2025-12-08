@@ -15,11 +15,11 @@ fn current_directory() -> PathBuf {
 
 /// Macro to create a mock schema registry server with predefined schema responses.
 macro_rules! mock_schema_registry {
-    ({ $($id:literal => $path:expr),+ $(,)? }) => {{
+    ({ $($url:literal => $path:expr),+ $(,)? }) => {{
         let mut server = mockito::Server::new_async().await;
         $(
             server
-                .mock("GET", concat!("/schemas/ids/", stringify!($id)))
+                .mock("GET", $url)
                 .with_status(200)
                 .match_header("accept", mockito::Matcher::Any)
                 .with_body(include_str!($path))
@@ -43,8 +43,8 @@ async fn test_avro_record() {
         .into_owned_message();
 
     let (_server, schema_client) = mock_schema_registry! {{
-        1 => "./inputs/schemas/key.json",
-        2 => "./inputs/schemas/value.json"
+        "/schemas/ids/1" => "./inputs/schemas/key.json",
+        "/schemas/ids/2" => "./inputs/schemas/value.json"
     }};
 
     let record = KafkaRecord::parse(owned_message, &mut Some(schema_client)).await;
@@ -64,8 +64,8 @@ async fn test_avro_record_unknown_primitive_type() {
     let owned_message = key_value.into_owned_message();
 
     let (_server, schema_client) = mock_schema_registry! {{
-        1 => "./inputs/schemas/key.json",
-        3 => "./inputs/schemas/value-with-reference.json"
+        "/schemas/ids/1" => "./inputs/schemas/key.json",
+        "/schemas/ids/3" => "./inputs/schemas/value-with-reference.json"
     }};
     let record = KafkaRecord::parse(owned_message, &mut Some(schema_client)).await;
     insta::with_settings!({sort_maps => true}, {
@@ -84,9 +84,9 @@ async fn test_avro_record_with_schema_reference() {
     let owned_message = key_value.into_owned_message();
 
     let (_server, schema_client) = mock_schema_registry! {{
-        1 => "./inputs/schemas/key.json",
-        2 => "./inputs/schemas/schema-reference.json",
-        3 => "./inputs/schemas/value-with-reference.json"
+        "/schemas/ids/1" => "./inputs/schemas/key.json",
+        "/subjects/io.maif.yozefu.Point/versions/1" => "./inputs/schemas/schema-reference.json",
+        "/schemas/ids/3" => "./inputs/schemas/value-with-reference.json"
     }};
 
     let record = KafkaRecord::parse(owned_message, &mut Some(schema_client)).await;
