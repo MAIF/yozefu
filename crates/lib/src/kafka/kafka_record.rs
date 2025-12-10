@@ -1,3 +1,4 @@
+#[cfg(feature = "native")]
 use super::SchemaRegistryClient;
 #[cfg(feature = "native")]
 use super::avro::avro_to_json;
