@@ -1,0 +1,25 @@
+---
+source: crates/lib/tests/deserializers/avro/mod.rs
+assertion_line: 119
+expression: record
+---
+{
+  "topic": "my-topic",
+  "timestamp": 0,
+  "partition": 0,
+  "offset": 0,
+  "headers": {},
+  "key_schema": {
+    "id": 1,
+    "schema_type": "AVRO"
+  },
+  "value_schema": {
+    "id": 3
+  },
+  "size": 380,
+  "key": {
+    "id": "2c78a422-fe06-4adb-9d88-ca4dfb941cbc",
+    "sunny": false
+  },
+  "value": ""
+}

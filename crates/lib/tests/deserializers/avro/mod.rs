@@ -94,3 +94,28 @@ async fn test_avro_record_with_schema_reference() {
         assert_json_snapshot!(record);
     });
 }
+
+#[tokio::test]
+/// Test deserialization of an Avro record with the value schema referencing another schema in the schema registry.
+async fn test_avro_record_with_multiple_schema_references() {
+    fix_timezone();
+    let input = fs::read_to_string(
+        current_directory().join("inputs/records/record-multiple-schema-reference.json"),
+    )
+    .unwrap();
+    let key_value: KeyValue = serde_json::from_str(&input).unwrap();
+    let owned_message = key_value.into_owned_message();
+
+    let (_server, schema_client) = mock_schema_registry! {{
+        "/schemas/ids/1" => "./inputs/schemas/key.json",
+        "/subjects/io.maif.yozefu.Point/versions/2" => "./inputs/schemas/point-with-shared-schema-reference.json",
+        "/subjects/io.maif.yozefu.LineString/versions/1" => "./inputs/schemas/line-with-shared-schema-reference.json",
+        "/subjects/io.maif.yozefu.MetaGeometry/versions/1" => "./inputs/schemas/shared-schema-reference.json",
+        "/schemas/ids/4" => "./inputs/schemas/value-with-multiple-references.json"
+    }};
+
+    let record = KafkaRecord::parse(owned_message, &mut Some(schema_client)).await;
+    insta::with_settings!({sort_maps => true}, {
+        assert_json_snapshot!(record);
+    });
+}

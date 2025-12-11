@@ -1,0 +1,16 @@
+{
+    "subject": "io.maif.yozefu.Point",
+    "version": 2,
+    "guid": "e0be5981-a2a8-b63d-2e54-d7f404987e54",
+    "references": [
+        {
+            "name": "io.maif.yozefu.MetaGeometry",
+            "subject": "io.maif.yozefu.MetaGeometry",
+            "version": 1
+        }
+    ],
+    "schemaType": "AVRO",
+    "schema": "{\"type\":\"record\",\"name\":\"Point\",\"namespace\":\"io.maif.yozefu\",\"doc\":\"Describes a point geometry\",\"fields\":[{\"name\":\"type\",\"type\":{\"type\":\"enum\",\"name\":\"PointType\",\"symbols\":[\"Point\"]},\"default\":\"Point\"},{\"name\":\"coordinates\",\"type\":{\"type\":\"array\",\"items\":\"double\"}},{\"name\":\"MetaGeometry\",\"type\":\"MetaGeometry\"}]}",
+    "ts": 1765149283156,
+    "deleted": false
+}
