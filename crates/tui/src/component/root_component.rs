@@ -13,19 +13,16 @@ use ratatui::{
     layout::{Constraint, Direction, Flex, Layout, Margin, Rect},
     widgets::{Clear, Paragraph},
 };
-use tokio::sync::{mpsc::UnboundedSender, watch::Receiver};
+use tokio::sync::mpsc::UnboundedSender;
 
-use crate::{
-    Action, Notification, action::Level, error::TuiError, highlighter::Highlighter,
-    records_buffer::BufferAction,
-};
+use crate::{Action, Notification, action::Level, error::TuiError, highlighter::Highlighter};
 
 use super::{
     Component, ComponentName, ConcurrentRecordsBuffer, State, footer_component::FooterComponent,
     header_component::HeaderComponent, help_component::HelpComponent,
-    progress_bar_component::ProgressBarComponent, record_details_component::RecordDetailsComponent,
-    records_component::RecordsComponent, schemas_component::SchemasComponent,
-    search_component::SearchComponent, topic_details_component::TopicDetailsComponent,
+    record_details_component::RecordDetailsComponent, records_component::RecordsComponent,
+    schemas_component::SchemasComponent, search_component::SearchComponent,
+    topic_details_component::TopicDetailsComponent,
     topics_and_records_component::TopicsAndRecordsComponent, topics_component::TopicsComponent,
 };
 
@@ -35,8 +32,6 @@ pub(crate) struct RootComponent {
     state: State,
     focus_history: Vec<ComponentName>,
     focus_order: Vec<ComponentName>,
-    progress_bar: ProgressBarComponent,
-    buffer_rx: Receiver<BufferAction>,
     action_tx: Option<UnboundedSender<Action>>,
 }
 
@@ -49,7 +44,6 @@ impl RootComponent {
         state: State,
     ) -> Self {
         let config = state.workspace().config();
-        let buffer_rx = records.lock().map(|e| e.channels.clone().1).ok().unwrap();
         let mut footer = FooterComponent::default();
         footer.show_shortcuts(config.show_shortcuts);
 
@@ -91,8 +85,6 @@ impl RootComponent {
             .collect();
         Self {
             components,
-            buffer_rx,
-            progress_bar: ProgressBarComponent::new(400),
             views: vec![ComponentName::TopicsAndRecords],
             focus_order: focus_order_of(&ComponentName::TopicsAndRecords),
             focus_history: vec![],
@@ -334,12 +326,6 @@ impl Component for RootComponent {
                 }?;
                 self.notify_footer()?;
             }
-            Action::RecordsToRead(length) => {
-                self.progress_bar.set_length(length);
-                let mut a = self.buffer_rx.clone();
-                let BufferAction::Stats(mut stats) = *a.borrow_and_update();
-                stats.total_to_read = length;
-            }
             Action::CopyToClipboard(ref content) => {
                 let mut ctx = ClipboardContext::new().unwrap();
                 self.action_tx
@@ -376,9 +362,6 @@ impl Component for RootComponent {
             );
             return Ok(());
         }
-        let mut a = self.buffer_rx.clone();
-        let BufferAction::Stats(stats) = *a.borrow_and_update();
-        self.progress_bar.set_progress(stats.read);
         f.render_widget(Clear, rect);
 
         let last_view = self.views.last().unwrap();

@@ -24,7 +24,8 @@ impl ProgressBarComponent {
         self.progress = inc as u64;
     }
 
-    pub fn set_length(&mut self, length: usize) {
+    #[allow(dead_code)]
+    fn set_length(&mut self, length: usize) {
         self.length = length as u64;
     }
 }

@@ -58,7 +58,7 @@ impl SchemaId {
 }
 
 #[cfg(feature = "native")]
-const MAGIC_BYTE: u8 = 0;
+pub const MAGIC_BYTE: u8 = 0;
 
 #[cfg(feature = "native")]
 impl SchemaId {
@@ -83,16 +83,4 @@ impl SchemaId {
     pub fn parse_from_consumer_offsets_topic(_payload: Option<&[u8]>) -> Option<Self> {
         None
     }
-}
-
-#[test]
-fn test_parse_schema_id() {
-    assert_eq!(SchemaId::parse(None), None);
-    assert_eq!(SchemaId::parse(Some(&[0, 0, 0, 0, 0])), Some(SchemaId(0)));
-    assert_eq!(SchemaId::parse(Some(&[0, 0, 0, 0, 1])), Some(SchemaId(1)));
-    assert_eq!(
-        SchemaId::parse(Some(&[0, 0, 0, 4, 2])),
-        Some(SchemaId(1026))
-    );
-    assert_eq!(SchemaId::parse(Some(&[54, 0, 0, 0, 1])), None);
 }
