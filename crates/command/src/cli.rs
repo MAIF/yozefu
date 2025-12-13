@@ -7,7 +7,6 @@ use app::configuration::{
     ClusterConfig, GlobalConfig, SchemaRegistryConfig, Workspace, YozefuConfig,
 };
 use app::{APPLICATION_NAME, BINARY_NAME};
-use clap::command;
 use lib::Error;
 use reqwest::Url;
 use std::collections::HashMap;

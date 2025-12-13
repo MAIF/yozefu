@@ -2,7 +2,7 @@ mod footer_component;
 mod header_component;
 mod help_component;
 mod issue_component;
-mod progress_bar_component;
+// mod progress_bar_component;
 mod record_details_component;
 mod records_component;
 mod root_component;

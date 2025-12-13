@@ -27,4 +27,6 @@ pub use schema::SchemaId;
 #[cfg(test)]
 mod kafka_record_test;
 #[cfg(test)]
+mod schema_test;
+#[cfg(test)]
 mod topic_test;
