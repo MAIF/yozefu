@@ -114,18 +114,18 @@ To check out docs, visit [https://maif.github.io/yozefu/](https://maif.github.io
 <table>
   <tr>
     <td>
-      <img alt=" A TUI displays a list of topics on the left, a search bar below, and records with timestamps and values in a table on the right. " src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/public/topics.png">
+      <img alt=" A TUI displays a list of topics on the left, a search bar below, and records with timestamps and values in a table on the right. " src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/public/topics.avif">
     </td>
     <td>
-      <img alt="A TUI listing the consumed kafka records with their timestamps, their partition, their offset and an excerpt of the key and the value." src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/public/records.png">
+      <img alt="A TUI listing the consumed kafka records with their timestamps, their partition, their offset and an excerpt of the key and the value." src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/public/records.avif">
     </td>
   </tr>
   <tr>
     <td>
-      <img alt="View of a selected kafka records" src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/public/record.png">
+      <img alt="View of a selected kafka records" src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/public/record.avif">
     </td>
     <td>
-      <img alt="View of the help page" src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/public/help.png">
+      <img alt="View of the help page" src="https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/public/help.avif">
     </td>
   </tr>
 </table>

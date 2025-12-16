@@ -19,25 +19,25 @@ yozf -c localhost
 
 ::: code-group
 
-```sh [cargo]
+```sh [Cargo]
 RUSTFLAGS="--cfg tokio_unstable" cargo install --locked yozefu
 ```
 
-```sh [git]
+```sh [Git]
 git clone git@github.com:MAIF/yozefu.git
-cargo run -- --localhost
+cd yozefu
+cargo install --path crates/bin
 ```
 
-```sh [brew]
+```sh [Brew]
 brew install yozefu
-
 ```
 
-```sh [yay]
+```sh [Yay]
 yay -S yozefu
 ```
 
-```sh [nix]
+```sh [Nix]
 nix run github:MAIF/yozefu
 ```
 :::

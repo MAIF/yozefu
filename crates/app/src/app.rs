@@ -152,7 +152,7 @@ impl App {
         }
 
         info!(
-            "{} records are about to be consumed on the following topic partitions: [{}]",
+            "{} records are about to be consumed from the following topic partitions: [{}]",
             count.separate_with_underscores(),
             topic_partition_list
                 .elements()

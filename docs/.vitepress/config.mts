@@ -1,11 +1,35 @@
-import { defineConfig } from 'vitepress'
+import { defineConfig, HeadConfig, TransformContext} from 'vitepress'
+
+
+const transformHead = ({ }): HeadConfig[] => {
+  const head: HeadConfig[] = []
+  head.push(['link', { rel: 'icon', type: 'image/svg+xml', href: '/yozefu/favicon.svg' }])
+  return head
+}
+
+
+const description = 'Browse and query Kafka from the terminal.'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  
-  title: "Yōzefu",
-  description: "Interactive TUI to explore Kafka clusters and data",
+  transformHead: transformHead,
+  title: "Yōzefu, An TUI for exploring data of a kafka cluster.",
+  description: "A TUI to explore Kafka clusters and data",
   base: '/yozefu/',
+  head: [
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: 'https://maif.github.io/yozefu/favicon.svg' }],
+    ['meta', { property: 'og:url', content: 'https://maif.github.io/yozefu/' }],
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:title', content: 'Yōzefu' }],
+    ['meta', { property: 'og:description', content: description }],
+    ['meta', { property: 'og:image', content: 'https://maif.github.io/yozefu/open-graph.png' }],
+    ['meta', { name: 'twitter:card', content: 'https://maif.github.io/yozefu/open-graph.png' }],
+    ['meta', { name: 'twitter:domain', content: 'maif.github.io' }],
+    ['meta', { name: 'twitter:url', content: 'https://maif.github.io/yozefu/' }],
+    ['meta', { name: 'twitter:title', content: 'Yōzefu' }],
+    ['meta', { name: 'twitter:description', content: description }],
+    ['meta', { name: 'twitter:image', content: 'https://maif.github.io/yozefu/open-graph.png' }],
+  ],
   themeConfig: {
     search: {
       provider: 'local'
@@ -17,7 +41,7 @@ export default defineConfig({
     ],
      footer: {
       message: `
-      <a href="https://maif.github.io/"><img class="footer-maif" src="https://maif.github.io/yozefu/maif.svg" /></a><br /><a href="https://maif.github.io/">OSS by MAIF</a>, released under Apache License, Version 2.0</p>`,
+      <a target="_self" rel="noopener noreferrer" href="https://maif.github.io/"><img width="500" height="392" class="footer-maif" alt="MAIF logo" src="https://maif.github.io/yozefu/maif.svg" /></a><br /><a target="_self" rel="noopener noreferrer" href="https://maif.github.io/">OSS by MAIF</a>, released under Apache License, Version 2.0`,
     },
     sidebar: [
       {
@@ -50,7 +74,9 @@ export default defineConfig({
       {
         text: 'Internals',
         items: [
-          { text: 'JSON schemas', link: '/json-schemas/' },
+          
+          { text: 'Example Input', link: '/search-filter/filter-input' },
+          { text: 'Example Result', link: '/search-filter/filter-result' },
         ]
       },
     ],
