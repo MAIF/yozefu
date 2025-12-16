@@ -135,10 +135,10 @@ For more details about Mutual TLS, refer to the documentation: [Configure mTLS A
 
 
 | Provider                | Compatible | Documentation                                                                                                                 |
-|-------------------------|------------|-------------------------------------------------------------------------------------------------------------------------------|
+| ----------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | Google Cloud Platform   | ?          | https://cloud.google.com/managed-service-for-apache-kafka/docs/quickstart#cloud-shell                                         |
 | Amazon Web Services     | ?          | https://docs.aws.amazon.com/msk/latest/developerguide/produce-consume.html                                                    |
-| Microsoft Azure         | ?          | https://learn.microsoft.com/fr-fr/azure/event-hubs/azure-event-hubs-kafka-overview                                            |
+| Microsoft Azure         | ?          | https://learn.microsoft.com/en-us/azure/event-hubs/azure-event-hubs-apache-kafka-overview                                     |
 | DigitalOcean            | ?          | https://docs.digitalocean.com/products/databases/kafka/how-to/connect/                                                        |
 | OVH                     | ?          | https://help.ovhcloud.com/csm/en-ie-public-cloud-databases-kafka-getting-started?id=kb_article_view&sysparm_article=KB0048944 |
 | Aiven for Apache Kafka® | `true`     | https://aiven.io/docs/products/kafka/howto/list-code-samples                                                                  |

@@ -52,7 +52,7 @@ pub(crate) enum Action {
     /// Notify the UI that a new component has been displayed
     NewView(ComponentName),
     /// Notify the UI the visible components and their order in the stack view
-    ViewStack((ComponentName, Vec<ComponentName>)),
+    ViewStack((ComponentName, Vec<ComponentName>, Vec<ComponentName>)),
     /// Request to open the web browser with the URL template (AKHQ, redpanda-console, etc.) pointing to the given record
     Open(KafkaRecord),
     /// Notify the UI some details (consumer groups, members...) of a given topic

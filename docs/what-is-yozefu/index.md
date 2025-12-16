@@ -50,7 +50,7 @@ yozf --headless \
 
 ## Screenshots
 
-![Records panel](../public/records.png)
-![record panel](../public/record.png)
-![topic panel](../public/topics.png)
-![help panel](../public/help.png)
+<img width="3455" height="2158" src="/records.avif" alt="Screenshot of the records view, a table displaying kafka records" />
+<img width="3455" height="2161" src="/record.avif" alt="Screenshot of the record view, detailed view of a single kafka record" />
+<img width="3455" height="2157" src="/topics.avif" alt="Screenshot of the topic view, a list of kafka topics you can consume" />
+<img width="3455" height="2161" src="/help.avif" alt="Screenshot of the help view, displaying keybindings, the configuration and the syntax of the query language" />

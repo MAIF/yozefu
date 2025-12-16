@@ -199,7 +199,7 @@ impl Ui {
                     )
                     .for_each(|bulk_of_records| {
                         let bulk_of_records = bulk_of_records.unwrap();
-                        info!("Received a bulk of records: {}", bulk_of_records.len());
+                        info!("Received a bulk of {} records", bulk_of_records.len());
                         let timestamp = bulk_of_records
                             .last()
                             .and_then(|r| r.timestamp().to_millis())
@@ -278,7 +278,7 @@ impl Ui {
         tokio::task::Builder::new()
             .name("topics-loader")
             .spawn(async move {
-                info!("Loading topics");
+                info!("Listing topics from the cluster");
                 match app.list_topics() {
                     Ok(topics) => {
                         action_tx.send(Action::Topics(topics)).unwrap();
