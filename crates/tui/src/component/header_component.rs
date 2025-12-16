@@ -40,9 +40,9 @@ impl Component for HeaderComponent {
 
     fn update(&mut self, action: Action) -> Result<Option<Action>, TuiError> {
         match action {
-            Action::ViewStack((main_component, views)) => {
+            Action::ViewStack((main_component, history, _views)) => {
                 self.main_component = main_component;
-                self.state = views;
+                self.state = history;
             }
             Action::Notification(notification) => {
                 self.ticks = 0;

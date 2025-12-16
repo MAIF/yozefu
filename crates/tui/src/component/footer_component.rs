@@ -1,6 +1,8 @@
 //! The footer component displays contextual information: the current cluster, shortcuts and the last notifications
 use crossterm::event::KeyEvent;
 
+use super::{Component, ComponentName, Shortcut, State};
+use crate::{action::Action, error::TuiError};
 use ratatui::{
     Frame,
     layout::Rect,
@@ -9,14 +11,11 @@ use ratatui::{
 };
 use tokio::sync::mpsc::UnboundedSender;
 
-use crate::{action::Action, error::TuiError};
-
-use super::{Component, ComponentName, Shortcut, State};
-
 #[derive(Default)]
 pub struct FooterComponent {
     shortcuts: Vec<Shortcut>,
     main_component: ComponentName,
+    views: Vec<ComponentName>,
     action_tx: Option<UnboundedSender<Action>>,
     show_shortcuts: bool,
 }
@@ -75,10 +74,14 @@ impl Component for FooterComponent {
                 }
                 self.shortcuts.push(Shortcut::new("CTRL + H", "Help"));
                 self.shortcuts.push(Shortcut::new("TAB", "Next panel"));
-                self.shortcuts.push(Shortcut::new("ESC", "Quit"));
+                self.shortcuts.push(Shortcut::new("CTRL + C", "Quit"));
+                if self.views.len() > 1 {
+                    self.shortcuts.push(Shortcut::new("ESC", "Close"));
+                }
             }
-            Action::ViewStack((main_component, _views)) => {
+            Action::ViewStack((main_component, _history, views)) => {
                 self.main_component = main_component;
+                self.views = views;
             }
             _ => (),
         }

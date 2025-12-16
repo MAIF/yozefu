@@ -133,11 +133,22 @@ impl RootComponent {
         Ok(())
     }
 
+    fn quit(&self) {
+        self.action_tx.as_ref().unwrap().send(Action::Quit).unwrap();
+    }
+
     fn close(&mut self) {
-        self.views.pop();
-        if self.views.is_empty() {
-            self.action_tx.as_ref().unwrap().send(Action::Quit).unwrap();
+        if self.views.len() == 1 {
+            self.action_tx
+                .as_ref()
+                .unwrap()
+                .send(Action::Notification(Notification::new(
+                    Level::Info,
+                    "Press [CTRL + C] to exit".to_string(),
+                )))
+                .unwrap();
         } else {
+            self.views.pop();
             self.focus_order = focus_order_of(self.views.last().unwrap());
 
             let last_focused_component = self
@@ -183,7 +194,12 @@ impl RootComponent {
             self.action_tx.as_ref().unwrap().send(Action::ViewStack((
                 self.views.first().unwrap().clone(),
                 self.focus_history.clone(),
+                self.views.clone(),
             )))?;
+            self.action_tx
+                .as_ref()
+                .unwrap()
+                .send(Action::RefreshShortcuts)?;
         }
         Ok(())
     }
@@ -272,6 +288,9 @@ impl Component for RootComponent {
                 return Ok(None);
             }
             KeyCode::Esc => self.close(),
+            KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+                self.quit();
+            }
             _ => (),
         }
         let focused_component = self.components.get(&self.state.focused).unwrap();
