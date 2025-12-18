@@ -172,9 +172,10 @@ impl KafkaRecord {
             ));
         }
         let mut parsed_schema = parsed_schema.unwrap();
-        let main_schema = parsed_schema.remove(0);
         //Order is important since from_avro_datum_schemata needs to read first the schemas that will be used by other schemas
         parsed_schema.reverse();
+        let main_schema = &parsed_schema[parsed_schema.len() - 1];
+
         match from_avro_datum_schemata(
             &main_schema,
             parsed_schema.iter().collect(),

@@ -10,7 +10,7 @@
         }
     ],
     "schemaType": "AVRO",
-    "schema": "{\"type\":\"record\",\"name\":\"LineString\",\"doc\":\"Describes a LineString geometry\",\"fields\":[{\"name\":\"type\",\"type\":{\"type\":\"enum\",\"name\":\"LineStringType\",\"symbols\":[\"LineString\"]},\"default\":\"LineString\"},{\"name\":\"coordinates\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"array\",\"items\":\"double\"}}},{\"name\":\"MetaGeometry\",\"type\":\"MetaGeometry\"}]}",
+    "schema": "{\"type\":\"record\",\"name\":\"LineString\",\"namespace\":\"io.maif.yozefu\",\"doc\":\"Describes a LineString geometry\",\"fields\":[{\"name\":\"type\",\"type\":{\"type\":\"enum\",\"name\":\"LineStringType\",\"symbols\":[\"LineString\"]},\"default\":\"LineString\"},{\"name\":\"coordinates\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"array\",\"items\":\"double\"}}},{\"name\":\"MetaGeometry\",\"type\":\"MetaGeometry\"}]}",
     "ts": 1765149283156,
     "deleted": false
 }

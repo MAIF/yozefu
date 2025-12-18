@@ -14,12 +14,25 @@ expression: record
     "schema_type": "AVRO"
   },
   "value_schema": {
-    "id": 3
+    "id": 4,
+    "schema_type": "AVRO"
   },
-  "size": 380,
+  "size": 82,
   "key": {
     "id": "2c78a422-fe06-4adb-9d88-ca4dfb941cbc",
     "sunny": false
   },
-  "value": ""
+  "value": {
+    "geometry": {
+      "MetaGeometry": {
+        "value": "shared value"
+      },
+      "coordinates": [
+        1.0,
+        2.0
+      ],
+      "type": "Point"
+    },
+    "type": "Feature"
+  }
 }
