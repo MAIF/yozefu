@@ -11,7 +11,7 @@ pub use schema_registry_client::SchemaRegistryClient;
 #[cfg(feature = "native")]
 mod avro;
 #[cfg(feature = "native")]
-pub use schema_registry_client::MessageSchema;
+pub use schema_registry_client::Schema;
 #[cfg(feature = "native")]
 mod internal;
 

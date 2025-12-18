@@ -3,13 +3,13 @@ use super::SchemaRegistryClient;
 #[cfg(feature = "native")]
 use super::avro::avro_to_json;
 use super::data_type::DataType;
-use super::schema::Schema;
+use super::schema::Schema as SchemaRef;
 #[cfg(feature = "native")]
 use super::schema::SchemaId;
 #[cfg(feature = "native")]
 use super::schema::SchemaType;
 #[cfg(feature = "native")]
-use super::schema_registry_client::MessageSchema;
+use super::schema_registry_client::Schema;
 #[cfg(feature = "native")]
 use crate::kafka::internal::extract_key_and_value_from_consumer_offsets_topics;
 #[cfg(feature = "native")]
@@ -36,9 +36,9 @@ pub struct KafkaRecord {
     pub offset: i64,
     pub headers: BTreeMap<String, String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub key_schema: Option<Schema>,
+    pub key_schema: Option<SchemaRef>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub value_schema: Option<Schema>,
+    pub value_schema: Option<SchemaRef>,
     /// Number of bytes for the key + the value
     #[serde(default)]
     pub size: usize,
@@ -122,7 +122,7 @@ impl KafkaRecord {
         }
     }
 
-    fn payload_to_data_type(payload: Option<&[u8]>, schema: Option<&MessageSchema>) -> DataType {
+    fn payload_to_data_type(payload: Option<&[u8]>, schema: Option<&Schema>) -> DataType {
         if schema.is_none() {
             return Self::deserialize_json(payload);
         }
@@ -159,7 +159,7 @@ impl KafkaRecord {
         }
     }
 
-    fn deserialize_avro(payload: Option<&[u8]>, schema: &MessageSchema) -> DataType {
+    fn deserialize_avro(payload: Option<&[u8]>, schema: &Schema) -> DataType {
         let mut payload = payload.unwrap_or_default();
         let parsed_schema = apache_avro::Schema::parse_list(&schema.schemas);
 
@@ -215,7 +215,7 @@ impl KafkaRecord {
     async fn extract_data_and_schema(
         payload: Option<&[u8]>,
         schema_registry: &mut Option<SchemaRegistryClient>,
-    ) -> (DataType, Option<Schema>) {
+    ) -> (DataType, Option<SchemaRef>) {
         let schema_id = SchemaId::parse(payload);
         match (schema_id, schema_registry.as_mut()) {
             (None, _) => (Self::payload_to_data_type(payload, None), None),
@@ -227,7 +227,7 @@ impl KafkaRecord {
                         match Self::try_deserialize_json(
                             Self::extract_data_from_payload_with_schema_header(payload),
                         ) {
-                            Ok(e) => (e, Some(Schema::new(id, None))),
+                            Ok(e) => (e, Some(SchemaRef::new(id, None))),
                             Err(_e) => (
                                 DataType::String(format!(
                                     "Yozefu was not able to retrieve the schema {} because there is no schema registry configured. Please visit https://maif.github.io/yozefu/schema-registry/ for more details.\nPayload: {:?}\n String: {}",
@@ -235,7 +235,7 @@ impl KafkaRecord {
                                     payload,
                                     String::from_utf8(payload.to_vec()).unwrap_or_default()
                                 )),
-                                Some(Schema::new(id, None)),
+                                Some(SchemaRef::new(id, None)),
                             ),
                         }
                     }
@@ -245,8 +245,8 @@ impl KafkaRecord {
                 let p = payload.unwrap_or_default();
 
                 let (schema_response, schema) = match schema_registry.schema(s.0).await {
-                    Ok(Some(d)) => (Some(d.clone()), Some(Schema::new(s, d.schema_type))),
-                    Ok(None) => (None, Some(Schema::new(s, None))),
+                    Ok(Some(d)) => (Some(d.clone()), Some(SchemaRef::new(s, d.schema_type))),
+                    Ok(None) => (None, Some(SchemaRef::new(s, None))),
                     Err(e) => {
                         let payload = payload.unwrap_or_default();
                         return (
@@ -257,7 +257,7 @@ impl KafkaRecord {
                                 payload,
                                 String::from_utf8(payload.to_vec()).unwrap_or_default()
                             )),
-                            Some(Schema::new(s, None)),
+                            Some(SchemaRef::new(s, None)),
                         );
                     }
                 };

@@ -76,7 +76,7 @@ impl SimpleSchemaRegistryClient {
         }
     }
 
-    async fn schema(&self, id: u32) -> Result<Option<MessageSchema>, Error> {
+    async fn schema(&self, id: u32) -> Result<Option<Schema>, Error> {
         // TODO https://github.com/servo/rust-url/issues/333
         let url = self.schema_url(id);
         let response = self.client.get(&url).send().await;
@@ -92,7 +92,7 @@ impl SimpleSchemaRegistryClient {
         }
     }
 
-    async fn response_to_schema(&self, response: Response) -> Result<Option<MessageSchema>, Error> {
+    async fn response_to_schema(&self, response: Response) -> Result<Option<Schema>, Error> {
         let mut json = response.json::<SchemaResponse>().await.unwrap();
         json.schema_type = Self::compute_schema_type(&json);
 
@@ -102,7 +102,7 @@ impl SimpleSchemaRegistryClient {
                 schemas.extend(ref_schemas);
             }
         }
-        Ok(Some(MessageSchema {
+        Ok(Some(Schema {
             schemas,
             schema_type: json.schema_type,
         }))
@@ -179,7 +179,7 @@ impl SimpleSchemaRegistryClient {
 /// All schemas are cached
 pub struct SchemaRegistryClient {
     client: SimpleSchemaRegistryClient,
-    cache: HashMap<u32, MessageSchema>,
+    cache: HashMap<u32, Schema>,
 }
 
 impl SchemaRegistryClient {
@@ -190,7 +190,7 @@ impl SchemaRegistryClient {
         }
     }
 
-    pub async fn schema(&mut self, id: u32) -> Result<Option<MessageSchema>, Error> {
+    pub async fn schema(&mut self, id: u32) -> Result<Option<Schema>, Error> {
         match self.cache.get(&id) {
             Some(schema) => Ok(Some(schema.clone())),
             None => {
@@ -209,7 +209,7 @@ impl SchemaRegistryClient {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, Hash, PartialEq, Eq)]
-pub struct MessageSchema {
+pub struct Schema {
     pub schemas: Vec<String>,
     pub schema_type: Option<SchemaType>,
 }
@@ -229,7 +229,7 @@ struct SchemaReference {
     pub version: u16,
 }
 
-impl MessageSchema {
+impl Schema {
     pub fn schema_to_string_pretty(&self) -> String {
         match self.schema_type {
             Some(SchemaType::Avro | SchemaType::Json) => {

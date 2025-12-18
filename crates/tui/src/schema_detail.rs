@@ -1,10 +1,10 @@
-use lib::kafka::{MessageSchema, SchemaId, SchemaRegistryClient};
+use lib::kafka::{Schema, SchemaId, SchemaRegistryClient};
 use serde::Serialize;
 use tracing::warn;
 
 #[derive(Clone, Debug, Serialize, Hash, PartialEq, Eq, Default)]
 pub struct SchemaDetail {
-    pub response: Option<MessageSchema>,
+    pub response: Option<Schema>,
     pub url: String,
     pub id: u32,
 }
