@@ -177,7 +177,7 @@ impl KafkaRecord {
         let main_schema = &parsed_schema[parsed_schema.len() - 1];
 
         match from_avro_datum_schemata(
-            &main_schema,
+            main_schema,
             parsed_schema.iter().collect(),
             &mut payload,
             None,
