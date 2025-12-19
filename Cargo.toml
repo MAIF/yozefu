@@ -21,7 +21,7 @@ default-members = [
 resolver = "3"
 
 [workspace.package]
-version = "0.0.22"
+version = "0.0.23"
 edition = "2024"
 authors = ["Yann Prono <yann.prono@maif.fr>"]
 readme = "README.md"
@@ -33,12 +33,12 @@ license = "Apache-2.0"
 rust-version = "1.85.0"
 
 [workspace.dependencies]
-lib = { package = "yozefu-lib", path = "crates/lib", version = "0.0.22" }
-app = { package = "yozefu-app", path = "crates/app", version = "0.0.22" }
-command = { package = "yozefu-command", path = "crates/command", version = "0.0.22" }
-yozefu = { package = "yozefu", path = "crates/bin", version = "0.0.22" }
-tui = { package = "yozefu-tui", path = "crates/tui", version = "0.0.22" }
-wasm-types = { package = "wasm-types", path = "crates/wasm-types", version = "0.0.22" }
+lib = { package = "yozefu-lib", path = "crates/lib", version = "0.0.23" }
+app = { package = "yozefu-app", path = "crates/app", version = "0.0.23" }
+command = { package = "yozefu-command", path = "crates/command", version = "0.0.23" }
+yozefu = { package = "yozefu", path = "crates/bin", version = "0.0.23" }
+tui = { package = "yozefu-tui", path = "crates/tui", version = "0.0.23" }
+wasm-types = { package = "wasm-types", path = "crates/wasm-types", version = "0.0.23" }
 serde_json = { version = "1.0.145", features = ["preserve_order"] }
 serde = { version = "1.0.228", features = ["derive"] }
 strum = {version = "0.27.2" }
