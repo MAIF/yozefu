@@ -24,12 +24,12 @@ nom = "8.0.0"
 rdkafka = { version = "0.38.0", features = [], optional = true}
 url = "2.5.7"
 apache-avro = "0.21.0"
-reqwest = { version = "0.12.25", features = ["json"] }
+reqwest = { version = "0.12.26", features = ["json"] }
 byteorder = "1.5.0"
 mockito = "1.7.1"
 
 [dev-dependencies]
-insta = { version = "1.44.3", features = ["filters", "glob", "json"] }
+insta = { version = "1.45.0", features = ["filters", "glob", "json"] }
 protobuf = "3.7.2"
 tokio = { version = "1.48.0", features = ["rt", "macros", "rt-multi-thread"] }
 schemars = { workspace = true, features = ["indexmap2", "url2", "chrono04"]}
