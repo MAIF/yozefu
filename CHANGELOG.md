@@ -1,3 +1,24 @@
+## What's Changed in 0.0.23
+* Develop by @Mcdostone in [#197](https://github.com/MAIF/yozefu/pull/197)
+* build: update dependencies by @Mcdostone
+* refactor: remove debug file by @Mcdostone
+* Add support for avro schemas with reference subjects #194 by @toninhoPinto
+* build(deps): bump reqwest from 0.12.24 to 0.12.25 by @dependabot[bot]
+* style: use CTRL + C to exit the TUI instead of ESC by @Mcdostone
+* fix: fix clippy warnings by @Mcdostone
+* test: make the mockito macro more generic regarding the endpoints by @Mcdostone
+* ci: trigger a build for pull requests by @Mcdostone
+* feat: testing schema references with avro for the demo by @Mcdostone
+* docs: fix typos by @Mcdostone
+* ci: fix documentation GA by @Mcdostone
+* Develop by @Mcdostone in [#196](https://github.com/MAIF/yozefu/pull/196)
+* Changelog for v0.0.22 by @github-actions[bot] in [#192](https://github.com/MAIF/yozefu/pull/192)
+
+### New Contributors
+* @toninhoPinto made their first contribution
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.22...v0.0.23
+
 ## What's Changed in 0.0.22
 * Develop by @Mcdostone in [#191](https://github.com/MAIF/yozefu/pull/191)
 * build: update dependencies by @Mcdostone
