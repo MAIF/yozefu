@@ -13,7 +13,7 @@ const description = 'Browse and query Kafka from the terminal.'
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   transformHead: transformHead,
-  title: "Yōzefu, An TUI for exploring data of a kafka cluster.",
+  title: "Yōzefu",
   description: "A TUI to explore Kafka clusters and data",
   base: '/yozefu/',
   head: [
@@ -75,8 +75,7 @@ export default defineConfig({
         text: 'Internals',
         items: [
           
-          { text: 'Example Input', link: '/search-filter/filter-input' },
-          { text: 'Example Result', link: '/search-filter/filter-result' },
+          { text: 'JSON schemas', link: '/json-schemas/' },
         ]
       },
     ],
