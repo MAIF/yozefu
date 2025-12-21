@@ -24,9 +24,6 @@ path = "src/main.rs"
 [dependencies]
 tokio = { version = "1", features = ["full", "tracing"] }
 command = { workspace = true }
-console-subscriber = "0.5.0"
-assert_cmd = "2.1.1"
-testcontainers = { version = "0.25.0", features = ["blocking"] }
 
 [features]
 default = ["ssl-vendored", "libz-static"]
@@ -39,6 +36,10 @@ gssapi-vendored = [
 libz-static = [
     "command/libz-static"
 ]
+
+[dev-dependencies]
+assert_cmd = "2.1.1"
+testcontainers = { version = "0.25.0", features = ["blocking"] }
 
 
 [package.metadata.cargo-machete]
