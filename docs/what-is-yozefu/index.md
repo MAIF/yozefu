@@ -48,6 +48,19 @@ yozf --headless \
  - Yōzefu has been tested on macOS Silicon but not on Windows or Linux. Feedback or contributions are welcome.
 
 
+## Features
+
+Yozefu relies on [rdkafka](https://docs.rs/crate/rdkafka/latest/features) for Kafka connectivity. The following table summarizes the features available on each target platform.
+
+| Target                    | cmake-build | curl-static | zstd  | ssl-vendored | external-lz4 | libz-static | gssapi-vendored |
+| ------------------------- | :---------: | :---------: | :---: | :----------: | :----------: | :---------: | :-------------: |
+| aarch64-apple-darwin      |      ✓      |      ✓      |   ✓   |      ✓       |      ✓       |      ✓      |        ✓        |
+| x86_64-apple-darwin       |      ✓      |      ✓      |   ✓   |      ✓       |      ✓       |      ✓      |        ✓        |
+| x86_64-unknown-linux-gnu  |      ✓      |      ✓      |   ✓   |      ✓       |      ✓       |      ✓      |        ✓        |
+| aarch64-unknown-linux-gnu |      ✓      |      ✓      |   ✓   |      ✓       |      ✓       |      ✓      |        ✓        |
+| x86_64-pc-windows-gnu     |      ✓      |      ✓      |   ✓   |      ✓       |      ✓       |      ✓      |                 |
+| x86_64-pc-windows-msvc    |      ✓      |      ✓      |   ✓   |      ✓       |      ✓       |      ✓      |                 |
+
 ## Screenshots
 
 <img width="3455" height="2158" src="/records.avif" alt="Screenshot of the records view, a table displaying kafka records" />
