@@ -18,7 +18,7 @@ EOF
 
 
 
-FROM debian:trixie-slim AS final
+FROM dhi.io/debian-base:trixie AS final
 ARG UID=10001
 RUN useradd \
     --shell "/sbin/nologin" \
