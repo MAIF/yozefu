@@ -22,7 +22,6 @@ mod vertical_scrollable_block;
 #[cfg(test)]
 use app::configuration::{GlobalConfig, InternalConfig, Workspace};
 use crossterm::event::{KeyEvent, MouseEvent};
-use ratatui::prelude::Stylize;
 use ratatui::{
     Frame,
     layout::Rect,

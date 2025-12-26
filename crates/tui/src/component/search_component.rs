@@ -9,7 +9,6 @@ use app::search::ValidSearchQuery;
 use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers};
 use itertools::Itertools;
 use lib::{Error, error::SearchError};
-use ratatui::prelude::Stylize;
 use ratatui::{
     Frame,
     layout::{Position, Rect},
