@@ -11,7 +11,6 @@ use crate::{
 };
 use crossterm::event::{KeyCode, KeyEvent};
 use lib::kafka::Schema;
-use ratatui::prelude::Stylize;
 use ratatui::{
     Frame,
     layout::Rect,

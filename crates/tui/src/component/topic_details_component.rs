@@ -5,10 +5,11 @@ use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
 use itertools::Itertools;
 use lib::{ConsumerGroupDetail, ConsumerGroupState, TopicDetail};
+use ratatui::style::Modifier;
 use ratatui::{
     Frame,
     layout::{Margin, Rect},
-    style::{Modifier, Style, Stylize},
+    style::{Style, Stylize},
     text::{Line, Span, Text},
     widgets::{Block, BorderType, Borders, Clear, Padding, Paragraph, TableState},
 };
