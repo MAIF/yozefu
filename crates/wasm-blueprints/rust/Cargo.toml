@@ -6,8 +6,8 @@ edition = "2024"
 [dependencies]
 extism-pdk = "1.4.1"
 serde = {version = "1.0.228", features = ["derive"]}
-yozefu-wasm-types = { git = "https://github.com/MAIF/yozefu.git", branch="main" }
-#yozefu-wasm-types = { path = "../../wasm-types" }
+yozefu-wasm-types = { git = "https://github.com/MAIF/yozefu.git", branch="develop" }
+# yozefu-wasm-types = { path = "../../wasm-types" }
 
 
 [workspace]
