@@ -338,7 +338,7 @@ jobs:
     permissions:
       contents: read
     container:
-      image: archlinux:latest
+      image: archlinux:base-20250928.0.426921
       volumes:
         - /tmp/yozefu-read-only:/tmp/yozefu-readonly:ro
     needs: [check]
@@ -346,13 +346,13 @@ jobs:
       - name: Checkout Actions Repository
         uses: actions/checkout@v6
       - name: Install dependencies
-        run: pacman -Sy --noconfirm --needed cargo devtools gcc-libs openssl cmake gcc clang base-devel
-      #- name: Use GCC 14 
-      #  # Because https://github.com/MaterializeInc/rust-krb5-src/issues/28
-      #  run: |
-      #    ln -s "$(which gcc-14)" "/usr/local/bin/gcc"
-      #    ln -s "$(which g++-14)" "/usr/local/bin/g++"
-      #    hash -r
+        run: pacman -Sy --noconfirm --needed cargo devtools gcc-libs openssl cmake gcc14 clang base-devel
+      - name: Use GCC 14 
+        # Because https://github.com/MaterializeInc/rust-krb5-src/issues/28
+        run: |
+          ln -s "$(which gcc-14)" "/usr/local/bin/gcc"
+          ln -s "$(which g++-14)" "/usr/local/bin/g++"
+          hash -r
       - name: Cargo build
         run: cargo build --all-features --locked
       - name: Cargo test
