@@ -37,11 +37,11 @@ lib = { package = "yozefu-lib", path = "crates/lib", version = "0.0.23" }
 app = { package = "yozefu-app", path = "crates/app", version = "0.0.23" }
 command = { package = "yozefu-command", path = "crates/command", version = "0.0.23" }
 tui = { package = "yozefu-tui", path = "crates/tui", version = "0.0.23" }
-serde_json = { version = "1.0.145", features = ["preserve_order"] }
+serde_json = { version = "1.0.149", features = ["preserve_order"] }
 serde = { version = "1.0.228", features = ["derive"] }
 strum = {version = "0.27.2" }
 tracing = "0.1.44"
-schemars = { version = "1.1.0" }
+schemars = { version = "1.2.0" }
 
 
 [profile.release]
