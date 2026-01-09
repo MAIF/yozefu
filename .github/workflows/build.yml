@@ -346,7 +346,9 @@ jobs:
       - name: Checkout Actions Repository
         uses: actions/checkout@v6
       - name: Install dependencies
-        run: pacman -Sy --noconfirm --needed cargo devtools gcc-libs openssl cmake gcc14 clang base-devel
+        run: |
+          pacman -Sy --noconfirm --needed cargo devtools gcc-libs openssl cmake clang base-devel git
+          yay  -Sy gcc14
       - name: Use GCC 14 
         # Because https://github.com/MaterializeInc/rust-krb5-src/issues/28
         run: |
