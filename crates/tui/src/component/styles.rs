@@ -50,7 +50,10 @@ pub(crate) fn colorize_timestamp<'a>(
 pub(crate) fn colorize_key<'a>(key: &str, theme: &Theme, width: usize) -> Line<'a> {
     let pouet = match key.len() > width {
         true => {
-            vec![Span::from(format!("{}..", &key[0..width - 2]))]
+            vec![Span::from(format!(
+                "{}..",
+                &key[0..width.saturating_sub(2)]
+            ))]
         }
         false => {
             vec![Span::from(key.to_string())]
@@ -77,7 +80,9 @@ pub(crate) fn colorize_and_shorten_topic<'a>(
         i if i <= 0 => topic.to_string(),
         _ => format!(
             "..{}",
-            &topic[topic.len() - (width - partition_width - 2)..]
+            &topic[topic
+                .len()
+                .saturating_sub(width.saturating_sub(partition_width).saturating_sub(2))..]
         ),
     };
 
