@@ -1,3 +1,20 @@
+## What's Changed in 0.0.24
+* Develop by @Mcdostone in [#221](https://github.com/MAIF/yozefu/pull/221)
+* develop by @Mcdostone in [#204](https://github.com/MAIF/yozefu/pull/204)
+* docs: typo, thank you @Chocorean by @Mcdostone
+* build: update dependencies by @Mcdostone
+* build(deps): bump raven-actions/actionlint from 2.0.1 to 2.1.0 by @dependabot[bot]
+* build(deps): bump actions/upload-pages-artifact from 3 to 4 by @dependabot[bot]
+* build(deps): bump actions/configure-pages from 4 to 5 by @dependabot[bot]
+* build: update dependencies by @Mcdostone
+* refactor: update to ratatui 0.30.0 by @Mcdostone
+* docs: features for each target by @Mcdostone
+* ci: use cargo shear by @Mcdostone
+* docs: fix title by @Mcdostone
+* Changelog for v0.0.23 by @github-actions[bot] in [#203](https://github.com/MAIF/yozefu/pull/203)
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.23...v0.0.24
+
 ## What's Changed in 0.0.23
 * Develop by @Mcdostone in [#197](https://github.com/MAIF/yozefu/pull/197)
 * build: update dependencies by @Mcdostone
