@@ -205,7 +205,10 @@ impl Ui {
                             .and_then(|r| r.timestamp().to_millis())
                             .unwrap_or(0);
                         for record in bulk_of_records {
-                            tx_dd.send(record.detach()).unwrap();
+                            if tx_dd.send(record.detach()).is_err() {
+                                token.cancel();
+                                break;
+                            }
                         }
                         if current_time.elapsed() > Duration::from_secs(13) {
                             current_time = Instant::now();
