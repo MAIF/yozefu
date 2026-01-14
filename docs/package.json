@@ -26,7 +26,7 @@
     "esbuild": "^0.27.2",
     "estree-walker": "^3.0.3",
     "fdir": "^6.5.0",
-    "focus-trap": "^7.7.1",
+    "focus-trap": "^7.8.0",
     "hast-util-to-html": "^9.0.5",
     "hast-util-whitespace": "^3.0.0",
     "hookable": "^6.0.1",
