@@ -52,6 +52,9 @@ services:
     container_name: yozefu-akhq
     image: tchiotludo/akhq:latest
     restart: unless-stopped
+    depends_on:
+      - kafka
+      - schema-registry
     environment:
       MICRONAUT_SERVER_HOST: localhost
       MICRONAUT_SERVER_PORT: 9000
@@ -65,7 +68,7 @@ services:
                 type: "confluent"
                 url: "http://schema-registry:${SCHEMA_REGISTRY_PORT:-8081}"
     ports:
-      - "9000:9000"
+      - "9000:3000"
 
   redpanda-console:
     profiles: ["disabled"]
