@@ -16,19 +16,19 @@ rust-version.workspace = true
 [dependencies]
 serde = { workspace = true }
 serde_json = { workspace = true }
-chrono = { version = "0.4.42", features = ["serde"], optional = true }
+chrono = { version = "0.4.43", features = ["serde"], optional = true }
 itertools = "0.14.0"
 strum = { workspace = true, features = ["derive", "strum_macros"], optional = true }
 fuzzydate = {version = "0.3.1", optional = true }
 nom = "8.0.0"
-rdkafka = { version = "0.38.0", features = [], optional = true}
+rdkafka = { version = "0.39.0", features = [], optional = true}
 url = "2.5.8"
 apache-avro = "0.21.0"
 reqwest = { version = "0.13.1", features = ["json"] }
 byteorder = "1.5.0"
 
 [dev-dependencies]
-insta = { version = "1.46.0", features = ["filters", "glob", "json"] }
+insta = { version = "1.46.2", features = ["filters", "glob", "json"] }
 tokio = { version = "1.49.0", features = ["rt", "macros", "rt-multi-thread"] }
 schemars = { workspace = true, features = ["indexmap2", "url2", "chrono04"]}
 proptest = "1.9.0"

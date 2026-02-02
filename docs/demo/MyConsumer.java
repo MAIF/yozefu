@@ -1,6 +1,6 @@
 //JAVA 25+
 //REPOS central,confluent=https://packages.confluent.io/maven
-//DEPS org.apache.kafka:kafka-clients:4.1.0
+//DEPS org.apache.kafka:kafka-clients:4.1.1
 //DEPS org.slf4j:slf4j-nop:2.0.17
 //DEPS info.picocli:picocli:4.7.7
 

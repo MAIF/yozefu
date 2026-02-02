@@ -19,14 +19,14 @@ rust-version.workspace = true
 
 
 [dependencies]
-clap = { version = "4.5.54", features = [
+clap = { version = "4.5.56", features = [
     "derive",
     "env",
     "color",
     "suggestions",
 ] }
 serde_json = { workspace = true }
-chrono = "0.4.42"
+chrono = "0.4.43"
 strum = { workspace = true, features = ["derive", "strum_macros"] }
 indicatif = { version = "0.18.3", features = ["tokio"] }
 tempfile = "3.24.0"
@@ -34,7 +34,7 @@ tokio-util = "0.7.18"
 futures = "0.3.31"
 itertools = "0.14.0"
 tokio = { version = "1", features = ["full", "tracing"] }
-rdkafka = { version = "0.38.0", features = [
+rdkafka = { version = "0.39.0", features = [
     "cmake-build",
     "curl-static",
     "zstd",
