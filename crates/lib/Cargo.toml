@@ -32,7 +32,7 @@ insta = { version = "1.46.2", features = ["filters", "glob", "json"] }
 tokio = { version = "1.49.0", features = ["rt", "macros", "rt-multi-thread"] }
 schemars = { workspace = true, features = ["indexmap2", "url2", "chrono04"]}
 proptest = "1.9.0"
-mockito = "1.7.1"
+mockito = "1.7.2"
 
 [features]
 native = [
