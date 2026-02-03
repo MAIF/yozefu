@@ -76,39 +76,45 @@ use crate::assert_draw;
 fn test_draw() {
     use std::collections::BTreeMap;
 
-    use app::configuration::TimestampFormat;
     use lib::{DataType, KafkaRecord};
     use serde_json::json;
+    use tokio::sync::mpsc::unbounded_channel;
 
-    use crate::component::{
-        BUFFER, records_component::RecordsComponent, topics_component::TopicsComponent,
+    use crate::{
+        component::{records_component::RecordsComponent, topics_component::TopicsComponent},
+        records_buffer::RecordsAndStats,
     };
 
     let topics_component = TopicsComponent::new(vec!["topic1".to_string()]);
-    let records_component = RecordsComponent::new(&BUFFER, TimestampFormat::DateTime);
-    BUFFER.lock().unwrap().reset();
-    BUFFER.lock().unwrap().push(KafkaRecord {
-        topic: "movie-trailers".into(),
-        timestamp: None,
-        partition: 0,
-        offset: 314,
-        headers: BTreeMap::default(),
-        key_schema: None,
-        value_schema: None,
-        size: 4348,
-        key: DataType::String("7f12bd3b-4c96-4ba1-b010-8092234eec13".into()),
-        key_as_string: "7f12bd3b-4c96-4ba1-b010-8092234eec13".into(),
-        value: DataType::Json(json!(
-            r#"{
+    let (tx, rx) = unbounded_channel();
+    let records_component = RecordsComponent::new(rx, Default::default());
+
+    tx.send(RecordsAndStats {
+        records: vec![KafkaRecord {
+            topic: "movie-trailers".into(),
+            timestamp: None,
+            partition: 0,
+            offset: 314,
+            headers: BTreeMap::default(),
+            key_schema: None,
+            value_schema: None,
+            size: 4348,
+            key: DataType::String("7f12bd3b-4c96-4ba1-b010-8092234eec13".into()),
+            key_as_string: "7f12bd3b-4c96-4ba1-b010-8092234eec13".into(),
+            value: DataType::Json(json!(
+                r#"{
             {
             "title" : "Swiss Army Man",
             "year": 20013
             }
 
             }"#
-        )),
-        value_as_string: String::default(),
-    });
+            )),
+            value_as_string: String::default(),
+        }],
+        read: 1,
+    })
+    .unwrap();
 
     let mut component = TopicsAndRecordsComponent::new(
         Arc::new(Mutex::new(topics_component)),

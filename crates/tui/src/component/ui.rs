@@ -14,19 +14,20 @@ use rdkafka::consumer::{Consumer, StreamConsumer};
 use rdkafka::message::OwnedMessage;
 use std::collections::HashSet;
 use std::time::Duration;
+use tokio::select;
 use tokio::sync::mpsc::{self, UnboundedSender};
 use tokio::time::Instant;
-use tokio::{select, time};
 use tokio_util::sync::CancellationToken;
 use tracing::{error, info, trace_span, warn};
 
 use crate::action::{Action, Level, Notification};
 use crate::component::{Component, RootComponent};
 use crate::error::TuiError;
+use crate::records_buffer::RecordsAndStats;
 use crate::schema_detail::SchemaDetail;
 use crate::tui;
 
-use super::{BUFFER, ConcurrentRecordsBuffer, State};
+use super::{RecordsSender, State};
 
 pub struct Ui {
     app: App,
@@ -35,20 +36,20 @@ pub struct Ui {
     worker: CancellationToken,
     topics: Vec<String>,
     last_tick_key_events: Vec<KeyEvent>,
-    records_sender: Option<UnboundedSender<KafkaRecord>>,
-    records: &'static ConcurrentRecordsBuffer,
+    records_sender: RecordsSender,
 }
 
 impl Ui {
     pub fn new(app: App, query: &str, selected_topics: Vec<String>, state: State) -> Self {
+        let (records_sender, records_receiver) = tokio::sync::mpsc::unbounded_channel();
+        info!("hello from tui ui");
         Self {
             should_quit: false,
             worker: CancellationToken::new(),
             app,
-            records: &BUFFER,
             topics: vec![],
-            root: RootComponent::new(query, selected_topics, &BUFFER, state),
-            records_sender: None,
+            root: RootComponent::new(query, selected_topics, records_receiver, state),
+            records_sender,
             last_tick_key_events: Vec::new(),
         }
     }
@@ -73,9 +74,8 @@ impl Ui {
 
     pub(crate) fn consume_topics(&mut self, tx: UnboundedSender<Action>) -> Result<(), TuiError> {
         self.worker.cancel();
-        {
-            self.records.lock().unwrap().reset();
-        }
+        // records state is now channel-driven, no global lock-reset needed
+        // If records need reset, propagate an action or recreate records_receiver
 
         if self.topics.is_empty() {
             tx.send(Action::StopConsuming())?;
@@ -98,21 +98,8 @@ impl Ui {
         tx.send(Action::OrderBy(order_by.clone()))?;
         tx.send(Action::NewConsumer())?;
         tx.send(Action::Consuming)?;
-        let r = self.records;
-        let token = self.worker.clone();
-        tokio::task::Builder::new()
-            .name("kafka-records-sorter")
-            .spawn(async move {
-                while !token.is_cancelled() {
-                    {
-                        r.lock().unwrap().sort(&order_by);
-                    }
-                    let mut interval = time::interval(Duration::from_secs(1));
-                    interval.tick().await;
-                }
-            })
-            .unwrap();
-        let r = self.records;
+
+        let _token = self.worker.clone();
         let token = self.worker.clone();
         let search_query = self.app.search_query.query().clone();
         let app = self.app.clone();
@@ -124,9 +111,11 @@ impl Ui {
         let token_cloned = token.clone();
 
         let filters_directory = self.app.config.workspace().filters_dir();
+        let records_sender = self.records_sender.clone();
         tokio::task::Builder::new()
             .name("search-engine")
         .spawn(async move {
+            let (mut read, mut matched) = (0, 0);
             loop {
                 select! {
                     _ = token_cloned.cancelled() => {
@@ -137,24 +126,29 @@ impl Ui {
                         let context = SearchContext::new(&record, &filters_directory);
                         let span = trace_span!("matching", offset = %record.offset, partition = %record.partition, topic = %record.topic);
                         let search_span = span.enter();
-                        let mut matched = false;
-                        if search_query.matches(&context) {
-                            matched = true;
-                        }
+                        let matches = search_query.matches(&context);
                         drop(search_span);
-                        let stats = {
-                            let push_span = trace_span!("push-to-buffer", offset = %record.offset, partition = %record.partition, topic = %record.topic);
-                            let _ = push_span.enter();
-                            let mut ll = r.lock().unwrap();
-                            ll.new_record_read();
-                            if matched {
-                                ll.push(record.clone());
-                            }
-                            ll.dispatch_metrics();
-                            ll.stats()
-                        };
+                        read += 1;
+                        // Pushing to a locked buffer replaced by sending over channel.
+                        if matches {
+                            matched += 1;
+                            records_sender.send(RecordsAndStats {
+                                records: vec![record],
+                                read
+                            }).unwrap();
+                        }
+
+                        if !matches && read % 200 == 0 {
+                            // Send stats update even if no match found to update the UI
+                            records_sender.send(RecordsAndStats {
+                                records: vec![],
+                                read
+                            }).unwrap();
+                        }
+
+
                         if let Some(limit) = query.limit {
-                            if Some(stats.matched) >= Some(limit) {
+                            if Some(matched) >= Some(limit) {
                                 token_cloned.cancel();
                             }
                         }
@@ -228,7 +222,6 @@ impl Ui {
                 consumer.unassign().unwrap();
                 info!("Consumer is terminated");
                 token.cancel();
-                r.lock().unwrap().sort(&query.order_by);
                 let _ = tx.send(Action::StopConsuming());
                 Ok(())
             })
@@ -305,8 +298,7 @@ impl Ui {
 
     pub async fn run(&mut self, topics: Vec<String>, state: State) -> Result<(), TuiError> {
         let (action_tx, mut action_rx) = mpsc::unbounded_channel();
-        let records_channel = mpsc::unbounded_channel::<KafkaRecord>();
-        self.records_sender = Some(records_channel.0);
+        // No need to track a global receiver here; records are passed directly to the components that consume them.
         self.load_topics(action_tx.clone());
         let mut tui: tui::Tui = tui::Tui::new()?;
         tui.enter()?;
@@ -332,6 +324,7 @@ impl Ui {
                 }
             }
             while let Ok(action) = action_rx.try_recv() {
+                // Possible place to poll or forward any pending records from channel, if needed
                 match action {
                     Action::NewSearchPrompt(ref prompt) => {
                         self.app.config.push_history(prompt);

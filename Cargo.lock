@@ -7054,7 +7054,6 @@ dependencies = [
 name = "yozefu-app"
 version = "0.0.25"
 dependencies = [
- "byteorder",
  "chrono",
  "directories",
  "extism",
