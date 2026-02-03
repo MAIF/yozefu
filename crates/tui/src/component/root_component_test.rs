@@ -1,21 +1,16 @@
 use crate::assert_draw;
 use crate::component::Component;
-use crate::{
-    component::{ConcurrentRecordsBuffer, RootComponent, default_state},
-    records_buffer::RecordsBuffer,
-};
-use std::sync::{Arc, LazyLock, Mutex};
-
-static BUFFER: ConcurrentRecordsBuffer =
-    LazyLock::new(|| Arc::new(Mutex::new(RecordsBuffer::new())));
+use crate::component::RootComponent;
+use crate::component::default_state;
 
 #[test]
 fn test_draw() {
-    BUFFER.lock().unwrap().reset();
+    use tokio::sync::mpsc::unbounded_channel;
+    let (_tx, rx) = unbounded_channel();
     let mut component = RootComponent::new(
         "from begin",
         vec!["topic1".to_string(), "topic2".to_string()],
-        &BUFFER,
+        rx,
         default_state(),
     );
     assert_draw!(component, 120, 20)

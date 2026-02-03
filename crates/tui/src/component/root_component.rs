@@ -15,10 +15,13 @@ use ratatui::{
 };
 use tokio::sync::mpsc::UnboundedSender;
 
-use crate::{Action, Notification, action::Level, error::TuiError, highlighter::Highlighter};
+use crate::{
+    Action, Notification, action::Level, component::RecordsReceiver, error::TuiError,
+    highlighter::Highlighter,
+};
 
 use super::{
-    Component, ComponentName, ConcurrentRecordsBuffer, State, footer_component::FooterComponent,
+    Component, ComponentName, State, footer_component::FooterComponent,
     header_component::HeaderComponent, help_component::HelpComponent,
     record_details_component::RecordDetailsComponent, records_component::RecordsComponent,
     schemas_component::SchemasComponent, search_component::SearchComponent,
@@ -40,7 +43,7 @@ impl RootComponent {
     pub fn new(
         query: &str,
         selected_topics: Vec<String>,
-        records: &'static ConcurrentRecordsBuffer,
+        records_receiver: RecordsReceiver,
         state: State,
     ) -> Self {
         let config = state.workspace().config();
@@ -54,7 +57,7 @@ impl RootComponent {
         let mut components: [Arc<Mutex<dyn Component>>; 10] = [
             topics_component.clone(),
             Arc::new(Mutex::new(RecordsComponent::new(
-                records,
+                records_receiver,
                 state.workspace().config().timestamp_format.clone(),
             ))),
             Arc::new(Mutex::new(TopicDetailsComponent::default())),

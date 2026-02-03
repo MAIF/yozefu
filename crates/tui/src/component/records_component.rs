@@ -14,47 +14,43 @@ use ratatui::{
 use thousands::Separable;
 use throbber_widgets_tui::ThrobberState;
 use tokio::sync::mpsc::UnboundedSender;
-use tokio::sync::watch::Receiver;
 
 use crate::{
     Action,
     action::{Level, Notification},
+    component::RecordsReceiver,
     error::TuiError,
-    records_buffer::{BUFFER_SIZE, BufferAction, Stats},
+    records_buffer::{BUFFER_SIZE, RecordsBuffer},
 };
 
-use super::{Component, ComponentName, ConcurrentRecordsBuffer, Shortcut, State, styles};
+use super::{Component, ComponentName, Shortcut, State, styles};
 
-pub(crate) struct RecordsComponent<'a> {
-    records: &'a ConcurrentRecordsBuffer,
+pub(crate) struct RecordsComponent {
+    records: RecordsBuffer,
     state: TableState,
     status: ThrobberState,
     search_query: ValidSearchQuery,
     consuming: bool,
-    stats: Stats,
+    receiver: RecordsReceiver,
     follow: bool,
     action_tx: Option<UnboundedSender<Action>>,
-    buffer_tx: Receiver<BufferAction>,
     selected_topics: usize,
     key_events_buffer: Vec<KeyEvent>,
     column_size: u16,
     timestamp_format: TimestampFormat,
 }
 
-impl<'a> RecordsComponent<'a> {
-    pub fn new(records: &'a ConcurrentRecordsBuffer, timestamp_format: TimestampFormat) -> Self {
-        let buffer_tx = records.lock().map(|e| e.channels.clone().1).ok().unwrap();
-
+impl RecordsComponent {
+    pub fn new(receiver: RecordsReceiver, timestamp_format: TimestampFormat) -> Self {
         Self {
-            records,
+            records: RecordsBuffer::new(),
+            receiver,
             state: TableState::default(),
             status: ThrobberState::default(),
             search_query: ValidSearchQuery::default(),
             consuming: false,
-            stats: Stats::default(),
             follow: false,
             action_tx: None,
-            buffer_tx,
             selected_topics: 0,
             key_events_buffer: Vec::default(),
             column_size: 0,
@@ -63,11 +59,25 @@ impl<'a> RecordsComponent<'a> {
     }
 
     fn buffer_is_empty(&self) -> bool {
-        self.stats.buffer_size == 0
+        self.records.is_empty()
     }
 
     fn buffer_len(&self) -> usize {
-        self.stats.buffer_size
+        self.records.len()
+    }
+
+    pub fn poll_new_records(&mut self) {
+        for _i in 0..500 {
+            match self.receiver.try_recv() {
+                Err(_) => break,
+                Ok(record) => {
+                    self.records.extend(record);
+                    self.on_new_record();
+                }
+            }
+        }
+
+        self.records.sort(&self.search_query.query().order_by);
     }
 
     fn next(&mut self) {
@@ -75,6 +85,7 @@ impl<'a> RecordsComponent<'a> {
             self.state.select(None);
             return;
         }
+
         let i = match self.state.selected() {
             Some(i) => {
                 if i >= self.buffer_len() - 1 {
@@ -101,7 +112,7 @@ impl<'a> RecordsComponent<'a> {
 
     fn set_event_dialog(&mut self) -> Result<(), TuiError> {
         if let Some(s) = self.state.selected() {
-            if let Some(record) = self.records.lock().unwrap().get(s) {
+            if let Some(record) = self.records.get(s) {
                 self.action_tx
                     .as_ref()
                     .unwrap()
@@ -143,9 +154,9 @@ impl<'a> RecordsComponent<'a> {
         }
     }
 
-    pub fn on_new_record(&mut self, stats: Stats) {
-        self.stats = stats;
-        let length = self.stats.buffer_size;
+    pub fn on_new_record(&mut self) {
+        let stats = self.records.stats();
+        let length = stats.buffer_size;
         let empty_buffer = length == 0;
         if self.follow && !empty_buffer {
             self.state.select(Some(length - 1));
@@ -210,7 +221,7 @@ impl<'a> RecordsComponent<'a> {
     }
 }
 
-impl Component for RecordsComponent<'_> {
+impl Component for RecordsComponent {
     fn register_action_handler(&mut self, tx: UnboundedSender<Action>) {
         self.action_tx = Some(tx.clone());
     }
@@ -223,8 +234,7 @@ impl Component for RecordsComponent<'_> {
         match key.code {
             KeyCode::Char('c') => {
                 if let Some(s) = self.state.selected() {
-                    let r = self.records.lock().unwrap();
-                    let record = r.get(s).unwrap();
+                    let record = self.records.get(s).unwrap();
                     let mut ctx = ClipboardContext::new().unwrap();
                     let exported_record: ExportedKafkaRecord = record.into();
                     self.action_tx.as_ref().unwrap().send(Action::Notification(
@@ -239,8 +249,7 @@ impl Component for RecordsComponent<'_> {
                 self.show_details()?;
             }
             KeyCode::Char('e') if key.modifiers.contains(KeyModifiers::CONTROL) => {
-                let records = self.records.lock().unwrap();
-                for record in records.iter() {
+                for record in self.records.iter() {
                     self.action_tx
                         .as_ref()
                         .unwrap()
@@ -249,8 +258,7 @@ impl Component for RecordsComponent<'_> {
             }
             KeyCode::Char('e') => {
                 if let Some(s) = self.state.selected() {
-                    let r = self.records.lock().unwrap();
-                    let record = r.get(s).unwrap();
+                    let record = self.records.get(s).unwrap();
                     self.action_tx
                         .as_ref()
                         .unwrap()
@@ -259,8 +267,7 @@ impl Component for RecordsComponent<'_> {
             }
             KeyCode::Char('o') => {
                 if let Some(s) = self.state.selected() {
-                    let r = self.records.lock().unwrap();
-                    let record = r.get(s).unwrap();
+                    let record = self.records.get(s).unwrap();
                     self.action_tx
                         .as_ref()
                         .unwrap()
@@ -304,19 +311,16 @@ impl Component for RecordsComponent<'_> {
     }
 
     fn update(&mut self, action: Action) -> Result<Option<Action>, TuiError> {
-        let mut a = self.buffer_tx.clone();
-        let BufferAction::Stats(stats) = *a.borrow_and_update();
-        self.on_new_record(stats);
         match action.clone() {
-            Action::NewConsumer() => {
-                self.stats = Stats::default();
-            }
             Action::Tick => self.status.calc_next(),
             Action::SelectedTopics(topics) => self.selected_topics = topics.len(),
-            Action::Consuming => self.consuming = true,
+            Action::Consuming => {
+                self.consuming = true;
+                self.records.reset();
+            }
             Action::StopConsuming() => {
                 self.consuming = false;
-                self.stats = Stats::default();
+                self.records.reset();
             }
             Action::Search(search_query) => {
                 self.state.select(None);
@@ -328,6 +332,7 @@ impl Component for RecordsComponent<'_> {
     }
 
     fn draw(&mut self, f: &mut Frame<'_>, rect: Rect, state: &State) -> Result<(), TuiError> {
+        self.poll_new_records();
         let focused = state.is_focused(&self.id());
         let block = Block::default()
             .borders(Borders::ALL)
@@ -363,10 +368,7 @@ impl Component for RecordsComponent<'_> {
             .bottom_margin(1);
 
         let mut records = Vec::with_capacity(BUFFER_SIZE);
-        {
-            let r = self.records.lock().unwrap();
-            records.extend(r.iter().cloned());
-        }
+        records.extend(self.records.iter().cloned());
 
         // TODO render only records in the viewport
         let rows = records.iter().enumerate().map(|(index, item)| {
@@ -424,8 +426,8 @@ impl Component for RecordsComponent<'_> {
         let metrics = Span::styled(
             format!(
                 " {} / {}",
-                self.stats.matched.separate_with_underscores(),
-                self.stats.read.separate_with_underscores(),
+                self.records.stats().matched.separate_with_underscores(),
+                self.records.stats().read.separate_with_underscores(),
                 //self.stats.read
                 //    .checked_div(self.stats.read)
                 //    .unwrap_or(0)
@@ -452,7 +454,7 @@ impl Component for RecordsComponent<'_> {
             1,
         );
 
-        if self.consuming && self.stats.read != 0 {
+        if self.records.stats().read != 0 {
             f.render_widget(metrics, metrics_area);
         }
         if self.consuming {
