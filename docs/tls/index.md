@@ -1,5 +1,8 @@
-# TLS
+---
+description: TLS configuration to connect to a kafka broker
+---
 
+# TLS
 
 This page helps you configure TLS settings for different providers.
 The steps are always the same:

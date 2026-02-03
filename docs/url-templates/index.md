@@ -1,3 +1,7 @@
+---
+description: URL templates to open Kafka records in web applications from the TUI.
+---
+
 # URL templates
 
 In certain situations, you may need to view a Kafka record in a web browser. Yōzefu allows you to do so: select the Kafka record and press the <kbd>o</kbd> key (for **o**pen). This will open the corresponding URL in a new browser tab.

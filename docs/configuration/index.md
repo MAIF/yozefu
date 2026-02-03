@@ -1,3 +1,7 @@
+---
+description: Configuration options CLI flags and environment variables for Yōzefu
+---
+
 # Configuration
 
 Yōzefu uses a workspace directory to store its configuration file, logs, and other data. By default, this directory is located at `yozf config get dir`. You can change the workspace directory using the `--config-dir` command-line option or the `YOZEFU_CONFIG_DIR` environment variable.

@@ -1,3 +1,7 @@
+---
+description: JSON schemas for important data structures used by Yōzefu.
+---
+
 # JSON schemas
 
 

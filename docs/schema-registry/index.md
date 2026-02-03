@@ -1,3 +1,7 @@
+---
+description: How to configure and use schema registries
+---
+
 # Schema registry
 
 > [!WARNING]

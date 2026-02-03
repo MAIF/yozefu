@@ -1,3 +1,7 @@
+---
+description: Keybindings for navigation and actions.
+---
+
 # Keybindings
 
 
