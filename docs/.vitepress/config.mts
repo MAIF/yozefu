@@ -1,5 +1,5 @@
-import { defineConfig, HeadConfig, TransformContext} from 'vitepress'
-
+import { defineConfig, HeadConfig} from 'vitepress'
+import llmstxt from 'vitepress-plugin-llms'
 
 const transformHead = ({ }): HeadConfig[] => {
   const head: HeadConfig[] = []
@@ -12,6 +12,9 @@ const description = 'Browse and query Kafka from the terminal.'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  vite: {
+		plugins: [llmstxt()],
+	},
   transformHead: transformHead,
   title: "Yōzefu",
   description: "A TUI to explore Kafka clusters and data",

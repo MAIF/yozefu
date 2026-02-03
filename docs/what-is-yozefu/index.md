@@ -1,3 +1,7 @@
+---
+description: Yōzefu in a nutshell.
+---
+
 # What is Yōzefu?
 
 
