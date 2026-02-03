@@ -10,7 +10,6 @@ use lib::{
     search::{Order, OrderBy},
 };
 use rayon::prelude::*;
-use tokio::sync::watch::{self, Receiver, Sender};
 
 /// Size of the ring buffer
 #[cfg(not(target_family = "windows"))]
@@ -24,7 +23,6 @@ pub const BUFFER_SIZE: usize = 120;
 pub(crate) struct RecordsBuffer {
     buffer: CircularBuffer<BUFFER_SIZE, KafkaRecord>,
     stats: Stats,
-    pub channels: (Sender<BufferAction>, Receiver<BufferAction>),
     last_time_sorted: usize,
 }
 
@@ -51,7 +49,6 @@ impl RecordsBuffer {
         Self {
             buffer: CircularBuffer::<BUFFER_SIZE, KafkaRecord>::new(),
             stats: Stats::default(),
-            channels: watch::channel(BufferAction::Stats(Stats::default())),
             last_time_sorted: 0,
         }
     }
@@ -60,7 +57,6 @@ impl RecordsBuffer {
     pub fn reset(&mut self) {
         self.buffer.clear();
         self.stats = Stats::default();
-        self.dispatch_metrics();
     }
 
     /// Returns the metrics of the number of records matched and read.
@@ -73,9 +69,12 @@ impl RecordsBuffer {
         }
     }
 
-    /// Updates the metric regarding the number of kafka records read
-    pub fn new_record_read(&mut self) {
-        self.stats.read += 1;
+    pub fn is_empty(&self) -> bool {
+        self.buffer.is_empty()
+    }
+
+    pub fn len(&self) -> usize {
+        self.buffer.len()
     }
 
     pub fn get(&self, index: usize) -> Option<&KafkaRecord> {
@@ -86,18 +85,18 @@ impl RecordsBuffer {
         self.buffer.iter()
     }
 
+    pub fn extend(&mut self, payload: RecordsAndStats) -> usize {
+        for record in payload.records {
+            let _ = self.push(record);
+        }
+        self.stats.read = payload.read;
+        self.stats.matched
+    }
+
     pub fn push(&mut self, kafka_record: KafkaRecord) -> usize {
         self.buffer.push_back(kafka_record);
         self.stats.matched += 1;
         self.stats.matched
-    }
-
-    /// Dispatches a new events about the metrics of the buffer
-    pub fn dispatch_metrics(&mut self) {
-        self.channels
-            .0
-            .send(BufferAction::Stats(self.stats()))
-            .unwrap();
     }
 
     /// Sort the buffer by the given order
@@ -137,16 +136,17 @@ impl RecordsBuffer {
     }
 }
 
-#[allow(clippy::large_enum_variant)]
-#[derive(Clone)]
-pub enum BufferAction {
-    Stats(Stats),
-}
-
 #[derive(Default, Clone, Copy)]
 pub struct Stats {
     pub matched: usize,
     pub read: usize,
     pub total_to_read: usize,
     pub buffer_size: usize,
+}
+
+impl Stats {}
+
+pub struct RecordsAndStats {
+    pub records: Vec<KafkaRecord>,
+    pub read: usize,
 }

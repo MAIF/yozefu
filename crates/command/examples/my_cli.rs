@@ -1,9 +1,10 @@
 //! This module shows you how to include yozefu to your own CLI.
 
+use std::collections::HashMap;
+
 use app::configuration::{ClusterConfig, ConsumerConfig, YozefuConfig};
 use clap::Parser;
 use indexmap::IndexMap;
-use rdkafka::ClientConfig;
 use strum::{Display, EnumIter, EnumString};
 use tui::TuiError;
 use yozefu_command::Cli;
@@ -35,12 +36,12 @@ impl MyCli {
             Cluster::Production => "kafka.production.acme:9092",
         };
 
-        let mut config = ClientConfig::new();
-        config.set("bootstrap.servers", url.to_string());
+        let mut config = HashMap::new();
+        config.insert("bootstrap.servers".to_string(), url.to_string());
         ClusterConfig {
             url_template: None,
             schema_registry: None,
-            kafka: IndexMap::from_iter(config.config_map().clone()),
+            kafka: IndexMap::from_iter(config),
             consumer: Some(ConsumerConfig {
                 buffer_capacity: 1000,
                 timeout_in_ms: 100,

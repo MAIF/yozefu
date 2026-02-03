@@ -1,7 +1,7 @@
 ## What's Changed in 0.0.25
 * next release by @Mcdostone in [#227](https://github.com/MAIF/yozefu/pull/227)
 * fix: underflow calculation when running the TUI in a small canvas by @Mcdostone
-* fix: panic consuming when reciever closed early due to limit by @royathan
+* fix: panic consuming when receiver closed early due to limit by @royathan
 * Changelog for v0.0.24 by @github-actions[bot] in [#222](https://github.com/MAIF/yozefu/pull/222)
 
 ### New Contributors

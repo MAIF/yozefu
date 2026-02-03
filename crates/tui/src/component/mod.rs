@@ -34,17 +34,15 @@ use strum::Display;
 use tokio::sync::mpsc::UnboundedSender;
 pub use ui::Ui;
 
-use std::sync::{Arc, LazyLock, Mutex};
-
 pub use state::State;
 
 use serde::Deserialize;
 
-use crate::{Action, TuiError, records_buffer::RecordsBuffer, tui::Event};
+use crate::{Action, TuiError, records_buffer::RecordsAndStats, tui::Event};
 
-pub(crate) type ConcurrentRecordsBuffer = LazyLock<Arc<Mutex<RecordsBuffer>>>;
-static BUFFER: ConcurrentRecordsBuffer =
-    LazyLock::new(|| Arc::new(Mutex::new(RecordsBuffer::new())));
+use tokio::sync::mpsc::UnboundedReceiver;
+pub(crate) type RecordsSender = UnboundedSender<RecordsAndStats>;
+pub(crate) type RecordsReceiver = UnboundedReceiver<RecordsAndStats>;
 
 #[derive(Debug, Clone, Display, Hash, PartialEq, Eq, Deserialize, PartialOrd, Ord, Default)]
 pub(crate) enum ComponentName {
