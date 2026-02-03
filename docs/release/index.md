@@ -1,3 +1,7 @@
+---
+description: Instructions to release a new version of Yōzefu.
+---
+
 # Releasing a new version
 
 This document explains the release process of the tool. Most of the steps are automated with gitHub actions. The `main` branch of the repository is protected. If you want to release a new version of the tool, you must create a release branch.

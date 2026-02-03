@@ -1,3 +1,7 @@
+---
+description: Creating custom search filters using WebAssembly modules.
+---
+
 # Creating a search filter
 
 Let's say you want to list all kafka records where the key ends with `1234`. 

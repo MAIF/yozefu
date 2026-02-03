@@ -1,3 +1,7 @@
+---
+description: Examples of the query language.
+---
+
 # Yōzefu query language.
 
 

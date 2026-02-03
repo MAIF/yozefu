@@ -1,3 +1,7 @@
+---
+description: Themes and syntax highlighting configuration
+---
+
 # Themes
 
 A theme is a [set of colors](https://github.com/MAIF/yozefu/blob/main/crates/command/themes.json) defining the appearance of UI. By default, Yōzefu comes with 3 built-in themes:

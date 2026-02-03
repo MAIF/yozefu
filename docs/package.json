@@ -77,6 +77,7 @@
     "zwitch": "^2.0.4"
   },
   "devDependencies": {
-    "vitepress": "^2.0.0-alpha.15"
+    "vitepress": "^2.0.0-alpha.15",
+    "vitepress-plugin-llms": "^1.11.0"
   }
 }

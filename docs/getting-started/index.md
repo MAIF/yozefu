@@ -1,3 +1,7 @@
+---
+description: Instructions to install Yōzefu and get started quickly.
+---
+
 # Getting started
 
 
