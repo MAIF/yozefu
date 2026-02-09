@@ -16,6 +16,14 @@
       "default": "Feature"
     },
     {
+      "name": "timestamp",
+       "type": [
+        "null",
+        "float"
+      ],
+       "default": null
+    },
+    {
       "name": "geometry",
       "type": [
         {
