@@ -30,6 +30,8 @@ import tech.allegro.schema.json2avro.converter.JsonAvroConverter;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaReference;
 import io.confluent.kafka.schemaregistry.avro.AvroSchema;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class IntoAvro implements Into<GenericRecord, GenericRecord> {
@@ -66,8 +68,12 @@ public class IntoAvro implements Into<GenericRecord, GenericRecord> {
         );
     }
 
-    
     public ProducerRecord<GenericRecord, GenericRecord> into(final String input, final String topic) throws Exception {
+        var mapper = new ObjectMapper();
+        var deserialized = mapper.readTree(input);
+        //if(System.currentTimeMillis() % 2 == 0) {
+        ((ObjectNode) deserialized).put("timestamp", 4284823489238492839489234892389428942984892.0);
+        //}
         var keySchemaString = readResource("/avro/key-schema.json");
         var valueSchemaString = readResource("/avro/value-schema.json");
         var pointSchemaString = readResource("/avro/point-schema.json");
@@ -85,7 +91,7 @@ public class IntoAvro implements Into<GenericRecord, GenericRecord> {
 
         var keyString = String.format("{ \"id\": \"%s\", \"sunny\": %s }", generateKey(), new Random().nextBoolean());
         GenericData.Record key = converter.convertToGenericDataRecord(keyString.getBytes(), keySchema);
-        GenericData.Record value = converter.convertToGenericDataRecord(input.getBytes(), valueSchema);
+        GenericData.Record value = converter.convertToGenericDataRecord(mapper.writeValueAsString(deserialized).getBytes(), valueSchema);
         value.put("geometry", point);
         return new ProducerRecord<>(topic, key, value);
     }
