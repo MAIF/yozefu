@@ -8,8 +8,8 @@ pub(crate) fn avro_to_json(value: Value) -> serde_json::Value {
         Value::Boolean(b) => serde_json::Value::Bool(b),
         Value::Int(i) => serde_json::Value::Number(Number::from(i)),
         Value::Long(l) => serde_json::Value::Number(Number::from(l)),
-        Value::Float(f) => serde_json::Value::Number(Number::from_f64(f.into()).unwrap()),
-        Value::Double(f) => serde_json::Value::Number(Number::from_f64(f).unwrap()),
+        Value::Float(f) => parse_number(f.into()),
+        Value::Double(f) => parse_number(f),
         Value::Bytes(vec) => serde_json::Value::Array(
             vec.iter()
                 .map(|b| serde_json::Value::Number(Number::from(*b)))
@@ -61,4 +61,47 @@ pub(crate) fn avro_to_json(value: Value) -> serde_json::Value {
         ),
         Value::BigDecimal(big_decimal) => serde_json::Value::String(big_decimal.to_string()),
     }
+}
+
+/// Parses a floating-point number into a JSON value, handling special cases for NaN and infinity.
+/// Bug discovered in <https://github.com/MAIF/yozefu/issues/239>
+fn parse_number(number: f64) -> serde_json::Value {
+    match Number::from_f64(number) {
+        Some(num) => serde_json::Value::Number(num),
+        None => match number.classify() {
+            std::num::FpCategory::Nan => serde_json::Value::String("NaN".to_string()),
+            std::num::FpCategory::Infinite if number.is_sign_positive() => {
+                serde_json::Value::String("Infinity".to_string())
+            }
+            std::num::FpCategory::Infinite if number.is_sign_negative() => {
+                serde_json::Value::String("-Infinity".to_string())
+            }
+            _ => unreachable!(
+                "The only way from_f64 can return None is if the float is NaN or infinite, which we handle above."
+            ),
+        },
+    }
+}
+
+#[test]
+fn test_avro_to_json() {
+    assert_eq!(
+        avro_to_json(Value::Int(42)),
+        serde_json::Value::Number(Number::from(42))
+    );
+
+    assert_eq!(
+        avro_to_json(Value::Float(f32::NAN)),
+        serde_json::Value::String("NaN".to_string())
+    );
+
+    assert_eq!(
+        avro_to_json(Value::Float(f32::INFINITY)),
+        serde_json::Value::String("Infinity".to_string())
+    );
+
+    assert_eq!(
+        avro_to_json(Value::Float(-f32::INFINITY)),
+        serde_json::Value::String("-Infinity".to_string())
+    );
 }
