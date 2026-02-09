@@ -12,7 +12,6 @@ Instead, report it using one of the following ways:
 
 Please include as much of the information listed below as you can to help us better understand and resolve the issue:
 
-
 * The type of issue (e.g., buffer overflow, SQL injection, or cross-site scripting)
 * Affected version(s)
 * Impact of the issue, including how an attacker might exploit the issue
@@ -27,5 +26,5 @@ This information will help us triage your report more quickly.
 
 ## Supported Versions
 
-We don't maintain security updates for all versions of our software. 
+We don't maintain security updates for all versions of our software.
 To ensure you are using a version free of known security vulnerabilities, please [use the latest release available on Github](https://github.com/MAIF/yozefu/releases).

@@ -1,15 +1,18 @@
 ## What's Changed in 0.0.25
+
 * next release by @Mcdostone in [#227](https://github.com/MAIF/yozefu/pull/227)
 * fix: underflow calculation when running the TUI in a small canvas by @Mcdostone
 * fix: panic consuming when receiver closed early due to limit by @royathan
 * Changelog for v0.0.24 by @github-actions[bot] in [#222](https://github.com/MAIF/yozefu/pull/222)
 
 ### New Contributors
+
 * @royathan made their first contribution
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.24...v0.0.25
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.24...v0.0.25>
 
 ## What's Changed in 0.0.24
+
 * Develop by @Mcdostone in [#221](https://github.com/MAIF/yozefu/pull/221)
 * develop by @Mcdostone in [#204](https://github.com/MAIF/yozefu/pull/204)
 * docs: typo, thank you @Chocorean by @Mcdostone
@@ -24,9 +27,10 @@
 * docs: fix title by @Mcdostone
 * Changelog for v0.0.23 by @github-actions[bot] in [#203](https://github.com/MAIF/yozefu/pull/203)
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.23...v0.0.24
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.23...v0.0.24>
 
 ## What's Changed in 0.0.23
+
 * Develop by @Mcdostone in [#197](https://github.com/MAIF/yozefu/pull/197)
 * build: update dependencies by @Mcdostone
 * refactor: remove debug file by @Mcdostone
@@ -43,11 +47,13 @@
 * Changelog for v0.0.22 by @github-actions[bot] in [#192](https://github.com/MAIF/yozefu/pull/192)
 
 ### New Contributors
+
 * @toninhoPinto made their first contribution
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.22...v0.0.23
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.22...v0.0.23>
 
 ## What's Changed in 0.0.22
+
 * Develop by @Mcdostone in [#191](https://github.com/MAIF/yozefu/pull/191)
 * build: update dependencies by @Mcdostone
 * feat: Allow to resize columns by @Mcdostone
@@ -58,9 +64,10 @@
 * build(deps): bump actions/checkout from 5 to 6 by @dependabot[bot]
 * Changelog for v0.0.21 by @github-actions[bot] in [#184](https://github.com/MAIF/yozefu/pull/184)
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.21...v0.0.22
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.21...v0.0.22>
 
 ## What's Changed in 0.0.21
+
 * Develop by @Mcdostone in [#180](https://github.com/MAIF/yozefu/pull/180)
 * ci: use `macos-15` for nix by @Mcdostone
 * feat: show topic configuration in the TopicDetailComponent by @Mcdostone
@@ -68,18 +75,20 @@
 * fix: integration tests with testcontainers by @Mcdostone
 * Changelog for v0.0.20 by @github-actions[bot] in [#176](https://github.com/MAIF/yozefu/pull/176)
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.20...v0.0.21
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.20...v0.0.21>
 
 ## What's Changed in 0.0.20
+
 * Develop by @Mcdostone in [#175](https://github.com/MAIF/yozefu/pull/175)
 * build: refactor schemars dependency by @Mcdostone
 * fix: wrong direction when scrolling with 'j' and 'k' #174 by @Mcdostone
 * build(deps-dev): bump esbuild in /crates/wasm-blueprints/js by @dependabot[bot]
 * Changelog for v0.0.19 by @github-actions[bot] in [#173](https://github.com/MAIF/yozefu/pull/173)
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.19...v0.0.20
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.19...v0.0.20>
 
 ## What's Changed in 0.0.19
+
 * develop by @Mcdostone in [#162](https://github.com/MAIF/yozefu/pull/162)
 * feat: log file can be specified via the CLI or an environment variable by @Mcdostone
 * fix: improve the error message if yozefu can't initialize the configuration file (readonly dir) by @Mcdostone
@@ -92,9 +101,10 @@
 * ci: do not install unused rust components by @Mcdostone
 * Changelog for v0.0.18 by @github-actions[bot] in [#161](https://github.com/MAIF/yozefu/pull/161)
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.18...v0.0.19
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.18...v0.0.19>
 
 ## What's Changed in 0.0.18
+
 * Develop by @Mcdostone in [#160](https://github.com/MAIF/yozefu/pull/160)
 * build: update dependencies by @Mcdostone
 * Show configuration in the help dialog by @Mcdostone
@@ -102,9 +112,10 @@
 * build(deps-dev): bump esbuild in /crates/wasm-blueprints/js by @dependabot[bot]
 * Changelog for v0.0.17 by @github-actions[bot] in [#148](https://github.com/MAIF/yozefu/pull/148)
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.17...v0.0.18
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.17...v0.0.18>
 
 ## What's Changed in 0.0.17
+
 * Develop by @Mcdostone in [#131](https://github.com/MAIF/yozefu/pull/131)
 * refactor: clippy pedantic by @Mcdostone
 * build: update java deps by @Mcdostone
@@ -120,9 +131,10 @@
 * chore: Release version v0.0.16 by @Mcdostone
 * Changelog for v0.0.16 by @github-actions[bot] in [#130](https://github.com/MAIF/yozefu/pull/130)
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.16...v0.0.17
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.16...v0.0.17>
 
 ## What's Changed in v0.0.16
+
 * Develop by @Mcdostone in [#122](https://github.com/MAIF/yozefu/pull/122)
 * ci: update dependencies by @Mcdostone
 * fix: the global configuration is now taken into account when you create a consumer by @Mcdostone
@@ -136,16 +148,18 @@
 * build(deps): bump actions/setup-go from 5 to 6 by @dependabot[bot]
 * Changelog for v0.0.15 by @github-actions[bot] in [#115](https://github.com/MAIF/yozefu/pull/115)
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.15...v0.0.16
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.15...v0.0.16>
 
 ## What's Changed in v0.0.15
+
 * syntax highlighting by @Mcdostone in [#110](https://github.com/MAIF/yozefu/pull/110)
 * feat: highlights the record payload with syntect by @Mcdostone
 * Changelog for v0.0.14 by @github-actions[bot] in [#106](https://github.com/MAIF/yozefu/pull/106)
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.14...v0.0.15
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.14...v0.0.15>
 
 ## What's Changed in v0.0.14
+
 * add cargo config for every crate by @Mcdostone in [#100](https://github.com/MAIF/yozefu/pull/100)
 * test: add new tests thanks to `cargo mutants` by @Mcdostone
 * build: update dependencies by @Mcdostone
@@ -157,16 +171,18 @@
 * docs: flag RUSTFLAGS is missing in the README.md by @Mcdostone
 * Changelog for v0.0.13 by @github-actions[bot] in [#99](https://github.com/MAIF/yozefu/pull/99)
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.13...v0.0.14
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.13...v0.0.14>
 
 ## What's Changed in v0.0.13
+
 * chore: Release version v0.0.13 by @Mcdostone in [#97](https://github.com/MAIF/yozefu/pull/97)
 * chore: Release version v0.0.13 by @Mcdostone
 * Changelog for v0.0.12 by @github-actions[bot] in [#95](https://github.com/MAIF/yozefu/pull/95)
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.12...v0.0.13
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.12...v0.0.13>
 
 ## What's Changed in v0.0.12
+
 * Develop by @Mcdostone in [#87](https://github.com/MAIF/yozefu/pull/87)
 * docs: fix typos by @Mcdostone
 * test: added more details when the createFilter test failed by @Mcdostone
@@ -192,13 +208,14 @@
 * chore: Update changelog by @Mcdostone in [#86](https://github.com/MAIF/yozefu/pull/86)
 * chore: Update changelog by @Mcdostone
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.11...v0.0.12
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.11...v0.0.12>
 
 # Changelog
 
 All notable changes to this project will be documented in this file.
 
 ## What's Changed in v0.0.11
+
 * build: rollback to ratatui 0.29.0
 * ci: fix CI about changelog, something went wrong during publishing the crates
 * chore: Release version v0.0.11
@@ -209,7 +226,7 @@ All notable changes to this project will be documented in this file.
 * test: tests that wasm filters don't have access to network
 * feat: update to rust 1.88.0
 * feat: disable IO interactions for wasm filters
-* style: design improvements based on https://github.com/ratatui/ratatui-website/pull/868
+* style: design improvements based on <https://github.com/ratatui/ratatui-website/pull/868>
 * build: update dependencies
 * ci: remove hardcoded URLs for `cargo-semver-checks`
 * ci: enable some clippy lints
@@ -219,12 +236,13 @@ All notable changes to this project will be documented in this file.
 * ci: rollback temporary change in github action
 * fix: rollback regarding commit and branch
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.10...v0.0.11
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.10...v0.0.11>
 
 ## What's Changed in v0.0.10
+
 * fix: rollback regarding commit and branch by @Mcdostone
 * Develop by @Mcdostone in [#66](https://github.com/MAIF/yozefu/pull/66)
-* docs: add link to https://docs.rs by @Mcdostone
+* docs: add link to <https://docs.rs> by @Mcdostone
 * chore: Release version v0.0.10 by @Mcdostone
 * feat: improve the `--version` output by @Mcdostone
 * build: simplify cross config by @Mcdostone
@@ -244,9 +262,10 @@ All notable changes to this project will be documented in this file.
 * docs: update documentation by @Mcdostone
 * Changelog for v0.0.9 by @github-actions[bot] in [#58](https://github.com/MAIF/yozefu/pull/58)
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.9...v0.0.10
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.9...v0.0.10>
 
 ## What's Changed in v0.0.9
+
 * build: rust 1.85.0, 2024 edition by @Mcdostone in [#51](https://github.com/MAIF/yozefu/pull/51)
 * build: update dependencies by @Mcdostone
 * ci: add cargo deny to build CI by @Mcdostone
@@ -256,9 +275,10 @@ All notable changes to this project will be documented in this file.
 * test: fix try-it.sh by @Mcdostone
 * Changelog for v0.0.8 by @github-actions[bot] in [#50](https://github.com/MAIF/yozefu/pull/50)
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.8...v0.0.9
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.8...v0.0.9>
 
 ## What's Changed in v0.0.8
+
 * fix: better error message when the cluster is unknown or missing by @Mcdostone in [#45](https://github.com/MAIF/yozefu/pull/45)
 * build: update dependencies by @Mcdostone
 * build: `strum` as a workspace dependency by @Mcdostone
@@ -271,9 +291,10 @@ All notable changes to this project will be documented in this file.
 * docs: fix screenshot URLs by @Mcdostone
 * Changelog for v0.0.7 by @github-actions[bot] in [#44](https://github.com/MAIF/yozefu/pull/44)
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.7...v0.0.8
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.7...v0.0.8>
 
 ## What's Changed in v0.0.7
+
 * Develop by @Mcdostone in [#42](https://github.com/MAIF/yozefu/pull/42)
 * build: update dependencies by @Mcdostone
 * refactor: cached filters are now passed to the `SearchContext` by @Mcdostone
@@ -288,9 +309,10 @@ All notable changes to this project will be documented in this file.
 * fix: make cluster argument not optional since it's required by @Mcdostone
 * Changelog for v0.0.6 by @github-actions[bot] in [#41](https://github.com/MAIF/yozefu/pull/41)
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.6...v0.0.7
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.6...v0.0.7>
 
 ## What's Changed in v0.0.6
+
 * Develop by @Mcdostone in [#37](https://github.com/MAIF/yozefu/pull/37)
 * build: update dependencies by @Mcdostone
 * feat: make `KAFKA_PROPERTIES_WITH_LOCATIONS` public by @Mcdostone
@@ -301,9 +323,10 @@ All notable changes to this project will be documented in this file.
 * Changelog for v0.0.5 by @github-actions[bot] in [#34](https://github.com/MAIF/yozefu/pull/34)
 * ci: another attempt ro fix CI for changelog by @Mcdostone
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.5...v0.0.6
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.5...v0.0.6>
 
 ## What's Changed in v0.0.5
+
 * Develop by @Mcdostone in [#28](https://github.com/MAIF/yozefu/pull/28)
 * fix: fix the table state in `topicDetailsComponent`, adjust delay for checkpoint while consuming records by @Mcdostone
 * docs: remove powerline-fonts by @Mcdostone
@@ -316,9 +339,10 @@ All notable changes to this project will be documented in this file.
 * feat: make TopicDetailComponent scrollable by @Mcdostone
 * chore: Update changelog by @github-actions[bot] in [#25](https://github.com/MAIF/yozefu/pull/25)
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.4...v0.0.5
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.4...v0.0.5>
 
 ## What's Changed in v0.0.4
+
 * Fix/user provided kafka properties by @Mcdostone in [#23](https://github.com/MAIF/yozefu/pull/23)
 * ci: add cargo-deny by @Mcdostone
 * feat: add a function `logs_file` that specifies a file to write logs to by @Mcdostone
@@ -328,9 +352,10 @@ All notable changes to this project will be documented in this file.
 * ci: fix github action that creates changelog PR by @Mcdostone
 * chore: Update changelog by @github-actions[bot] in [#20](https://github.com/MAIF/yozefu/pull/20)
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.3...v0.0.4
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.3...v0.0.4>
 
 ## What's Changed in v0.0.3
+
 * fix `KeyEvent` on windows by @Mcdostone in [#19](https://github.com/MAIF/yozefu/pull/19)
 * test: snapshots tests for `KafkaRecord::parse` by @Mcdostone
 * feat: Try its best to deserialize the record payload when the schema registry is not configured by @Mcdostone
@@ -346,11 +371,13 @@ All notable changes to this project will be documented in this file.
 * Changelog for 0.0.2 by @github-actions[bot] in [#9](https://github.com/MAIF/yozefu/pull/9)
 
 ## New Contributors
+
 * @dependabot[bot] made their first contribution
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.2...v0.0.3
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.2...v0.0.3>
 
 ## What's Changed in v0.0.2
+
 * Release/v0.0.2 by @Mcdostone in [#7](https://github.com/MAIF/yozefu/pull/7)
 * chore: Release version 0.0.2 by @Mcdostone
 * fix: fix rust imports with `native` feature by @Mcdostone
@@ -364,14 +391,17 @@ All notable changes to this project will be documented in this file.
 * ci: fix package name by @Mcdostone
 
 ## New Contributors
+
 * @github-actions[bot] made their first contribution in [#1](https://github.com/MAIF/yozefu/pull/1)
 
-**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.1...v0.0.2
+**Full Changelog**: <https://github.com/MAIF/yozefu/compare/v0.0.1...v0.0.2>
 
 ## What's Changed in v0.0.1
+
 * feat: first commit by @Mcdostone
 
 ## New Contributors
+
 * @Mcdostone made their first contribution
 
 <!-- generated by git-cliff -->

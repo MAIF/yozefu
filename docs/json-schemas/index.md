@@ -4,7 +4,6 @@ description: JSON schemas for important data structures used by Yōzefu.
 
 # JSON schemas
 
-
 these json schemas are for documentation purpose and give an overview of the data structures used by Yozefu.
 
 | Name                  | Rust definition                                                                                                    | Schema definition                                                                                                   |

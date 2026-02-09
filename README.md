@@ -11,25 +11,22 @@
 <a href="https://github.com/MAIF/yozefu/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="Licence"/></a>
 <a href="https://ratatui.rs/"><img src="https://ratatui.rs/built-with-ratatui/badge.svg" alt="Built With Ratatui"/></a>
 
-
 </p>
 
 Yōzefu is an interactive terminal user interface (TUI) application for exploring data of a kafka cluster.
 It is an alternative tool to [AKHQ](https://akhq.io/), [redpanda console](https://www.redpanda.com/redpanda-console-kafka-ui) or [the kafka plugin for JetBrains IDEs](https://plugins.jetbrains.com/plugin/21704-kafka).
 
 The tool offers the following features:
- - A real-time access to data published to topics.
- - A [search query language](https://maif.github.io/yozefu/query-language/) inspired from SQL providing a fine-grained way filtering capabilities.
- - Ability to search kafka records across multiple topics.
- - Support for extending the search engine with [user-defined filters](https://maif.github.io/yozefu/search-filter/) written in WebAssembly ([Extism](https://extism.org/)).
- - The tool can be used as a terminal user interface or a CLI with the `--headless` flag.
- - One keystroke to export kafka records for further analysis.
- - Support for registering multiple kafka clusters, each with specific kafka consumer properties.
 
+- A real-time access to data published to topics.
+- A [search query language](https://maif.github.io/yozefu/query-language/) inspired from SQL providing a fine-grained way filtering capabilities.
+- Ability to search kafka records across multiple topics.
+- Support for extending the search engine with [user-defined filters](https://maif.github.io/yozefu/search-filter/) written in WebAssembly ([Extism](https://extism.org/)).
+- The tool can be used as a terminal user interface or a CLI with the `--headless` flag.
+- One keystroke to export kafka records for further analysis.
+- Support for registering multiple kafka clusters, each with specific kafka consumer properties.
 
 By default, [the kafka consumer is configured](https://github.com/MAIF/yozefu/blob/main/crates/command/src/command/main_command.rs#L318-L325) with the property `enable.auto.commit` set to `false`, meaning no kafka consumer offset will be published to kafka.
-
-
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://vhs.charm.sh/vhs-UpIJD2h92vKkj01XSS0r0.gif">
@@ -38,12 +35,11 @@ By default, [the kafka consumer is configured](https://github.com/MAIF/yozefu/bl
 
 ## Limitations
 
- - The tool is designed only to consume kafka records. There is no feature to produce records or manage a cluster.
- - Serialization formats such as `json`, `xml` or plain text are supported. [Avro](https://avro.apache.org/) support is [experimental for now](https://maif.github.io/yozefu/schema-registry/). [Protobuf](https://protobuf.dev/) is not supported.
- - The tool uses a ring buffer to store the [last 500 kafka records](https://github.com/MAIF/yozefu/blob/main/crates/tui/src/records_buffer.rs#L17).
- - There is probably room for improvement regarding the throughput (lot of `clone()` and deserialization).
- - Yozefu has been tested on macOS Silicon but not on Windows or Linux. Feedback or contributions are welcome.
-
+- The tool is designed only to consume kafka records. There is no feature to produce records or manage a cluster.
+- Serialization formats such as `json`, `xml` or plain text are supported. [Avro](https://avro.apache.org/) support is [experimental for now](https://maif.github.io/yozefu/schema-registry/). [Protobuf](https://protobuf.dev/) is not supported.
+- The tool uses a ring buffer to store the [last 500 kafka records](https://github.com/MAIF/yozefu/blob/main/crates/tui/src/records_buffer.rs#L17).
+- There is probably room for improvement regarding the throughput (lot of `clone()` and deserialization).
+- Yozefu has been tested on macOS Silicon but not on Windows or Linux. Feedback or contributions are welcome.
 
 ## Getting started
 
@@ -80,6 +76,7 @@ yozf import-filter path/to/key-ends-with.wasm
 ```
 
 You can also download pre-build binaries from the [releases section](https://github.com/MAIF/yozefu/releases). [Attestations](https://github.com/MAIF/yozefu/attestations) are available:
+
 ```bash
 gh attestation verify --repo MAIF/yozefu $(which yozf)
 
@@ -90,12 +87,10 @@ yay -S yozefu
 nix run github:MAIF/yozefu
 ```
 
-
 ## Try it
 
 > [!NOTE]
 > Docker is required to start a single node Kafka cluster on your machine. [JBang](https://www.jbang.dev/) is not required but recommended if you want to produce records with the schema registry.
-
 
 ```bash
 # It clones this repository, starts a docker kafka node and produces json records
@@ -104,11 +99,10 @@ curl -L "https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/try-
 yozf -c localhost
 ```
 
-
 ## Documentation
 
 To check out docs, visit [https://maif.github.io/yozefu/](https://maif.github.io/yozefu/).
- 
+
 ## Screenshots
 
 <table>
@@ -129,4 +123,3 @@ To check out docs, visit [https://maif.github.io/yozefu/](https://maif.github.io
     </td>
   </tr>
 </table>
-

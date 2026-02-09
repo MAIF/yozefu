@@ -6,8 +6,6 @@ description: Configuration options CLI flags and environment variables for Yōze
 
 Yōzefu uses a workspace directory to store its configuration file, logs, and other data. By default, this directory is located at `yozf config get dir`. You can change the workspace directory using the `--config-dir` command-line option or the `YOZEFU_CONFIG_DIR` environment variable.
 
-
-
 |               | Default                           |      CLI option |        Env variable |  Configuration file |
 | ------------- | --------------------------------- | --------------: | ------------------: | ------------------: |
 | Workspace     | `~/.config/io.maif.yozefu/`       |  `--config-dir` | `YOZEFU_CONFIG_DIR` |                  No |
@@ -15,14 +13,9 @@ Yōzefu uses a workspace directory to store its configuration file, logs, and ot
 | Logs          | `${workspace}/application.log`    |    `--log-file` |   `YOZEFU_LOG_FILE` |         `/log_file` |
 | Export folder | `$PWD/export-{datetime-now}.json` |      `--output` |                  No | `/export_directory` |
 
-
-
-
 ## `config.json` file
 
-
 Yōzefu uses a JSON configuration file to set various options. By default, it looks for a file named `config.json` in the workspace directory.
-
 
 | Key                                                                                      | Type                  | Examples                                                |
 | ---------------------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------- |
@@ -39,9 +32,7 @@ Yōzefu uses a JSON configuration file to set various options. By default, it lo
 | `log_file`             <br/> File path to write logs.                                    | String                | `/path/to/log/file.log`                                 |
 | `timestamp_format`     <br/> Display timestamps as date-time or relative.                | `DateTime` or `Ago`   | `DateTime`                                              |
 
-
 ## Kafka cluster
-
 
 | Key                                                                             | Type                  | Examples                                          |
 | ------------------------------------------------------------------------------- | --------------------- | ------------------------------------------------- |
@@ -49,6 +40,5 @@ Yōzefu uses a JSON configuration file to set various options. By default, it lo
 | `schema_registry` <br/> Schema registry settings for this cluster.              | Object                | `{}`                                              |
 | `kafka`           <br/> Kafka consumer properties for this cluster              | Map\<String, String\> | `{}`                                              |
 | `consumer`        <br/> configuration for the Yozefu consumer.                  | Object                | `{ buffer_capacity: 10, timeout_in_ms: 1 }`        |
-
 
 For more details, see the [configuration json schema](../json-schemas/).

@@ -6,11 +6,13 @@ labels: ''
 assignees: ''
 
 ---
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce the behavior:
+
 1. Run `--topics my-topics 'from begin'`
 2. Select the kafka record X...
 3. See error

@@ -4,7 +4,7 @@ description: Creating custom search filters using WebAssembly modules.
 
 # Creating a search filter
 
-Let's say you want to list all kafka records where the key ends with `1234`. 
+Let's say you want to list all kafka records where the key ends with `1234`.
 Currently, the query syntax doesn't offer such feature. Fortunately, you have the ability to extend the search engine and create your own search logic.
 
 You can implement what it's called **a search filter**. A search filter is a WebAssembly module that exports a `parse_parameters` and `matches` functions. You can pass string or number parameters to that function. It will look like this:
@@ -14,15 +14,12 @@ You can implement what it's called **a search filter**. A search filter is a Web
 from begin where key-ends-with('1234')
 ```
 
-The name of the function corresponds to the name of the wasm file. In the example above, the wasm file is `key-ends-with.wasm`. 
+The name of the function corresponds to the name of the wasm file. In the example above, the wasm file is `key-ends-with.wasm`.
 
 > [!TIP]
 > Wasm files can be found at `yozf config get filters-dir`.
 
-
-
 ## Defining your search filter
-
 
 Yōzefu relies on [Extism](https://extism.org/) to develop and execute search filters.
 The WebAssembly module we're going to implement must export 2 functions, `parse_parameters` and `matches`.
@@ -62,13 +59,9 @@ func ParseParameters() int32 {
 }
 ```
 
-
-
 ### Function `matches`
 
 This function receives a [JSON object](./filter-input.json) containing both the kafka record and the function parameters. It returns the json `{"match": true}` when the record matches your query. The output is represented by the struct [`FilterResult`](https://github.com/MAIF/yozefu/blob/main/crates/lib/src/search/mod.rs#L80-L89). This function is called for every kafka record read.
-
-
 
 ```go
 // golang example
@@ -96,7 +89,6 @@ func Matches() int32 {
 }
 ```
 
-
 ### Build it
 
 Now, it's time to compile it to WebAssembly:
@@ -107,6 +99,7 @@ make build
 ```
 
 You can also implement and run tests:
+
 ```bash
 $EDITOR ./tests/parameters.json
 $EDITOR ./tests/match.json
@@ -115,6 +108,7 @@ make test
 ```
 
 Finally import your filter 🎉
+
 ```bash
 yozf import-filter 'plugin.wasm' --name "key-ends-with"
 

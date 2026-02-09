@@ -33,6 +33,5 @@ features:
     link: /keybindings/
 ---
 
-
 ![The user selects a topic and sees and real time new records published to Kafka.](https://vhs.charm.sh/vhs-UpIJD2h92vKkj01XSS0r0.gif){.dark-only .gif}
 ![The user selects a topic and sees and real time new records published to Kafka.](https://vhs.charm.sh/vhs-1oh0ovd0DaUfvKLTx4iZTo.gif){.light-only .gif}

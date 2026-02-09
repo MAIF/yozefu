@@ -5,6 +5,7 @@
 
 Blueprint project to write a search filter in Rust.
 To build the WebAssembly module:
+
 ```bash
 make build
 yozf import-filter module.wasm --name 'key-ends-with'

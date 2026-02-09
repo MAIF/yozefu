@@ -4,7 +4,6 @@ description: Instructions to install Yōzefu and get started quickly.
 
 # Getting started
 
-
 Give Yōzefu a try in your terminal with the following command:
 
 ```shell
@@ -13,13 +12,9 @@ curl -L "https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/docs/try-
 yozf -c localhost
 ```
 
-
 ## Install
 
-
 ### Prerequisites
-
-
 
 ::: code-group
 
@@ -44,13 +39,12 @@ yay -S yozefu
 ```sh [Nix]
 nix run github:MAIF/yozefu
 ```
-:::
 
+:::
 
 ### Configuration
 
 Once installed, you can configure Yōzefu to connect to your Kafka clusters.
-
 
 ::: tip NOTE
 
@@ -67,6 +61,7 @@ yozf configure --editor 'vim'
 ```
 
 And then add your cluster configuration. Here is an example for a Aiven cluster:
+
 ```json{8-18}
 {
   "default_url_template": "...",

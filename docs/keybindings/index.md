@@ -4,8 +4,7 @@ description: Keybindings for navigation and actions.
 
 # Keybindings
 
-
-So far, keybindings are hardcoded. The choices I made are completely personal. 
+So far, keybindings are hardcoded. The choices I made are completely personal.
 
 | Focused panel  | Keybinding                        | Description                                   |
 | :------------- | --------------------------------- | :-------------------------------------------- |

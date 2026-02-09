@@ -7,21 +7,18 @@ description: How to configure and use schema registries
 > [!WARNING]
 > The support of the schema registry is **highly experimental**. Contributions and feedback are welcome.
 
-
-
 | Types       | Support                   |
 | ----------- | :------------------------ |
 | Json schema | Experimental              |
 | Avro        | Experimental              |
 | Protobuf    | Looking for contributions |
 
-
-
 You can configure the tool to use a schema registry. Open the configuration file and add a `schema_registry` entry to your cluster:
 
 ```shell
 EDITOR=nano yozf configure
 ```
+
 ```json{4}
 {
     "clusters": {
@@ -39,10 +36,6 @@ EDITOR=nano yozf configure
     }
 }
 ```
-
-
-
-
 
 ## Authentication
 

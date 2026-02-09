@@ -6,10 +6,9 @@ description: Instructions to release a new version of Yōzefu.
 
 This document explains the release process of the tool. Most of the steps are automated with gitHub actions. The `main` branch of the repository is protected. If you want to release a new version of the tool, you must create a release branch.
 
-
 1. Ensure you are on a release branch.
 2. Install `cargo-release`: `cargo install cargo-release`
-3. Thanks to conventional commits and `cargo-semver-checks`, you can determine the next version to release: 
+3. Thanks to conventional commits and `cargo-semver-checks`, you can determine the next version to release:
 
 ```bash
 cargo semver-checks --color never   \
