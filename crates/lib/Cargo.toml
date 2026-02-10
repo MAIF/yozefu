@@ -31,7 +31,7 @@ byteorder = "1.5.0"
 insta = { version = "1.46.3", features = ["filters", "glob", "json"] }
 tokio = { version = "1.49.0", features = ["rt", "macros", "rt-multi-thread"] }
 schemars = { workspace = true, features = ["indexmap2", "url2", "chrono04"]}
-proptest = "1.9.0"
+proptest = "1.10.0"
 mockito = "1.7.2"
 
 [features]
