@@ -1,3 +1,22 @@
+## What's Changed in 0.0.26
+* Develop by @Mcdostone in [#238](https://github.com/MAIF/yozefu/pull/238)
+* build: update rust and node dependencies by @Mcdostone
+* fix: Parses a avro floating-point number into a JSON value, especially cases for NaN and infinity by @Mcdostone
+* docs: give a try to llms.txt by @Mcdostone
+* perf: get rid of arc<mutex<buffer>> and use channels to avoid contention around the records buffer by @Mcdostone
+* build(deps): bump perfect-debounce from 2.0.0 to 2.1.0 in /docs by @dependabot[bot]
+* build(deps-dev): bump vitepress in /docs by @dependabot[bot]
+* build(deps): bump schemars from 1.2.0 to 1.2.1 by @dependabot[bot]
+* build(deps): bump insta from 1.46.2 to 1.46.3 by @dependabot[bot]
+* build(deps): bump mockito from 1.7.1 to 1.7.2 by @dependabot[bot]
+* build(deps): bump shiki from 3.21.0 to 3.22.0 in /docs by @dependabot[bot]
+* build(deps): bump rollup from 4.55.1 to 4.57.1 in /docs by @dependabot[bot]
+* build(deps): bump vue from 3.5.26 to 3.5.27 in /docs by @dependabot[bot]
+* build: update dependencies by @Mcdostone
+* Changelog for v0.0.25 by @github-actions[bot] in [#228](https://github.com/MAIF/yozefu/pull/228)
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.25...v0.0.26
+
 ## What's Changed in 0.0.25
 * next release by @Mcdostone in [#227](https://github.com/MAIF/yozefu/pull/227)
 * fix: underflow calculation when running the TUI in a small canvas by @Mcdostone
