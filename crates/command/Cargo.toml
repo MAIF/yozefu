@@ -19,7 +19,7 @@ rust-version.workspace = true
 
 
 [dependencies]
-clap = { version = "4.5.56", features = [
+clap = { version = "4.5.57", features = [
     "derive",
     "env",
     "color",
@@ -29,7 +29,7 @@ serde_json = { workspace = true }
 chrono = "0.4.43"
 strum = { workspace = true, features = ["derive", "strum_macros"] }
 indicatif = { version = "0.18.3", features = ["tokio"] }
-tempfile = "3.24.0"
+tempfile = "3.25.0"
 tokio-util = "0.7.18"
 futures = "0.3.31"
 itertools = "0.14.0"
@@ -45,7 +45,7 @@ indexmap = "2.13.0"
 tui = { workspace = true }
 app = { workspace = true }
 lib = { workspace = true }
-reqwest = { version = "0.13.1", features = ["json"] }
+reqwest = { version = "0.13.2", features = ["json"] }
 const_format = { version = "0.2.35", features = ["rust_1_64"] }
 tracing = { workspace = true }
 tracing-subscriber = { version = "0.3.22", features = ["env-filter"]}
