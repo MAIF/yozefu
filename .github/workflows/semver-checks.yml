@@ -111,6 +111,7 @@ jobs:
           printf "> According to \`cargo-semver-checks\`, the next release version doesn\'t respect semantic versioning."
           printf '```bash'
           } > ./report.md
+      - run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
       - name: Run cargo semver-checks
         id: check
         run: |
