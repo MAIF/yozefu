@@ -119,9 +119,23 @@
     },
     "DataType": {
       "anyOf": [
-        true,
         {
           "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "array"
+        },
+        {
+          "type": "object"
         }
       ]
     }
