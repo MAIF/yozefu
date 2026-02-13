@@ -4,6 +4,7 @@ mod action;
 mod component;
 pub mod error;
 mod highlighter;
+mod partition_lag;
 mod records_buffer;
 mod schema_detail;
 pub mod theme;

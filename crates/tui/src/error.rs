@@ -64,3 +64,5 @@ impl From<TryFromIntError> for TuiError {
         TuiError(Error::Error(e.to_string()))
     }
 }
+
+impl std::error::Error for TuiError {}
