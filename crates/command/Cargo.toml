@@ -28,7 +28,7 @@ clap = { version = "4.5.57", features = [
 serde_json = { workspace = true }
 chrono = "0.4.43"
 strum = { workspace = true, features = ["derive", "strum_macros"] }
-indicatif = { version = "0.18.3", features = ["tokio"] }
+indicatif = { version = "0.18.4", features = ["tokio"] }
 tempfile = "3.25.0"
 tokio-util = "0.7.18"
 futures = "0.3.31"
