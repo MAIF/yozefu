@@ -367,11 +367,8 @@ impl Component for RecordsComponent {
             .height(1)
             .bottom_margin(1);
 
-        let mut records = Vec::with_capacity(BUFFER_SIZE);
-        records.extend(self.records.iter().cloned());
-
         // TODO render only records in the viewport
-        let rows = records.iter().enumerate().map(|(index, item)| {
+        let rows = self.records.iter().enumerate().map(|(index, item)| {
             if let Some(s) = self.state.selected() {
                 let is_visible = (s + rect.height as usize) > index
                     && s.saturating_sub(rect.height as usize) <= index;
