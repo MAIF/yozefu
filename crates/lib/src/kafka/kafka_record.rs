@@ -142,6 +142,7 @@ impl KafkaRecord {
     /// Will I regret it ? Maybe
     fn try_deserialize_json(payload: Option<&[u8]>) -> Result<DataType, Error> {
         let payload = payload.unwrap_or_default();
+        //return Ok(DataType::String(str::from_utf8(&payload).unwrap().to_string()));
         match serde_json::from_slice(payload) {
             Ok(e) => Ok(DataType::Json(e)),
             Err(e) => Err(e),

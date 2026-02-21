@@ -20,7 +20,7 @@ use crate::{
     action::{Level, Notification},
     component::RecordsReceiver,
     error::TuiError,
-    records_buffer::{BUFFER_SIZE, RecordsBuffer},
+    records_buffer::RecordsBuffer,
 };
 
 use super::{Component, ComponentName, Shortcut, State, styles};
