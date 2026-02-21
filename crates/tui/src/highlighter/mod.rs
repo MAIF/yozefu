@@ -90,8 +90,8 @@ impl<'a> Highlighter {
     }
 
     pub fn highlight(&self, content: &str) -> Text<'a> {
-        if !self.enabled {
-            return Text::from(content.to_string());
+        if !self.enabled || content.len() > 100_000 {
+            return Text::from(content[0..99_000].to_string());
         }
 
         let mut h = HighlightLines::new(&self.syntax, &self.theme);
@@ -104,8 +104,7 @@ impl<'a> Highlighter {
     }
 
     pub fn highlight_data_type(&self, value: &DataType) -> Text<'a> {
-        let pretty = value.to_string_pretty();
-        self.highlight(&pretty)
+        self.highlight(&value.to_string_pretty())
     }
 
     fn to_line(regions: Vec<(highlighting::Style, &str)>) -> Line<'static> {

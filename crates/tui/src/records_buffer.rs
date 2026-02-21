@@ -7,7 +7,7 @@
 use circular_buffer::{CircularBuffer, Iter};
 use lib::{
     KafkaRecord,
-    search::{Order, OrderBy},
+    search::{Order, OrderBy, order::OrderKeyword},
 };
 use rayon::prelude::*;
 
@@ -101,10 +101,13 @@ impl RecordsBuffer {
 
     /// Sort the buffer by the given order
     pub fn sort(&mut self, order_by: &OrderBy) {
-        let mut unsorted = self.buffer.to_vec();
         if self.stats.read == self.last_time_sorted {
             return;
         }
+        if order_by == &OrderBy::new(Order::Timestamp, OrderKeyword::Asc) {
+            return;
+        }
+        let mut unsorted = self.buffer.to_vec();
         let is_descending = order_by.is_descending();
         match order_by.order {
             Order::Timestamp => {
