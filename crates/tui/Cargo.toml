@@ -18,7 +18,7 @@ tokio = { version = "1", features = ["full", "tracing"] }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tui-input = { version = "0.15.0", features = ["crossterm"], default-features = false }
-chrono = "0.4.43"
+chrono = "0.4.44"
 strum = { workspace = true, features = ["derive", "strum_macros"] }
 ratatui = { version = "0.30.0", features = [
     "serde",
