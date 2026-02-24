@@ -40,7 +40,7 @@ lib = { workspace = true }
 app = { workspace = true }
 tracing = { workspace = true }
 rdkafka = { version = "0.39.0", features = ["cmake-build"] }
-timeago = "0.5.0"
+timeago = "0.6.0"
 futures-batch = "0.7.0"
 syntect = "5.3.0"
 resolve-path = "0.1.0"
