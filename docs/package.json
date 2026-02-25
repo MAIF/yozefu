@@ -55,8 +55,8 @@
     "regex-recursion": "^6.0.2",
     "regex-utilities": "^2.3.0",
     "rfdc": "^1.4.1",
-    "rollup": "^4.57.1",
-    "shiki": "^3.22.0",
+    "rollup": "^4.59.0",
+    "shiki": "^3.23.0",
     "source-map-js": "^1.2.1",
     "space-separated-tokens": "^2.0.2",
     "speakingurl": "^14.0.1",
@@ -73,7 +73,7 @@
     "vfile": "^6.0.3",
     "vfile-message": "^4.0.3",
     "vite": "^7.3.1",
-    "vue": "^3.5.28",
+    "vue": "^3.5.29",
     "zwitch": "^2.0.4"
   },
   "devDependencies": {
