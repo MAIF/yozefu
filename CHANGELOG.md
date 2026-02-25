@@ -1,3 +1,17 @@
+## What's Changed in 0.0.27
+* Develop by @Mcdostone in [#253](https://github.com/MAIF/yozefu/pull/253)
+* ci: update dependencies by @Mcdostone
+* perf: do not highlight when it's big payload by @Mcdostone
+* build(deps): bump indicatif from 0.18.3 to 0.18.4 by @dependabot[bot]
+* build(deps): bump clap from 4.5.57 to 4.5.59 by @dependabot[bot]
+* build(deps): bump futures from 0.3.31 to 0.3.32 by @dependabot[bot]
+* perf: working on performances bottlenecks with flamegraphs by @Mcdostone
+* refactor: small changes by @Mcdostone
+* Changelog for v0.0.26 by @github-actions[bot] in [#252](https://github.com/MAIF/yozefu/pull/252)
+* ci: add curl-lib to github actions by @Mcdostone
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.26...v0.0.27
+
 ## What's Changed in 0.0.26
 * Develop by @Mcdostone in [#238](https://github.com/MAIF/yozefu/pull/238)
 * build: update rust and node dependencies by @Mcdostone
