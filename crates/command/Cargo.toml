@@ -19,17 +19,17 @@ rust-version.workspace = true
 
 
 [dependencies]
-clap = { version = "4.5.59", features = [
+clap = { version = "4.5.60", features = [
     "derive",
     "env",
     "color",
     "suggestions",
 ] }
 serde_json = { workspace = true }
-chrono = "0.4.43"
+chrono = "0.4.44"
 strum = { workspace = true, features = ["derive", "strum_macros"] }
 indicatif = { version = "0.18.4", features = ["tokio"] }
-tempfile = "3.25.0"
+tempfile = "3.26.0"
 tokio-util = "0.7.18"
 futures = "0.3.32"
 itertools = "0.14.0"

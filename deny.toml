@@ -76,7 +76,12 @@ ignore = [
     "RUSTSEC-2025-0134", # rustls-pemfile is unmaintained
     "RUSTSEC-2025-0141", # Bincode is unmaintained
     "RUSTSEC-2026-0006", # Wasmtime segfault or unused out-of-sandbox load with `f64.copysign` operator on x86-64
-    "RUSTSEC-2026-0007"  # Integer overflow in `BytesMut::reserve`
+    "RUSTSEC-2026-0007", # Integer overflow in `BytesMut::reserve`
+    "RUSTSEC-2026-0020", # Guest-controlled resource exhaustion in WASI implementations
+    "RUSTSEC-2026-0021", # Panic adding excessive fields to a `wasi:http/types.fields` instance
+    "RUSTSEC-2025-0141", # Bincode is unmaintained
+    "RUSTSEC-2025-0134"  # rustls-pemfile is unmaintained
+    
     #"RUSTSEC-0000-0000",
     #{ id = "RUSTSEC-0000-0000", reason = "you can specify a reason the advisory is ignored" },
     #"a-crate-that-is-yanked@0.1.1", # you can also ignore yanked crate versions if you wish
