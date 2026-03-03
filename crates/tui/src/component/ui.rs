@@ -192,7 +192,15 @@ impl Ui {
                         Duration::from_millis(consumer_config.timeout_in_ms),
                     )
                     .for_each(|bulk_of_records| {
-                        let bulk_of_records = bulk_of_records.unwrap();
+                        // For example, TopicAuthorizationFailed
+                        let bulk_of_records = bulk_of_records
+                            .inspect_err(|e| {
+                                let _ = tx.send(Action::Notification(Notification::new(
+                                    Level::Error,
+                                    e.to_string(),
+                                )));
+                            })
+                            .unwrap_or(vec![]);
                         info!("Received a bulk of {} records", bulk_of_records.len());
                         let timestamp = bulk_of_records
                             .last()
