@@ -39,7 +39,7 @@ command = { package = "yozefu-command", path = "crates/command", version = "0.0.
 tui = { package = "yozefu-tui", path = "crates/tui", version = "0.0.27" }
 serde_json = { version = "1.0.149", features = ["preserve_order"] }
 serde = { version = "1.0.228", features = ["derive"] }
-strum = {version = "0.27.2" }
+strum = {version = "0.28.0" }
 tracing = "0.1.44"
 schemars = { version = "1.2.1" }
 

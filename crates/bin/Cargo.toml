@@ -38,7 +38,7 @@ libz-static = [
 ]
 
 [dev-dependencies]
-assert_cmd = "2.1.2"
+assert_cmd = "2.2.0"
 testcontainers = { version = "0.25.0", features = ["blocking"] }
 
 
