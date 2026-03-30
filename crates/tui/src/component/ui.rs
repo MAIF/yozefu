@@ -193,14 +193,15 @@ impl Ui {
                     )
                     .for_each(|bulk_of_records| {
                         // For example, TopicAuthorizationFailed
-                        let bulk_of_records = bulk_of_records
-                            .inspect_err(|e| {
-                                let _ = tx.send(Action::Notification(Notification::new(
-                                    Level::Error,
-                                    e.to_string(),
-                                )));
-                            })
-                            .unwrap_or(vec![]);
+                        if let Err(e) = bulk_of_records {
+                            let _ = tx.send(Action::Notification(Notification::new(
+                                Level::Error,
+                                e.to_string(),
+                            )));
+                            let _ = tx.send(Action::StopConsuming());
+                            token.cancel();
+                        };
+                        let bulk_of_records = bulk_of_records.unwrap();
                         info!("Received a bulk of {} records", bulk_of_records.len());
                         let timestamp = bulk_of_records
                             .last()
