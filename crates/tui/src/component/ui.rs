@@ -193,7 +193,7 @@ impl Ui {
                     )
                     .for_each(|bulk_of_records| {
                         // For example, TopicAuthorizationFailed
-                        if let Err(e) = bulk_of_records {
+                        if let Err(ref e) = bulk_of_records {
                             let _ = tx.send(Action::Notification(Notification::new(
                                 Level::Error,
                                 e.to_string(),
