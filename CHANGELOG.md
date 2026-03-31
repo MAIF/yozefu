@@ -1,3 +1,13 @@
+## What's Changed in 0.0.28
+* build: update dependencies by @Mcdostone
+* feat: stop the consumer if you are not allowed to read a topic by @Mcdostone
+* fix: handle authorization error when consuming by @belltoy
+
+### New Contributors
+* @belltoy made their first contribution
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.27...v0.0.28
+
 ## What's Changed in 0.0.27
 * Develop by @Mcdostone in [#253](https://github.com/MAIF/yozefu/pull/253)
 * ci: update dependencies by @Mcdostone
