@@ -21,4 +21,4 @@ jobs:
         with:
           persist-credentials: false
       - name: actionlint
-        uses: raven-actions/actionlint@v2.1.0
+        uses: raven-actions/actionlint@v2.1.2
