@@ -32,42 +32,8 @@ impl SearchQuery {
     pub fn is_empty(&self) -> bool {
         self.limit.is_none() && self.from.is_none() && self.expression.is_empty()
     }
-}
 
-impl std::fmt::Display for SearchQuery {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let mut clauses = vec![];
-
-        let from = match &self.from {
-            Some(f) => format!("from {f}"),
-            None => String::new(),
-        };
-        let limit = match self.limit {
-            Some(i) => format!("limit {i}"),
-            None => String::new(),
-        };
-        clauses.push(from.to_string());
-        clauses.push(format!("{}", self.expression));
-        clauses.push(format!("{}", self.order_by));
-        clauses.push(limit.to_string());
-        let clauses = clauses.into_iter().filter(|e| !e.is_empty()).collect_vec();
-        write!(f, "{}", clauses.join(" "))
-    }
-}
-
-impl Default for SearchQuery {
-    fn default() -> Self {
-        Self {
-            expression: Expression::OrExpression(vec![]),
-            limit: None,
-            from: None,
-            order_by: OrderBy::new(Order::Timestamp, OrderKeyword::Asc),
-            //group_by_key: false,
-        }
-    }
-}
-
-pub fn parse_search_query(input: &str) -> Result<(&str, SearchQuery), SearchError> {
+    pub fn parse(input: &str) -> Result<(&str, SearchQuery), SearchError> {
     map(
         many_till(
             alt((
@@ -104,12 +70,48 @@ pub fn parse_search_query(input: &str) -> Result<(&str, SearchQuery), SearchErro
     })
 }
 
+}
+
+impl std::fmt::Display for SearchQuery {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let mut clauses = vec![];
+
+        let from = match &self.from {
+            Some(f) => format!("from {f}"),
+            None => String::new(),
+        };
+        let limit = match self.limit {
+            Some(i) => format!("limit {i}"),
+            None => String::new(),
+        };
+        clauses.push(from.to_string());
+        clauses.push(format!("{}", self.expression));
+        clauses.push(format!("{}", self.order_by));
+        clauses.push(limit.to_string());
+        let clauses = clauses.into_iter().filter(|e| !e.is_empty()).collect_vec();
+        write!(f, "{}", clauses.join(" "))
+    }
+}
+
+impl Default for SearchQuery {
+    fn default() -> Self {
+        Self {
+            expression: Expression::OrExpression(vec![]),
+            limit: None,
+            from: None,
+            order_by: OrderBy::new(Order::Timestamp, OrderKeyword::Asc),
+            //group_by_key: false,
+        }
+    }
+}
+
+
 #[test]
 fn test_parse_search_query() {
-    assert!(parse_search_query(r#"   from end - 10"#).is_ok());
+    assert!(SearchQuery::parse(r#"   from end - 10"#).is_ok());
 }
 
 #[test]
 fn test_parse_search_query_with_json_path() {
-    assert!(parse_search_query(r#"from end - 10 value.sequenceNum == "115568969""#).is_ok());
+    assert!(SearchQuery::parse(r#"from end - 10 value.sequenceNum == "115568969""#).is_ok());
 }
