@@ -9,9 +9,8 @@ use lib::{Error, SearchQuery, search::offset::FromOffset};
 use rdkafka::{
     Offset, TopicPartitionList,
     consumer::{Consumer as _, stream_consumer::StreamConsumer},
-    message::OwnedMessage,
+    message::BorrowedMessage,
 };
-use tokio::sync::mpsc::UnboundedSender;
 
 use crate::{
     configuration::{Configuration, ConsumerConfig, YozefuConfig},
@@ -19,7 +18,6 @@ use crate::{
 };
 
 pub struct Consumer {
-    config: YozefuConfig,
     consumer_config: ConsumerConfig,
     consumer: StreamConsumer,
 }
@@ -36,13 +34,15 @@ impl Consumer {
         consumer.assign(&assignments)?;
 
         Ok(Self {
-            config,
             consumer_config,
             consumer,
         })
     }
 
-    fn consume(&self, tx: UnboundedSender<OwnedMessage>) -> Result<(), Error> {
+    pub async fn consume(
+        &self,
+        mut process_records_closure: impl FnMut(Result<Vec<BorrowedMessage<'_>>, rdkafka::error::KafkaError>),
+    ) -> Result<(), Error> {
         let _ = self
             .consumer
             .stream()
@@ -51,14 +51,20 @@ impl Consumer {
                 Duration::from_millis(self.consumer_config.timeout_in_ms),
             )
             .for_each(|bulk_of_records| {
-                let bulk_of_records = bulk_of_records.unwrap();
-                for record in bulk_of_records {
-                    tx.send(record.detach()).unwrap();
-                }
+                process_records_closure(bulk_of_records);
                 futures::future::ready(())
-            });
+            })
+            .await;
 
         Ok(())
+    }
+
+    pub fn stream_consumer(self) -> StreamConsumer {
+        self.consumer
+    }
+
+    pub fn assignment(&self) -> Result<TopicPartitionList, rdkafka::error::KafkaError> {
+        self.consumer.assignment()
     }
 
     fn create_assignments(
