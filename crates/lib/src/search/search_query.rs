@@ -34,42 +34,41 @@ impl SearchQuery {
     }
 
     pub fn parse(input: &str) -> Result<(&str, SearchQuery), SearchError> {
-    map(
-        many_till(
-            alt((
-                parse_from_offset_clause,
-                parse_limit,
-                parse_expression,
-                parse_order_by,
-            )),
-            wsi(eof),
-        ),
-        |clauses| {
-            let mut s = SearchQuery::default();
-            for c in clauses.0 {
-                match c {
-                    SearchClause::Limit(i) => s.limit = Some(i),
-                    SearchClause::From(f) => s.from = Some(f),
-                    SearchClause::Expression(u) => s.expression = u,
-                    SearchClause::OrderBy(order, k) => {
-                        s.order_by = OrderBy::new(order, k.unwrap_or(OrderKeyword::Asc));
-                    } //SearchClause::GroupByKey => s.group_by_key = true,
+        map(
+            many_till(
+                alt((
+                    parse_from_offset_clause,
+                    parse_limit,
+                    parse_expression,
+                    parse_order_by,
+                )),
+                wsi(eof),
+            ),
+            |clauses| {
+                let mut s = SearchQuery::default();
+                for c in clauses.0 {
+                    match c {
+                        SearchClause::Limit(i) => s.limit = Some(i),
+                        SearchClause::From(f) => s.from = Some(f),
+                        SearchClause::Expression(u) => s.expression = u,
+                        SearchClause::OrderBy(order, k) => {
+                            s.order_by = OrderBy::new(order, k.unwrap_or(OrderKeyword::Asc));
+                        } //SearchClause::GroupByKey => s.group_by_key = true,
+                    }
                 }
-            }
-            s
-        },
-    )
-    .parse(input)
-    .map_err(|e| {
-        let remaining = match e {
-            nom::Err::Incomplete(_) => input.to_string(),
-            nom::Err::Error(s) => s.input.to_string(),
-            nom::Err::Failure(s) => s.input.to_string(),
-        };
-        SearchError::Parse(remaining)
-    })
-}
-
+                s
+            },
+        )
+        .parse(input)
+        .map_err(|e| {
+            let remaining = match e {
+                nom::Err::Incomplete(_) => input.to_string(),
+                nom::Err::Error(s) => s.input.to_string(),
+                nom::Err::Failure(s) => s.input.to_string(),
+            };
+            SearchError::Parse(remaining)
+        })
+    }
 }
 
 impl std::fmt::Display for SearchQuery {
@@ -104,7 +103,6 @@ impl Default for SearchQuery {
         }
     }
 }
-
 
 #[test]
 fn test_parse_search_query() {

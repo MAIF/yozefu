@@ -3,7 +3,7 @@
 
 use std::time::Duration;
 
-use futures::StreamExt;
+use futures::{StreamExt, future};
 use futures_batch::TryChunksTimeoutStreamExt;
 use lib::{Error, SearchQuery, search::offset::FromOffset};
 use rdkafka::{
@@ -41,9 +41,11 @@ impl Consumer {
 
     pub async fn consume(
         &self,
-        mut process_records_closure: impl FnMut(Result<Vec<BorrowedMessage<'_>>, rdkafka::error::KafkaError>),
+        mut process_records_closure: impl FnMut(
+            Result<Vec<BorrowedMessage<'_>>, rdkafka::error::KafkaError>,
+        ),
     ) -> Result<(), Error> {
-        let _ = self
+        let future = self
             .consumer
             .stream()
             .try_chunks_timeout(
@@ -52,11 +54,10 @@ impl Consumer {
             )
             .for_each(|bulk_of_records| {
                 process_records_closure(bulk_of_records);
-                futures::future::ready(())
-            })
-            .await;
+                future::ready(())
+            });
 
-        Ok(())
+        Ok(future.await)
     }
 
     pub fn stream_consumer(self) -> StreamConsumer {

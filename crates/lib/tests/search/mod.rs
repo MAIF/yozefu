@@ -1,6 +1,6 @@
 use insta::{assert_debug_snapshot, glob};
-use yozefu_lib::SearchQuery;
 use std::fs;
+use yozefu_lib::SearchQuery;
 
 #[test]
 fn test_search_queries() {

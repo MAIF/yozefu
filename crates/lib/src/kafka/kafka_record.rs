@@ -71,25 +71,43 @@ impl KafkaRecord {
 
 #[cfg(feature = "native")]
 impl KafkaRecord {
-    pub async fn parse(
+    pub fn parse(owned_message: OwnedMessage) -> Self {
+        let headers = Self::extract_headers(&owned_message);
+        let size = owned_message.payload().map_or(0, <[u8]>::len)
+            + owned_message.key().map_or(0, <[u8]>::len);
+
+        let (key, key_schema, value, value_schema) = match owned_message.topic() {
+            "__consumer_offsets" => {
+                extract_key_and_value_from_consumer_offsets_topics(&owned_message)
+            }
+            _ => {
+                let key = Self::extract_data(owned_message.key());
+                let value = Self::extract_data(owned_message.payload());
+                (key, None, value, None)
+            }
+        };
+
+        Self {
+            value_as_string: value.to_string(),
+            value,
+            key_as_string: key.to_string(),
+            key,
+            topic: owned_message.topic().to_string(),
+            timestamp: owned_message.timestamp().to_millis(),
+            partition: owned_message.partition(),
+            offset: owned_message.offset(),
+            headers,
+            key_schema,
+            value_schema,
+            size,
+        }
+    }
+
+    pub async fn parse_with_schema_registry(
         owned_message: OwnedMessage,
         schema_registry: &mut Option<SchemaRegistryClient>,
     ) -> Self {
-        let mut headers: BTreeMap<String, String> = BTreeMap::new();
-        if let Some(old_headers) = owned_message.headers() {
-            for header in old_headers.iter() {
-                headers.insert(
-                    header.key.to_string(),
-                    header
-                        .value
-                        .map(|e| {
-                            String::from_utf8(e.to_vec()).unwrap_or("<unable to parse>".to_string())
-                        })
-                        .unwrap_or_default(),
-                );
-            }
-        }
-
+        let headers = Self::extract_headers(&owned_message);
         let size = owned_message.payload().map_or(0, <[u8]>::len)
             + owned_message.key().map_or(0, <[u8]>::len);
 
@@ -277,6 +295,33 @@ impl KafkaRecord {
                 }
             }
         }
+    }
+
+    fn extract_data(payload: Option<&[u8]>) -> DataType {
+        let schema_id = SchemaId::parse(payload);
+        if schema_id.is_none() {
+            return Self::payload_to_data_type(payload, None);
+        }
+        Self::payload_to_data_type(payload, None)
+    }
+
+    fn extract_headers(owned_message: &OwnedMessage) -> BTreeMap<String, String> {
+        let mut headers: BTreeMap<String, String> = BTreeMap::new();
+        if let Some(old_headers) = owned_message.headers() {
+            for header in old_headers.iter() {
+                headers.insert(
+                    header.key.to_string(),
+                    header
+                        .value
+                        .map(|e| {
+                            String::from_utf8(e.to_vec()).unwrap_or("<unable to parse>".to_string())
+                        })
+                        .unwrap_or_default(),
+                );
+            }
+        }
+
+        headers
     }
 }
 

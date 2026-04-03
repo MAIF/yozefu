@@ -5,9 +5,7 @@
 pub mod error;
 
 #[cfg(feature = "native")]
-pub use {
-    error::Error, kafka::ExportedKafkaRecord, kafka::topic::*, search::SearchQuery
-};
+pub use {error::Error, kafka::ExportedKafkaRecord, kafka::topic::*, search::SearchQuery};
 
 pub mod kafka;
 pub mod search;

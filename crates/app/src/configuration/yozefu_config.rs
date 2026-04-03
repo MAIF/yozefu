@@ -15,7 +15,7 @@ pub struct YozefuConfig {
 }
 
 impl YozefuConfig {
-    pub(super) fn new(cluster: &str, cluster_config: ClusterConfig) -> Self {
+    pub fn new(cluster: &str, cluster_config: ClusterConfig) -> Self {
         Self {
             cluster: cluster.to_string(),
             cluster_config,
