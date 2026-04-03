@@ -1,10 +1,10 @@
-use crate::search::{compare::parse_compare, parse_search_query};
+use crate::{SearchQuery, search::compare::parse_compare};
 
 #[test]
 fn test_parse_compare() {
     assert!(parse_compare(r#"timestamp between "2024-05-28T17:55:08.145+02:00" and now"#).is_ok());
     assert!(
-        parse_search_query(
+        SearchQuery::parse(
             r#"timestamp between "2024-05-28T17:55:08.145+02:00" and now from begin"#
         )
         .is_ok()
@@ -14,7 +14,7 @@ fn test_parse_compare() {
 #[test]
 fn test_parse_search_query() {
     assert!(
-        parse_search_query(
+        SearchQuery::parse(
             r#"timestamp between "2024-05-28T17:55:08.145+02:00" and now from begin"#
         )
         .is_ok()

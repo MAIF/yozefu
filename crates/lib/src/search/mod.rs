@@ -65,8 +65,6 @@ pub use order::Order;
 pub use order::OrderBy;
 #[cfg(feature = "native")]
 pub use search_query::SearchQuery;
-#[cfg(feature = "native")]
-pub use search_query::parse_search_query;
 use serde::Deserialize;
 use serde::Serialize;
 

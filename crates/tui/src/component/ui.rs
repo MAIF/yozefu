@@ -1,16 +1,14 @@
 //! Module gathering the code to run the terminal user interface.
 
-use app::App;
+use app::consumer::Consumer;
 use app::search::{Search, SearchContext};
+use app::{AdminClient, App};
 use chrono::DateTime;
 use crossterm::event::KeyEvent;
-use futures::{StreamExt, future};
-use futures_batch::TryChunksTimeoutStreamExt;
 use itertools::Itertools;
 use lib::KafkaRecord;
 use ratatui::prelude::Rect;
 use rdkafka::Message;
-use rdkafka::consumer::{Consumer, StreamConsumer};
 use rdkafka::message::OwnedMessage;
 use std::collections::HashSet;
 use std::time::Duration;
@@ -42,7 +40,6 @@ pub struct Ui {
 impl Ui {
     pub fn new(app: App, query: &str, selected_topics: Vec<String>, state: State) -> Self {
         let (records_sender, records_receiver) = tokio::sync::mpsc::unbounded_channel();
-        info!("hello from tui ui");
         Self {
             should_quit: false,
             worker: CancellationToken::new(),
@@ -58,8 +55,8 @@ impl Ui {
         app: &App,
         topics: Vec<String>,
         tx: UnboundedSender<Action>,
-    ) -> Result<StreamConsumer, TuiError> {
-        match app.create_consumer(&topics) {
+    ) -> Result<Consumer, TuiError> {
+        match app.create_consumer_2(&topics) {
             Ok(c) => Ok(c),
             Err(e) => {
                 tx.send(Action::Notification(Notification::new(
@@ -103,7 +100,6 @@ impl Ui {
         let token = self.worker.clone();
         let search_query = self.app.search_query.query().clone();
         let app = self.app.clone();
-        let txx = tx.clone();
         let topics = self.topics.clone();
 
         let (tx_dd, mut rx_dd) = mpsc::unbounded_channel::<OwnedMessage>();
@@ -122,7 +118,7 @@ impl Ui {
                         return;
                      },
                     Some(message) = rx_dd.recv() => {
-                        let record = KafkaRecord::parse(message, &mut schema_registry).await;
+                        let record = KafkaRecord::parse_with_schema_registry(message, &mut schema_registry).await;
                         let context = SearchContext::new(&record, &filters_directory);
                         let span = trace_span!("matching", offset = %record.offset, partition = %record.partition, topic = %record.topic);
                         let search_span = span.enter();
@@ -157,12 +153,11 @@ impl Ui {
             }
         }).unwrap();
 
-        let consumer_config = self.app.consumer_config();
         tokio::task::Builder::new()
             .name("kafka-consumer")
             .spawn(async move {
                 let _ = tx.send(Action::Consuming);
-                let consumer = match Self::create_consumer(&app, topics.clone(), txx.clone()) {
+                let consumer = match Self::create_consumer(&app, topics.clone(), tx.clone()) {
                     Ok(c) => c,
                     Err(e) => {
                         let _ = tx.send(Action::StopConsuming());
@@ -184,15 +179,8 @@ impl Ui {
                     .unwrap();
                 let mut current_time = Instant::now();
 
-                let _ = consumer
-                    .stream()
-                    .take_until(token.cancelled())
-                    .try_chunks_timeout(
-                        consumer_config.buffer_capacity,
-                        Duration::from_millis(consumer_config.timeout_in_ms),
-                    )
-                    .for_each(|bulk_of_records| {
-                        // For example, TopicAuthorizationFailed
+                consumer
+                    .consume(|bulk_of_records| {
                         if let Err(ref e) = bulk_of_records {
                             let _ = tx.send(Action::Notification(Notification::new(
                                 Level::Error,
@@ -225,10 +213,9 @@ impl Ui {
                             )))
                             .unwrap();
                         }
-                        future::ready(())
                     })
-                    .await;
-                consumer.unassign().unwrap();
+                    .await
+                    .unwrap();
                 info!("Consumer is terminated");
                 token.cancel();
                 let _ = tx.send(Action::StopConsuming());
@@ -279,12 +266,13 @@ impl Ui {
     }
 
     pub(crate) fn load_topics(&mut self, action_tx: UnboundedSender<Action>) {
-        let app = self.app.clone();
+        let admin_client = AdminClient::new(self.app.config.clone()).unwrap();
+        let cluster = self.app.config.cluster().to_string();
         tokio::task::Builder::new()
             .name("topics-loader")
             .spawn(async move {
-                info!("Listing topics from the cluster");
-                match app.list_topics() {
+                info!("Listing topics of the '{}' cluster", cluster);
+                match admin_client.list_topics() {
                     Ok(topics) => {
                         action_tx.send(Action::Topics(topics)).unwrap();
                     }
