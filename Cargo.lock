@@ -1857,9 +1857,9 @@ dependencies = [
 
 [[package]]
 name = "fuzzydate"
-version = "0.4.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "51ddfc7f800df80b58d70db49cd96a1567c372c65bc8e4fa1ba728a9741426a2"
+checksum = "657e4642509d94e6464630bea116b686dbdcccb4f5764bd0ec454e49d5fccb49"
 dependencies = [
  "chrono",
  "lazy_static",
