@@ -17,8 +17,8 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
       - name: actionlint
-        uses: raven-actions/actionlint@v2.1.0
+        uses: raven-actions/actionlint@963d4779ef039e217e5d0e6fd73ce9ab7764e493

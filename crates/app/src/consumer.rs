@@ -57,7 +57,8 @@ impl Consumer {
                 future::ready(())
             });
 
-        Ok(future.await)
+        let _: () = future.await;
+        Ok(())
     }
 
     pub fn stream_consumer(self) -> StreamConsumer {

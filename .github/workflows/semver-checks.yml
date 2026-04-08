@@ -48,7 +48,7 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
           fetch-depth: 0
@@ -59,10 +59,10 @@ jobs:
           xargs -I {} gh api -X DELETE "/repos/${{ github.repository }}/issues/comments/{}" < comments.txt
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: dtolnay/rust-toolchain@master
+      - uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9
         with:
           toolchain: stable
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
       - name: List the releases on GitHub
         id: current
         run: echo "version=$(git tag --sort=-creatordate | head -n 1)" >> "$GITHUB_OUTPUT"
@@ -90,14 +90,14 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ needs.setup.outputs.nextStep != 'compute' }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
           fetch-depth: 0
-      - uses: dtolnay/rust-toolchain@master
+      - uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9
         with:
           toolchain: stable
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
       - name: Install cargo-semver-checks
         run: cargo install --locked cargo-semver-checks
       - name: Show release type
@@ -145,14 +145,14 @@ jobs:
     if: ${{ needs.setup.outputs.nextStep == 'compute' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
           fetch-depth: 0
-      - uses: dtolnay/rust-toolchain@master
+      - uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9
         with:
           toolchain: stable
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
       - name: Install cargo-semver-checks
         run: cargo install --locked cargo-semver-checks
       - name: Determine the next version
@@ -186,4 +186,4 @@ jobs:
           gh pr comment ${{ github.event.number }} --body-file ./report.md
         env:
           GH_TOKEN: ${{ github.token }}
-          branch : '${{ toJSON(github.head_ref) }}'
+          branch: '${{ toJSON(github.head_ref) }}'

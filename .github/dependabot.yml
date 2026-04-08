@@ -5,51 +5,75 @@ updates:
     target-branch: "develop"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: "cargo"
     directory: "/crates/app/tests/http_search_filter"
     target-branch: "develop"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
+
 
   - package-ecosystem: "cargo"
     directory: "/crates/wasm-blueprints/rust/"
     target-branch: "develop"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
+
 
   - package-ecosystem: "github-actions"
     directory: "/"
     target-branch: "develop"
     schedule:
       interval: "monthly"
+    cooldown:
+      default-days: 7
+
 
   - package-ecosystem: "docker"
     directory: "/"
     target-branch: "develop"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: "gomod"
     directory: "/crates/wasm-blueprints/golang/"
     target-branch: "develop"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
+
 
   - package-ecosystem: "rust-toolchain"
     directory: "/"
     target-branch: "develop"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
+
 
   - package-ecosystem: "npm"
     directory: "/crates/wasm-blueprints/js/"
     target-branch: "develop"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
+
 
   - package-ecosystem: "npm"
     directory: "/docs"
     target-branch: "develop"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7

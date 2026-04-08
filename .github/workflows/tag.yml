@@ -26,16 +26,16 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
       - name: Get tags
         run: git fetch --tags origin
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8
         with:
           components: rustc, cargo
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
       - name: Configure git
         run: |
           git config --global user.name "${ACTOR}"
@@ -50,7 +50,7 @@ jobs:
         run: echo "version=$(cargo pkgid --manifest-path crates/bin/Cargo.toml | cut -d '@' -f2)" >> "$GITHUB_OUTPUT"
       - name: Create git tag
         id: tag
-        run:  |
+        run: |
           if git tag -a "v${VERSION}" -m "${VERSION}"; then
             echo "created=true" >> "$GITHUB_OUTPUT"
           else

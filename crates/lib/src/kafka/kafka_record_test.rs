@@ -8,8 +8,8 @@ use crate::{
     kafka::{SchemaId, schema::Schema},
 };
 
-#[tokio::test]
-async fn test_kafka_record_deserialization() {
+#[test]
+fn test_kafka_record_deserialization() {
     let payload = b"\x00\x00\x00\x00\x01{\"key\":\"value\"}";
     let message = OwnedMessage::new(
         Some(payload.to_vec()),
@@ -20,7 +20,7 @@ async fn test_kafka_record_deserialization() {
         313,
         None,
     );
-    let record = KafkaRecord::parse(message, &mut None).await;
+    let record = KafkaRecord::parse(message);
     assert_eq!(record.size, 20);
     assert_eq!(
         record.timestamp_as_local_date_time(),
