@@ -4,6 +4,7 @@ env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
   RUSTDOCFLAGS: '--deny warnings'
+  RUST_CHANNEL: stable
 
 on:
   workflow_dispatch:

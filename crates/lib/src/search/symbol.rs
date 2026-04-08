@@ -25,21 +25,6 @@ pub enum Symbol {
     Header(String),
 }
 
-pub(crate) fn parse_symbol(input: &str) -> IResult<&str, Symbol> {
-    alt((
-        parse_offset,
-        parse_timestamp_symbol,
-        parse_topic,
-        parse_partition,
-        parse_key,
-        parse_size,
-        parse_value,
-        map(parse_value_symbol, |e| e.0),
-        map(parse_header_symbol, |e| e.0),
-    ))
-    .parse(input)
-}
-
 pub(crate) fn parse_offset(input: &str) -> IResult<&str, Symbol> {
     value(Symbol::Offset, wsi(alt((tag("offset"), tag("o"))))).parse(input)
 }
