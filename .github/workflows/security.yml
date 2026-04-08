@@ -5,7 +5,7 @@ env:
   RUST_BACKTRACE: 1
   RUSTDOCFLAGS: '--deny warnings'
   MINIMUM_SUPPORTED_RUST_VERSION: 1.85.0
-
+  RUST_CHANNEL: stable
 on:
   schedule:
     - cron: "0 10 * * MON" # every monday, at 10AM

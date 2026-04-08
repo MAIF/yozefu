@@ -29,6 +29,7 @@ fn generate_mock_value() -> serde_json::Value {
     }))
 }
 
+#[allow(dead_code)]
 fn generate_mock_key() -> serde_json::Value {
     mock(&json!({
         "code":0,

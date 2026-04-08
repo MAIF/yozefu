@@ -76,6 +76,8 @@ pub mod filter_test;
 pub mod number_test;
 #[cfg(test)]
 pub mod offset_test;
+#[cfg(test)]
+pub mod symbol_test;
 
 /// Result of a search filter evaluation.
 #[derive(Debug, PartialEq, Clone, Default, Deserialize, Serialize)]

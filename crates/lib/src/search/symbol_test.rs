@@ -1,4 +1,4 @@
-use crate::search::symbol::{parse_symbol, Symbol};
+use crate::search::symbol::{Symbol, parse_symbol};
 
 #[test]
 fn test_parse_value() {

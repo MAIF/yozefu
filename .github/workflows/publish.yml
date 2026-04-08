@@ -6,6 +6,7 @@ env:
   RUSTDOCFLAGS: '--deny warnings'
   MINIMUM_SUPPORTED_RUST_VERSION: 1.85.0
   DOCKER_REGISTRY: ghcr.io
+  RUST_CHANNEL: stable
 
 permissions:
   id-token: write

@@ -7,6 +7,7 @@ env:
   MINIMUM_SUPPORTED_RUST_VERSION: 1.85.0
   GOLANG_VERSION: 1.23.3
   JS_VERSION: 22
+  RUST_CHANNEL: stable
 
 on:
   schedule:

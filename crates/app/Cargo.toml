@@ -28,7 +28,6 @@ directories = "6.0.0"
 chrono = "0.4.44"
 tracing = { workspace = true }
 futures-batch = "0.7.0"
-tokio = { workspace = true, features = ["full", "tracing"] }
 futures = { workspace = true }
 
 

@@ -5,6 +5,8 @@ use nom::{
     IResult, Parser, branch::alt, bytes::complete::tag, combinator::map, sequence::delimited,
 };
 
+use crate::search::symbol::parse_symbol;
+
 use super::{
     compare::{CompareExpression, parse_compare},
     expression::{Expression, parse_or_expression},
@@ -29,7 +31,7 @@ pub(crate) fn parse_atom(input: &str) -> IResult<&str, Atom> {
             delimited(wsi(tag("(")), parse_or_expression, wsi(tag(")"))),
             |expr: Expression| Atom::Parenthesis(Box::new(expr)),
         ),
-        //map(parse_symbol, Atom::Symbol),
+        map(parse_symbol, Atom::Symbol),
     ))
     .parse(input)
 }
