@@ -59,9 +59,10 @@ jobs:
           xargs -I {} gh api -X DELETE "/repos/${{ github.repository }}/issues/comments/{}" < comments.txt
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9
-        with:
-          toolchain: stable
+      - run: |
+          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
+          rustup component add --toolchain ${{ env.RUST_CHANNEL }} cargo
+          rustup default ${{ env.RUST_CHANNEL }}
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
       - name: List the releases on GitHub
         id: current
@@ -94,9 +95,10 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9
-        with:
-          toolchain: stable
+      - run: |
+          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
+          rustup component add --toolchain ${{ env.RUST_CHANNEL }} rust-src
+          rustup default ${{ env.RUST_CHANNEL }}
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
       - name: Install cargo-semver-checks
         run: cargo install --locked cargo-semver-checks
@@ -149,9 +151,10 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9
-        with:
-          toolchain: stable
+      - run: |
+          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
+          rustup component add --toolchain ${{ env.RUST_CHANNEL }} cargo
+          rustup default ${{ env.RUST_CHANNEL }}
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
       - name: Install cargo-semver-checks
         run: cargo install --locked cargo-semver-checks

@@ -30,9 +30,10 @@ jobs:
         with:
           persist-credentials: false
       - uses: Swatinem/rust-cache@v2
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
+      - run: |
+          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
+          rustup component add --toolchain ${{ env.RUST_CHANNEL }} cargo
+          rustup default ${{ env.RUST_CHANNEL }}
       - name: Install cargo-edit
         run: cargo install --locked cargo-edit
       - name: Check for outdated dependencies
@@ -47,9 +48,10 @@ jobs:
         with:
           persist-credentials: false
       - uses: Swatinem/rust-cache@v2
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
+      - run: |
+          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
+          rustup component add --toolchain ${{ env.RUST_CHANNEL }} rust-src
+          rustup default ${{ env.RUST_CHANNEL }}
       - name: Install cargo-outdated
         run: cargo install --locked cargo-audit
       - name: Cargo audit

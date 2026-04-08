@@ -35,8 +35,10 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8
+      - run: |
+          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
+          rustup component add --toolchain ${{ env.RUST_CHANNEL }} cargo
+          rustup default ${{ env.RUST_CHANNEL }}
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
       - id: release
         run: echo "version=$(cargo pkgid --manifest-path crates/bin/Cargo.toml | cut -d '@' -f2)" >> "$GITHUB_OUTPUT"
@@ -231,8 +233,8 @@ jobs:
           subject-name: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
+  
   publish-to-registry:
-
     runs-on: ubuntu-latest
     name: Publish to registry
     needs: [version, build-and-publish]
@@ -245,8 +247,10 @@ jobs:
         with:
           persist-credentials: false
       # https://crates.io/docs/trusted-publishing
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8
+      - run: |
+          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
+          rustup component add --toolchain ${{ env.RUST_CHANNEL }} cargo
+          rustup default ${{ env.RUST_CHANNEL }}
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
       - uses: rust-lang/crates-io-auth-action@b7e9a28eded4986ec6b1fa40eeee8f8f165559ec
         id: auth
