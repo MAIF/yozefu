@@ -74,6 +74,7 @@ jobs:
           context: .
           push: false
           tags: maif/yozefu:latest
+          load: true
       - name: Docker image
         uses: anchore/scan-action@522bcc5cc7e62e4ce7cbe30f22372b991b432751
         with:
