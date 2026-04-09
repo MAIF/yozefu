@@ -80,7 +80,6 @@ jobs:
           persist-credentials: false
       - run: |
           rustup update --no-self-update ${{ matrix.rust }}
-          rustup component add --toolchain ${{ matrix.rust }} cargo,rust-src
           rustup default ${{ matrix.rust }}
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
       - name: Run cargo build
