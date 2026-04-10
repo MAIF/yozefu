@@ -29,7 +29,6 @@ pub(crate) fn parse_atom(input: &str) -> IResult<&str, Atom> {
             delimited(wsi(tag("(")), parse_or_expression, wsi(tag(")"))),
             |expr: Expression| Atom::Parenthesis(Box::new(expr)),
         ),
-        //map(parse_symbol, Atom::Symbol),
     ))
     .parse(input)
 }

@@ -1,6 +1,6 @@
 use insta::{assert_debug_snapshot, glob};
 use std::fs;
-use yozefu_lib::parse_search_query;
+use yozefu_lib::SearchQuery;
 
 #[test]
 fn test_search_queries() {
@@ -13,7 +13,7 @@ fn test_search_queries() {
             filters => vec![
             ("[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{6,}\\+[0-9]{2}:[0-9]{2}", "[datetime]"),
         ]}, {
-            assert_debug_snapshot!(parse_search_query(input));
+            assert_debug_snapshot!(SearchQuery::parse(input));
         });
     });
 }

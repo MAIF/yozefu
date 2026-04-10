@@ -70,15 +70,22 @@ feature-depth = 1
 # output a note when they are encountered.
 ignore = [
     "RUSTSEC-2026-0009", # time Denial of Service via Stack Exhaustion
-    "RUSTSEC-2025-0057", # fxhash - no longer maintained
     "RUSTSEC-2024-0320", # yaml-rust is unmaintained.
     "RUSTSEC-2025-0111", # tokio-tar parses PAX extended headers incorrectly, allows file smuggling
-    "RUSTSEC-2026-0006", # Wasmtime segfault or unused out-of-sandbox load with `f64.copysign` operator on x86-64
-    "RUSTSEC-2026-0007", # Integer overflow in `BytesMut::reserve`
-    "RUSTSEC-2026-0020", # Guest-controlled resource exhaustion in WASI implementations
-    "RUSTSEC-2026-0021", # Panic adding excessive fields to a `wasi:http/types.fields` instance
     "RUSTSEC-2025-0141", # Bincode is unmaintained
-    "RUSTSEC-2025-0134"  # rustls-pemfile is unmaintained
+    "RUSTSEC-2025-0134", # rustls-pemfile is unmaintained
+    "RUSTSEC-2026-0096", # Miscompiled guest heap access enables sandbox escape on aarch64 Cranelift
+    "RUSTSEC-2026-0095", # Wasmtime with Winch compiler backend may allow a sandbox-escaping memory access
+    "RUSTSEC-2026-0094", # Improperly masked return value from `table.grow` with Winch compiler backend
+    "RUSTSEC-2026-0085", # Panic when lifting `flags` component value
+    "RUSTSEC-2026-0086", # Host data leakage with 64-bit tables and Winch
+    "RUSTSEC-2026-0087", # Wasmtime segfault or unused out-of-sandbox load with `f64x2.splat` operator on Cranelift x86-64
+    "RUSTSEC-2026-0088", # Data leakage between pooling allocator instances
+    "RUSTSEC-2026-0089", # Host panic when Winch compiler executes `table.fill`
+    "RUSTSEC-2026-0091", # Out-of-bounds write or crash when transcoding component model strings
+    "RUSTSEC-2026-0092", # Panic when transcoding misaligned component model UTF-16 strings
+    "RUSTSEC-2026-0093", # Heap OOB read in component model UTF-16 to latin1+utf16 string transcoding
+
     
     #"RUSTSEC-0000-0000",
     #{ id = "RUSTSEC-0000-0000", reason = "you can specify a reason the advisory is ignored" },

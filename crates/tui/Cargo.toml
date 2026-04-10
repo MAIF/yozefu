@@ -14,10 +14,12 @@ repository.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-tokio = { version = "1", features = ["full", "tracing"] }
+tokio = { workspace = true, features = ["full", "tracing"] }
 serde = { workspace = true }
 serde_json = { workspace = true }
-tui-input = { version = "0.15.0", features = ["crossterm"], default-features = false }
+tui-input = { version = "0.15.1", features = [
+    "crossterm",
+], default-features = false }
 chrono = "0.4.44"
 strum = { workspace = true, features = ["derive", "strum_macros"] }
 ratatui = { version = "0.30.0", features = [
@@ -29,7 +31,7 @@ itertools = "0.14.0"
 bytesize = { version = "2.3.1" }
 nom = "8.0.0"
 throbber-widgets-tui = "0.11.0"
-futures = "0.3.32"
+futures = { workspace = true }
 open = "5.3.3"
 tokio-util = "0.7.18"
 thousands = "0.2.0"
@@ -41,9 +43,9 @@ app = { workspace = true }
 tracing = { workspace = true }
 rdkafka = { version = "0.39.0", features = ["cmake-build"] }
 timeago = "0.6.0"
-futures-batch = "0.7.0"
 syntect = "5.3.0"
 resolve-path = "0.1.0"
+futures-batch = "0.7.0"
 
 
 [features]
@@ -52,6 +54,6 @@ gssapi-vendored = ["rdkafka/gssapi-vendored"]
 
 
 [dev-dependencies]
-indexmap = "2.13.0"
+indexmap = "2.14.0"
 insta = { version = "1.47.2", features = ["filters"] }
 tempfile = "3.27.0"

@@ -80,7 +80,7 @@ impl Headless {
                             return;
                          },
                         Some(message) = rx_dd.recv() => {
-                            let record = KafkaRecord::parse(message, &mut schema_registry).await;
+                            let record = KafkaRecord::parse_with_schema_registry(message, &mut schema_registry).await;
                             let context = SearchContext::new(&record, &filters_directory);
                             if search_query.matches(&context) {
                                 records_channel.0.send(record).unwrap();
