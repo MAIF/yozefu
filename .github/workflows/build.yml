@@ -15,6 +15,7 @@ env:
   RUST_BACKTRACE: 1
   RUSTDOCFLAGS: "--deny warnings"
   MINIMUM_SUPPORTED_RUST_VERSION: 1.85.0
+  RUST_CHANNEL: stable
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -27,13 +28,17 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
-      - uses: Swatinem/rust-cache@v2
+      - name: Install Rust
+        run: |
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
+        env:
+          RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
         with:
           cache-all-crates: true
       - name: Run cargo check
@@ -46,14 +51,20 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-      - uses: dtolnay/rust-toolchain@stable
+      - name: Install Rust
+        run: |
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} rustfmt rust-src
+          rustup default ${RUST_CHANNEL}
+        env:
+          RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
+      - uses: taiki-e/install-action@9c2513f9f4b233b22bd50555b872dc29d48bf3a8
         with:
-          toolchain: stable
-      - uses: Swatinem/rust-cache@v2  
-      - uses: taiki-e/install-action@cargo-hack
+          tool: cargo-hack
       - run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
       - run: cargo hack check --feature-powerset --no-dev-deps
 
@@ -70,13 +81,13 @@ jobs:
           - beta
           - nightly
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: ${{ matrix.rust }}
-      - uses: Swatinem/rust-cache@v2
+      - run: |
+          rustup update --no-self-update ${{ matrix.rust }}
+          rustup default ${{ matrix.rust }}
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
       - name: Run cargo build
         run: cargo build
 
@@ -109,10 +120,10 @@ jobs:
             target: x86_64-pc-windows-msvc
             features: "--no-default-features --features ssl-vendored,libz-static"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-      - uses: houseabsolute/actions-rust-cross@v1
+      - uses: houseabsolute/actions-rust-cross@576730dbfbb705690d43bd285987a3094fd84874
         with:
           target: ${{ matrix.platforms.target }}
           args: "--locked ${{ matrix.platforms.features }}"
@@ -126,13 +137,17 @@ jobs:
       contents: read
     if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
-      - uses: Swatinem/rust-cache@v2
+      - name: Install Rust
+        run: |
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
+        env:
+          RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
       - name: Check lockfile is updated
         run: cargo update --locked
 
@@ -143,14 +158,17 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
-          components: clippy
-      - uses: Swatinem/rust-cache@v2
+      - name: Install Rust
+        run: |
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
+        env:
+          RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
       - name: Run cargo clippy
         run: cargo clippy --all-targets --all-features -- --deny warnings
 
@@ -161,13 +179,17 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
-      - uses: Swatinem/rust-cache@v2
+      - name: Install Rust
+        run: |
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
+        env:
+          RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
       - name: Install git-cliff
         run: cargo install --locked cargo-deny
       - name: Run cargo deny
@@ -180,14 +202,17 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
-          components: rustfmt
-      - uses: Swatinem/rust-cache@v2
+      - name: Install Rust
+        run: |
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
+        env:
+          RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
       - name: Run cargo fmt
         run: cargo fmt --all -- --check
 
@@ -198,11 +223,10 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-      - uses: Swatinem/rust-cache@v2
-      - uses: bnjbvr/cargo-machete@main
+      - uses: bnjbvr/cargo-machete@b81ce1560c5fbd0210cb66d88bf210329ff04266
 
   tests:
     needs: check
@@ -211,13 +235,16 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
-      - uses: Swatinem/rust-cache@v2
+      - name: Install Rust
+        run: |
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
+        env:
+          RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       - run: cargo install cargo-nextest --locked
       - run: cargo nextest run --locked
         env:
@@ -231,17 +258,21 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
-      - uses: Swatinem/rust-cache@v2
+      - name: Install Rust
+        run: |
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
+        env:
+          RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
       - name: Build documentation
         run: cargo doc --no-deps --document-private-items --verbose
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version: 24
           cache-dependency-path: docs/package-lock.json
@@ -258,7 +289,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
       - run: cargo install --locked cargo-shear
@@ -272,10 +303,10 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-      - uses: lycheeverse/lychee-action@v2
+      - uses: lycheeverse/lychee-action@8646ba30535128ac92d33dfc9133794bfdd9b411
         name: Link Checker
         # https://github.com/lycheeverse/lychee/issues/1405
         with:
@@ -293,13 +324,13 @@ jobs:
       id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
       - name: Build
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
         with:
           context: .
           push: false
@@ -314,11 +345,11 @@ jobs:
       contents: read
     steps:
       - name: Checkout Actions Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
       - name: Check spelling of the project
-        uses: crate-ci/typos@master
+        uses: crate-ci/typos@02ea592e44b3a53c302f697cddca7641cd051c3d
 
   cargo-deny:
     name: Cargo deny
@@ -327,10 +358,10 @@ jobs:
       contents: read
     needs: [check]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-      - uses: EmbarkStudios/cargo-deny-action@v2
+      - uses: EmbarkStudios/cargo-deny-action@3fd3802e88374d3fe9159b834c7714ec57d6c979
 
   # https://github.com/orhun/PKGBUILDs/tree/master/yozefu
   archlinux:
@@ -339,13 +370,15 @@ jobs:
     permissions:
       contents: read
     container:
-      image: archlinux:base-20250928.0.426921
+      image: index.docker.io/library/archlinux@sha256:9a72b5e3c1675683016cb065f513deea7c65836cb5bd22b88c89353098faa40f
       volumes:
         - /tmp/yozefu-read-only:/tmp/yozefu-readonly:ro
     needs: [check]
     steps:
       - name: Checkout Actions Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - name: Install dependencies
         run: pacman -Sy --noconfirm --needed cargo devtools gcc-libs openssl cmake gcc clang base-devel
       # - name: Use GCC 14 
@@ -378,8 +411,10 @@ jobs:
           - os: ubuntu-24.04-arm
             target: aarch64-unknown-linux-gnu
     steps:
-      - uses: actions/checkout@v6
-      - uses: cachix/install-nix-action@v31
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - uses: cachix/install-nix-action@616559265b40713947b9c190a8ff4b507b5df49b
         with:
           nix_path: nixpkgs=channel:nixos-unstable
       - run: nix build
