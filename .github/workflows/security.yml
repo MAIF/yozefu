@@ -84,8 +84,8 @@ jobs:
         uses: anchore/scan-action@522bcc5cc7e62e4ce7cbe30f22372b991b432751
         with:
           image: "maif/yozefu:latest"
+          fail-build: false
       - name: upload Anchore scan SARIF report
         uses: github/codeql-action/upload-sarif@f94817b9f0deeb3871261446912ae8f854d1b675
         with:
-          fail-build: false
           sarif_file: ${{ steps.scan.outputs.sarif }}
