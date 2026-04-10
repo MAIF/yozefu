@@ -5,6 +5,7 @@ env:
   RUST_BACKTRACE: 1
   RUSTDOCFLAGS: '--deny warnings'
   MINIMUM_SUPPORTED_RUST_VERSION: 1.85.0
+  RUST_CHANNEL: stable
 
 permissions:
   contents: write
@@ -26,16 +27,19 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
       - name: Get tags
         run: git fetch --tags origin
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustc, cargo
-      - uses: Swatinem/rust-cache@v2
+        run: |
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
+        env:
+          RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
       - name: Configure git
         run: |
           git config --global user.name "${ACTOR}"
@@ -50,7 +54,7 @@ jobs:
         run: echo "version=$(cargo pkgid --manifest-path crates/bin/Cargo.toml | cut -d '@' -f2)" >> "$GITHUB_OUTPUT"
       - name: Create git tag
         id: tag
-        run:  |
+        run: |
           if git tag -a "v${VERSION}" -m "${VERSION}"; then
             echo "created=true" >> "$GITHUB_OUTPUT"
           else
@@ -71,4 +75,5 @@ jobs:
       attestations: write
       id-token: write
       pull-requests: write
-    secrets: inherit
+    secrets: 
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -5,6 +5,7 @@ env:
   RUST_BACKTRACE: 1
   RUSTDOCFLAGS: '--deny warnings'
   MINIMUM_SUPPORTED_RUST_VERSION: 1.85.0
+  RUST_CHANNEL: stable
 
 on:
   pull_request:
@@ -14,11 +15,6 @@ on:
     paths-ignore:
       - CHANGELOG.md
   workflow_dispatch:
-  workflow_run:
-    workflows: ['Prepare a release']
-    types:
-      - completed
-
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -48,7 +44,7 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
           fetch-depth: 0
@@ -59,10 +55,14 @@ jobs:
           xargs -I {} gh api -X DELETE "/repos/${{ github.repository }}/issues/comments/{}" < comments.txt
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: stable
-      - uses: Swatinem/rust-cache@v2
+      - name: Install Rust
+        run: |
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
+        env:
+          RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
       - name: List the releases on GitHub
         id: current
         run: echo "version=$(git tag --sort=-creatordate | head -n 1)" >> "$GITHUB_OUTPUT"
@@ -90,20 +90,27 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ needs.setup.outputs.nextStep != 'compute' }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
           fetch-depth: 0
-      - uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: stable
-      - uses: Swatinem/rust-cache@v2
+      - name: Install Rust
+        run: |
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
+        env:
+          RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
       - name: Install cargo-semver-checks
         run: cargo install --locked cargo-semver-checks
       - name: Show release type
         id: semver
         run: |
-          echo "release=$(bash ./.github/workflows/semver.sh diff ${{ needs.setup.outputs.currentVersion }} ${{ needs.setup.outputs.nextVersion }})" >> "$GITHUB_OUTPUT"
+          echo "release=$(bash ./.github/workflows/semver.sh diff ${CURRENT_VERSION} ${NEXT_VERSION})" >> "$GITHUB_OUTPUT"
+        env: 
+          CURRENT_VERSION: ${{ needs.setup.outputs.currentVersion }}
+          NEXT_VERSION: ${{ needs.setup.outputs.nextVersion }}
       - name: Prepare report.md
         run: |
           {
@@ -117,11 +124,15 @@ jobs:
         run: |
           printf "\`cargo-semver-checks\` has detected some issues: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\n" > report.md
           printf '```bash' >> report.md
-          RUSTFLAGS="--cfg tokio_unstable" cargo semver-checks --color never --package yozefu-lib --package yozefu-app --package yozefu-wasm-types --package yozefu-command --baseline-rev "${{ needs.setup.outputs.currentVersion }}" --release-type "${{ steps.semver.outputs.release }}" 2>&1 | tee -a report.md
+          RUSTFLAGS="--cfg tokio_unstable" cargo semver-checks --color never --package yozefu-lib --package yozefu-app --package yozefu-wasm-types --package yozefu-command --baseline-rev "${CURRENT_VERSION}" --release-type "${RELEASE_TYPE}" 2>&1 | tee -a report.md
           if [[ "${PIPESTATUS[0]}" != "0" ]]; then
             printf '```' >> report.md
             exit 1
           fi
+        env:
+          CURRENT_VERSION: ${{ needs.setup.outputs.currentVersion }}
+          RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
+          RELEASE_TYPE: ${{ steps.semver.outputs.release }}
         continue-on-error: true
       - name: Publish semver-checks report
         if: ${{ steps.check.outcome != 'success' }}
@@ -145,14 +156,17 @@ jobs:
     if: ${{ needs.setup.outputs.nextStep == 'compute' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
           fetch-depth: 0
-      - uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: stable
-      - uses: Swatinem/rust-cache@v2
+      - run: |
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
+        env:
+          RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
       - name: Install cargo-semver-checks
         run: cargo install --locked cargo-semver-checks
       - name: Determine the next version
@@ -162,23 +176,25 @@ jobs:
           b="major"
           for t in patch minor; do
             echo "Checking whether the next version is $t"
-            if RUSTFLAGS="--cfg tokio_unstable" cargo semver-checks --color never --package yozefu-lib --package yozefu-app --package yozefu-wasm-types --package yozefu-command --baseline-rev "${{ needs.setup.outputs.currentVersion }}" --release-type "$t"; then
+            if RUSTFLAGS="--cfg tokio_unstable" cargo semver-checks --color never --package yozefu-lib --package yozefu-app --package yozefu-wasm-types --package yozefu-command --baseline-rev "${CURRENT_VERSION}" --release-type "$t"; then
               b="$t"
               break
             fi
           done
           echo $b
           echo "bump=$b" >> "$GITHUB_OUTPUT"
+        env:
+          CURRENT_VERSION: ${{ needs.setup.outputs.currentVersion }}
       - name: Comment the pull request
         run: |
-          echo "::info title=Next version:: Last public version is '${{ needs.setup.outputs.currentVersion }}' but version of this branch is '${{ needs.setup.outputs.nextVersion }}'."
+          echo "::info title=Next version:: Last public version is '${CURRENT_VERSION}' but version of this branch is '${NEXT_VERSION}'."
           {
-            printf "This pull request is not ready because version \`%s\` is already published." "${{ needs.setup.outputs.currentVersion }}"
-            printf "\nAccording to \`cargo-semver-checks\`, the next version should be \`v%s\`:" "$(bash .github/workflows/semver.sh bump ${{ steps.bump.outputs.bump }} ${{ needs.setup.outputs.currentVersion }} | tr -d "\n")"
+            printf "This pull request is not ready because version \`%s\` is already published." "${CURRENT_VERSION}"
+            printf "\nAccording to \`cargo-semver-checks\`, the next version should be \`v%s\`:" "$(bash .github/workflows/semver.sh bump ${BUMP} ${CURRENT_VERSION} | tr -d "\n")"
             printf "\n"
             echo '```shell'
             printf "git checkout %s\n" "$branch"
-            echo "cargo release ${{ steps.bump.outputs.bump }} --no-push --no-tag --no-publish --no-confirm --execute"
+            echo "cargo release ${BUMP} --no-push --no-tag --no-publish --no-confirm --execute"
             echo "git push"
             echo '```'
             echo "More details at https://github.com/MAIF/yozefu/blob/main/docs/release/README.md"
@@ -186,4 +202,7 @@ jobs:
           gh pr comment ${{ github.event.number }} --body-file ./report.md
         env:
           GH_TOKEN: ${{ github.token }}
-          branch : '${{ toJSON(github.head_ref) }}'
+          branch: '${{ toJSON(github.head_ref) }}'
+          CURRENT_VERSION: ${{ needs.setup.outputs.currentVersion }}
+          NEXT_VERSION: ${{ needs.setup.outputs.nextVersion }}
+          BUMP: ${{ steps.bump.outputs.bump }}

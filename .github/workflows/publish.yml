@@ -6,13 +6,8 @@ env:
   RUSTDOCFLAGS: '--deny warnings'
   MINIMUM_SUPPORTED_RUST_VERSION: 1.85.0
   DOCKER_REGISTRY: ghcr.io
+  RUST_CHANNEL: stable
 
-permissions:
-  id-token: write
-  packages: write
-  contents: write
-  attestations: write
-  pull-requests: write
 
 on:
   workflow_dispatch:
@@ -31,13 +26,19 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.release.outputs.version }}
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+        run: |
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
+        env:
+          RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       - id: release
         run: echo "version=$(cargo pkgid --manifest-path crates/bin/Cargo.toml | cut -d '@' -f2)" >> "$GITHUB_OUTPUT"
 
@@ -45,8 +46,10 @@ jobs:
     runs-on: ubuntu-latest
     name: Create release
     needs: version
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
       - name: Create github release
@@ -59,12 +62,21 @@ jobs:
     needs: [version, create-release]
     uses: ./.github/workflows/changelog.yml
     name: Create changelog
-    secrets: inherit
+    secrets: 
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
 
   build-and-publish:
     needs: [version, create-release]
     name: Build and publish
     runs-on: ${{ matrix.platforms.os }}
+    permissions:
+      contents: write
+      attestations: write
+      id-token: write
     strategy:
       matrix:
         platforms:
@@ -87,17 +99,17 @@ jobs:
             target: x86_64-pc-windows-msvc
             features: "--no-default-features --features ssl-vendored"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
       - run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
         if: matrix.platforms.os == 'ubuntu-latest' || matrix.platforms.os == 'ubuntu-24.04-arm'
-      - uses: houseabsolute/actions-rust-cross@v1
+      - uses: houseabsolute/actions-rust-cross@576730dbfbb705690d43bd285987a3094fd84874
         with:
           target: ${{ matrix.platforms.target }}
           args: "--verbose --locked --release ${{ matrix.platforms.features }}"
           strip: true
-      
+
       - name: Setup variables
         id: variables
         shell: bash
@@ -125,10 +137,14 @@ jobs:
           VERSION: ${{ needs.version.outputs.version }}
 
       - name: Attest
-        uses: actions/attest-build-provenance@v3
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a
         with:
-          subject-path: "${{ steps.variables.outputs.source }}"
-          subject-name: "${{ steps.variables.outputs.archive }}-${{ needs.version.outputs.version }}"
+          subject-path: "${SOURCE}}"
+          subject-name: "${ARCHIVE}-${VERSION}"
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+          SOURCE: ${{ steps.variables.outputs.source }}
+          ARCHIVE: ${{ steps.variables.outputs.archive }}
 
       - name: Create temp dir
         run: mkdir -p dist
@@ -153,86 +169,95 @@ jobs:
         if: matrix.platforms.os != 'windows-latest'
         shell: bash
         working-directory: ./dist
-        run: |
-          tar cvzf "${{ steps.variables.outputs.archive }}.tar.gz" "${{ steps.variables.outputs.binaryName }}" 
+        run: "tar cvzf \"${ARCHIVE}.tar.gz\" \"${BINARY}\" \n"
+        env:
+          ARCHIVE: ${{ steps.variables.outputs.archive }}
+          BINARY: ${{ steps.variables.outputs.binaryName }}
       - name: Clean release directory
         shell: bash
-        run: rm -f "dist/${{ steps.variables.outputs.binaryName }}"
-
+        run: rm -f "dist/${BINARY}"
+        env:
+          BINARY: ${{ steps.variables.outputs.binaryName }}
       - name: cargo install cargo-cyclonedx
+
         run: cargo install --locked cargo-cyclonedx
-
       - name: Generate SBOM
+
         run: cargo cyclonedx --describe binaries --format json ${{ matrix.platforms.features }} --target ${{ matrix.platforms.target }}
-
       - name: Rename SBOM
-        shell: bash
-        run: mv crates/bin/${{ steps.variables.outputs.name }}_bin.cdx.json "dist/${{ steps.variables.outputs.archive }}.cdx.json"
 
-      - name: Upload binary
         shell: bash
-        run: gh release upload "v${{ needs.version.outputs.version }}" dist/* --clobber
+        run: mv crates/bin/${NAME}_bin.cdx.json "dist/${ARCHIVE}.cdx.json"
+        env:
+          ARCHIVE: ${{ steps.variables.outputs.archive }}
+          NAME: ${{ steps.variables.outputs.name }}
+      - name: Upload binary
+
+        shell: bash
+        run: gh release upload "v${VERSION}" dist/* --clobber
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.version.outputs.version }}
+          # https://docs.github.com/en/actions/use-cases-and-examples/publishing-packages/publishing-docker-images
 
 
-# https://docs.github.com/en/actions/use-cases-and-examples/publishing-packages/publishing-docker-images
   publish-docker-image:
     name: Docker image
     runs-on: ubuntu-latest
     needs: [version, create-release]
     permissions:
-        contents: read
-        packages: write
-        attestations: write
-        id-token: write
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
     steps:
-    - name: Checkout
-      uses: actions/checkout@v6
-      with:
-        persist-credentials: false
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v4
-    - name: Extract metadata
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        tags: |
-          type=raw,value=latest,enable={{is_default_branch}}
-          type=raw,value=${{ needs.version.outputs.version }}
-        images: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}
-        labels: |
-          org.opencontainers.image.description=Yozefu is a CLI tool for Apache kafka. It allows you to navigate topics and search Kafka records.
-          org.opencontainers.image.vendor=Yann Prono
-          org.opencontainers.image.licenses=Apache-2.0
-      env:
-        DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
-    - name: Login to GitHub Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-    - name: Build and push
-      uses: docker/build-push-action@v7
-      id: push
-      with:
-        context: .
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        labels: ${{ steps.meta.outputs.labels }}
-        sbom: true
-        annotations: ${{ steps.meta.outputs.annotations }}
-    # https://github.com/actions/attest-build-provenance
-    - name: Generate artifact attestation
-      uses: actions/attest-build-provenance@v3
-      with:
-        subject-name: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}
-        subject-digest: ${{ steps.push.outputs.digest }}
-        push-to-registry: true
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051
+        with:
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=${{ needs.version.outputs.version }}
+          images: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}
+          labels: |
+            org.opencontainers.image.description=Yozefu is a CLI tool for Apache kafka. It allows you to navigate topics and search Kafka records.
+            org.opencontainers.image.vendor=Yann Prono
+            org.opencontainers.image.licenses=Apache-2.0
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
+        id: push
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          labels: ${{ steps.meta.outputs.labels }}
+          sbom: true
+          annotations: ${{ steps.meta.outputs.annotations }}
+      # https://github.com/actions/attest-build-provenance
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a
+        with:
+          subject-name: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
 
+  
   publish-to-registry:
     runs-on: ubuntu-latest
     name: Publish to registry
@@ -242,14 +267,18 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
       # https://crates.io/docs/trusted-publishing
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-      - uses: rust-lang/crates-io-auth-action@v1
+        run: |
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
+        env:
+          RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
+      - uses: rust-lang/crates-io-auth-action@b7e9a28eded4986ec6b1fa40eeee8f8f165559ec
         id: auth
       - run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
       - run: cargo publish --workspace
