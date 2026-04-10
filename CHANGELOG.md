@@ -1,3 +1,18 @@
+## What's Changed in 0.0.29
+* ci: fix permissions issues by @Mcdostone
+* Develop by @Mcdostone in [#284](https://github.com/MAIF/yozefu/pull/284)
+* build: update cargo dependencies by @Mcdostone
+* ci: trying to improve security of the CI by @Mcdostone
+* refactor: refactoring on the lib crate, new method to parse a kafka record with or without a schema registry client by @Mcdostone
+* build(deps): bump codecov/codecov-action from 5 to 6 by @dependabot[bot]
+* build(deps): bump raven-actions/actionlint from 2.1.0 to 2.1.2 by @dependabot[bot]
+* build(deps): bump docker/build-push-action from 6 to 7 by @dependabot[bot]
+* build(deps): bump docker/setup-buildx-action from 3 to 4 by @dependabot[bot]
+* build(deps): bump actions/configure-pages from 5 to 6 by @dependabot[bot]
+* Changelog for v0.0.28 by @github-actions[bot] in [#269](https://github.com/MAIF/yozefu/pull/269)
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.28...v0.0.29
+
 ## What's Changed in 0.0.28
 * build: update dependencies by @Mcdostone
 * feat: stop the consumer if you are not allowed to read a topic by @Mcdostone
