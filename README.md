@@ -53,6 +53,8 @@ By default, [the kafka consumer is configured](https://github.com/MAIF/yozefu/bl
 > -->
 
 ```bash
+# packages such as `libclang-dev` are required to build Yōzefu
+# for more details https://maif.github.io/yozefu/getting-started/#prerequisites
 RUSTFLAGS="--cfg tokio_unstable" cargo install --locked yozefu
 
 # By default, it starts the TUI. 
