@@ -122,7 +122,7 @@ impl Ui {
                         return;
                      },
                     Some(message) = rx_dd.recv() => {
-                        let record = KafkaRecord::parse(message, &mut schema_registry).await;
+                        let record = KafkaRecord::parse_with_schema_registry(message, &mut schema_registry).await;
                         let context = SearchContext::new(&record, &filters_directory);
                         let span = trace_span!("matching", offset = %record.offset, partition = %record.partition, topic = %record.topic);
                         let search_span = span.enter();

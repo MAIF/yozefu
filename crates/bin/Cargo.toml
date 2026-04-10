@@ -22,7 +22,7 @@ name = "yozf"
 path = "src/main.rs"
 
 [dependencies]
-tokio = { version = "1", features = ["full", "tracing"] }
+tokio = { workspace = true, features = ["full", "tracing"] }
 command = { workspace = true }
 
 [features]

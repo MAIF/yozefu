@@ -1,0 +1,39 @@
+---
+source: crates/lib/tests/deserializers/text/mod.rs
+expression: "KafkaRecord::parse_with_schema_registry(owned_message, &mut None).await"
+input_file: crates/lib/tests/deserializers/text/inputs/record-3.json
+---
+KafkaRecord {
+    topic: "my-topic",
+    timestamp: Some(
+        0,
+    ),
+    partition: 0,
+    offset: 0,
+    headers: {},
+    key_schema: Some(
+        Schema {
+            id: SchemaId(
+                1,
+            ),
+            schema_type: None,
+        },
+    ),
+    value_schema: Some(
+        Schema {
+            id: SchemaId(
+                2,
+            ),
+            schema_type: None,
+        },
+    ),
+    size: 14,
+    key: Json(
+        Object {},
+    ),
+    key_as_string: "{}",
+    value: Json(
+        Object {},
+    ),
+    value_as_string: "{}",
+}
