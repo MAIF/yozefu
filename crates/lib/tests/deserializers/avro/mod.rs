@@ -47,7 +47,8 @@ async fn test_avro_record() {
         "/schemas/ids/2" => "./inputs/schemas/value.json"
     }};
 
-    let record = KafkaRecord::parse(owned_message, &mut Some(schema_client)).await;
+    let record =
+        KafkaRecord::parse_with_schema_registry(owned_message, &mut Some(schema_client)).await;
     insta::with_settings!({sort_maps => true}, {
         assert_json_snapshot!(record);
     });
@@ -67,7 +68,8 @@ async fn test_avro_record_unknown_primitive_type() {
         "/schemas/ids/1" => "./inputs/schemas/key.json",
         "/schemas/ids/3" => "./inputs/schemas/value-with-reference.json"
     }};
-    let record = KafkaRecord::parse(owned_message, &mut Some(schema_client)).await;
+    let record =
+        KafkaRecord::parse_with_schema_registry(owned_message, &mut Some(schema_client)).await;
     insta::with_settings!({sort_maps => true}, {
         assert_json_snapshot!(record);
     });
@@ -89,7 +91,8 @@ async fn test_avro_record_with_schema_reference() {
         "/schemas/ids/3" => "./inputs/schemas/value-with-reference.json"
     }};
 
-    let record = KafkaRecord::parse(owned_message, &mut Some(schema_client)).await;
+    let record =
+        KafkaRecord::parse_with_schema_registry(owned_message, &mut Some(schema_client)).await;
     insta::with_settings!({sort_maps => true}, {
         assert_json_snapshot!(record);
     });
@@ -114,7 +117,8 @@ async fn test_avro_record_with_multiple_schema_references() {
         "/schemas/ids/4" => "./inputs/schemas/value-with-multiple-references.json"
     }};
 
-    let record = KafkaRecord::parse(owned_message, &mut Some(schema_client)).await;
+    let record =
+        KafkaRecord::parse_with_schema_registry(owned_message, &mut Some(schema_client)).await;
     insta::with_settings!({sort_maps => true}, {
         assert_json_snapshot!(record);
     });

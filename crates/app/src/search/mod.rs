@@ -4,7 +4,7 @@ use extism::{Manifest, Plugin, Wasm};
 use filter::{CACHED_FILTERS, PARSE_PARAMETERS_FUNCTION_NAME};
 use itertools::Itertools;
 use lib::{
-    KafkaRecord, SearchQuery, parse_search_query,
+    KafkaRecord, SearchQuery,
     search::{
         filter::{Filter, Parameter},
         offset::FromOffset,
@@ -76,7 +76,7 @@ impl ValidSearchQuery {
 
 impl ValidSearchQuery {
     pub fn from(input: &str, filters_directory: &Path) -> Result<Self, lib::Error> {
-        let query = parse_search_query(input).map_err(lib::Error::Search)?.1;
+        let query = SearchQuery::parse(input).map_err(lib::Error::Search)?.1;
         let filters = query.filters();
         for filter in filters {
             let name = filter.name;

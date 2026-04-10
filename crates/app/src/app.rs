@@ -1,14 +1,13 @@
 //! This app is both a kafka consumer and a kafka admin client.
 use lib::{
-    ConsumerGroupDetail, Error, ExportedKafkaRecord, KafkaRecord, TopicConfig, TopicDetail,
-    kafka::SchemaRegistryClient, search::offset::FromOffset,
+    Error, ExportedKafkaRecord, KafkaRecord, TopicConfig, TopicDetail, kafka::SchemaRegistryClient,
 };
 use rdkafka::{
-    Offset, TopicPartitionList,
-    consumer::{BaseConsumer, Consumer, StreamConsumer},
+    TopicPartitionList,
+    consumer::{Consumer as AA, StreamConsumer},
 };
 use thousands::Separable;
-use tracing::{info, warn};
+use tracing::info;
 
 use std::{collections::HashSet, fs, time::Duration};
 
@@ -17,7 +16,8 @@ use itertools::Itertools;
 use crate::{
     AdminClient,
     configuration::{Configuration, ConsumerConfig, InternalConfig, YozefuConfig},
-    search::{Search, ValidSearchQuery},
+    consumer::Consumer,
+    search::ValidSearchQuery,
 };
 
 /// Struct exposing different functions for consuming kafka records.
@@ -26,21 +26,14 @@ pub struct App {
     pub cluster: String,
     pub config: InternalConfig,
     pub search_query: ValidSearchQuery,
-    //pub output_file: PathBuf,
 }
 
 impl App {
-    pub fn new(
-        cluster: String,
-        config: InternalConfig,
-        search_query: ValidSearchQuery,
-        //     output_file: PathBuf,
-    ) -> Self {
+    pub fn new(cluster: String, config: InternalConfig, search_query: ValidSearchQuery) -> Self {
         Self {
             cluster,
             config,
             search_query,
-            //    output_file,
         }
     }
 
@@ -51,31 +44,18 @@ impl App {
         }
     }
 
+    pub fn create_consumer_2(&self, topics: &Vec<String>) -> Result<Consumer, Error> {
+        Consumer::new(
+            self.config.specific.clone(),
+            self.consumer_config(),
+            self.search_query.query().clone(),
+            topics,
+        )
+    }
+
     /// Create a kafka consumer
     pub fn create_consumer(&self, topics: &Vec<String>) -> Result<StreamConsumer, Error> {
-        let offset = self.search_query.offset().unwrap_or(FromOffset::End);
-        match offset {
-            FromOffset::Beginning => self.assign_partitions(topics, Offset::Beginning),
-            FromOffset::End => self.assign_partitions(topics, Offset::End),
-            FromOffset::Offset(o) => self.assign_partitions(topics, Offset::Offset(o)),
-            FromOffset::OffsetTail(o) => self.assign_partitions(topics, Offset::OffsetTail(o)),
-            FromOffset::Timestamp(timestamp) => {
-                let consumer: StreamConsumer = self.config.create_kafka_consumer()?;
-                let mut tp = TopicPartitionList::new();
-                for t in topics {
-                    let metadata = consumer.fetch_metadata(Some(t), Duration::from_secs(10))?;
-                    for m in metadata.topics() {
-                        for p in m.partitions() {
-                            tp.add_partition(m.name(), p.id());
-                        }
-                    }
-                }
-                tp.set_all_offsets(Offset::Offset(timestamp))?;
-                let tt = consumer.offsets_for_times(tp, Duration::from_secs(60))?;
-                consumer.assign(&tt)?;
-                Ok(consumer)
-            }
-        }
+        Ok(self.create_consumer_2(topics)?.stream_consumer())
     }
 
     pub fn consumer_config(&self) -> ConsumerConfig {
@@ -124,33 +104,9 @@ impl App {
         &self,
         topic_partition_list: &TopicPartitionList,
     ) -> Result<i64, Error> {
-        let client: StreamConsumer = self.create_assigned_consumer()?;
-        let mut count = 0;
-        for t in topic_partition_list.elements() {
-            // this function call be very slow
-            let watermarks: (i64, i64) =
-                match client.fetch_watermarks(t.topic(), t.partition(), Duration::from_secs(10)) {
-                    Ok(i) => i,
-                    Err(e) => {
-                        warn!(
-                            "I was not able to fetch watermarks of topic '{}', partition {}: {}",
-                            t.partition(),
-                            t.topic(),
-                            e
-                        );
-                        (0, 0)
-                    }
-                };
-            count += match t.offset() {
-                Offset::Beginning => watermarks.1 - watermarks.0,
-                Offset::End => 0,
-                Offset::Stored => 1,
-                Offset::Invalid => 1,
-                Offset::Offset(o) => watermarks.1 - o,
-                Offset::OffsetTail(o) => o,
-            }
-        }
-
+        let count = self
+            .admin_client()?
+            .estimate_number_of_records_to_read(topic_partition_list)?;
         info!(
             "{} records are about to be consumed from the following topic partitions: [{}]",
             count.separate_with_underscores(),
@@ -163,98 +119,21 @@ impl App {
         Ok(count)
     }
 
-    fn create_assigned_consumer(&self) -> Result<StreamConsumer, Error> {
-        self.config.create_kafka_consumer()
-    }
-
-    /// Assigns topics to a consumer
-    fn assign_partitions(
-        &self,
-        topics: &Vec<String>,
-        offset: Offset,
-    ) -> Result<StreamConsumer, Error> {
-        let consumer = self.create_assigned_consumer()?;
-        let mut assignments = TopicPartitionList::new();
-        for topic in topics {
-            let metadata = consumer.fetch_metadata(Some(topic), Duration::from_secs(10))?;
-            for t in metadata.topics() {
-                for p in t.partitions() {
-                    assignments.add_partition_offset(topic, p.id(), offset)?;
-                }
-            }
-        }
-        consumer.assign(&assignments)?;
-        info!("New Consumer created, about to consume {topics:?}");
-        Ok(consumer)
-    }
-
-    /// Returns the topics details for a given list topics
-    /// This function is not ready yet
     pub fn topic_details(&self, topics: HashSet<String>) -> Result<Vec<TopicDetail>, Error> {
-        let mut results = vec![];
-        for topic in topics {
-            let consumer: BaseConsumer = self.config.create_kafka_consumer()?;
-            let metadata = consumer.fetch_metadata(Some(&topic), Duration::from_secs(10))?;
-            let metadata = metadata.topics().first().unwrap();
-            let mut detail = TopicDetail {
-                name: topic.clone(),
-                replicas: metadata.partitions().first().unwrap().replicas().len(),
-                partitions: metadata.partitions().len(),
-                consumer_groups: vec![],
-                count: self.count_records_in_topic(&topic)?,
-                config: None,
-            };
-            let mut consumer_groups = vec![];
-            let metadata = consumer.fetch_group_list(None, Duration::from_secs(10))?;
-            for g in metadata.groups() {
-                consumer_groups.push(ConsumerGroupDetail {
-                    name: g.name().to_string(),
-                    members: vec![], //Self::parse_members(g, g.members())?,
-                    state: g.state().parse()?,
-                });
-            }
-            detail.consumer_groups = consumer_groups;
-            results.push(detail);
-        }
-
-        Ok(results)
+        self.admin_client()?.topic_details(topics)
     }
 
     pub async fn topic_config_of(&self, topic: &str) -> Result<Option<TopicConfig>, Error> {
-        AdminClient::new(self.config.client_config())?
-            .topic_config(topic)
-            .await
+        self.admin_client()?.topic_config(topic).await
     }
 
-    pub fn count_records_in_topic(&self, topic: &str) -> Result<i64, Error> {
-        let mut count = 0;
-        let consumer: BaseConsumer = self.config.create_kafka_consumer()?;
-        let metadata = consumer.fetch_metadata(Some(topic), Duration::from_secs(10))?;
-        let metadata_topic = metadata.topics().first();
-        if metadata_topic.is_none() {
-            return Ok(0);
-        }
-
-        let metadata_topic = metadata_topic.unwrap();
-        for partition in metadata_topic.partitions() {
-            let watermarks =
-                consumer.fetch_watermarks(topic, partition.id(), Duration::from_secs(10))?;
-            count += watermarks.1 - watermarks.0;
-        }
-
-        Ok(count)
+    pub fn admin_client(&self) -> Result<AdminClient, Error> {
+        AdminClient::new(self.config.clone())
     }
 
     /// Lists available kafka topics on the cluster.
     pub fn list_topics(&self) -> Result<Vec<String>, Error> {
-        let consumer: StreamConsumer = self.create_assigned_consumer()?;
-        let metadata = consumer.fetch_metadata(None, Duration::from_secs(10))?;
-        let topics = metadata
-            .topics()
-            .iter()
-            .map(|t| t.name().to_string())
-            .collect_vec();
-        Ok(topics)
+        self.admin_client()?.list_topics()
     }
 
     // TODO https://github.com/fede1024/rust-rdkafka/pull/680

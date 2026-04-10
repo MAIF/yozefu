@@ -65,8 +65,6 @@ pub use order::Order;
 pub use order::OrderBy;
 #[cfg(feature = "native")]
 pub use search_query::SearchQuery;
-#[cfg(feature = "native")]
-pub use search_query::parse_search_query;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -78,6 +76,8 @@ pub mod filter_test;
 pub mod number_test;
 #[cfg(test)]
 pub mod offset_test;
+#[cfg(test)]
+pub mod symbol_test;
 
 /// Result of a search filter evaluation.
 #[derive(Debug, PartialEq, Clone, Default, Deserialize, Serialize)]

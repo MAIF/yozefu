@@ -5,6 +5,7 @@
 pub mod admin;
 mod app;
 pub mod configuration;
+pub mod consumer;
 pub mod search;
 
 pub use admin::*;
