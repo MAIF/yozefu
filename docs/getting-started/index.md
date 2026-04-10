@@ -24,6 +24,9 @@ yozf -c localhost
 ::: code-group
 
 ```sh [Cargo]
+# On Debian-based distributions
+apt install build-essential cmake ca-certificates libclang-dev libxtst-dev curl
+
 RUSTFLAGS="--cfg tokio_unstable" cargo install --locked yozefu
 ```
 
