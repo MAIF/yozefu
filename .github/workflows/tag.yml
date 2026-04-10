@@ -75,5 +75,4 @@ jobs:
       attestations: write
       id-token: write
       pull-requests: write
-    secrets: 
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    secrets: inherit
