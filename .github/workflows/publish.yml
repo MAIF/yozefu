@@ -138,7 +138,7 @@ jobs:
       - name: Attest
         uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a
         with:
-          subject-path: "${SOURCE}}"
+          subject-path: "${SOURCE}"
           subject-name: "${ARCHIVE}-${VERSION}"
         env:
           VERSION: ${{ needs.version.outputs.version }}
