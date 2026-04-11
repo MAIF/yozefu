@@ -100,10 +100,8 @@ impl Component for TopicDetailsComponent {
                 self.refreshing_data = false;
                 self.details = details;
             }
-            Action::RequestTopicDetails(_details) => {
-                if !self.details.is_empty() {
-                    self.refreshing_data = true;
-                }
+            Action::RequestTopicDetails(_details) if !self.details.is_empty() => {
+                self.refreshing_data = true;
             }
             _ => (),
         }
