@@ -76,6 +76,7 @@ jobs:
       contents: write
       attestations: write
       id-token: write
+      artifact-metadata: write
     strategy:
       matrix:
         platforms:
@@ -128,6 +129,7 @@ jobs:
             echo "name=${name}"
             echo "source=${source}"
             echo "archive=${archive}"
+            echo "sbom=dist/${archive}.cdx.json"
             echo "subjectName=${subjectName}"
             echo "destination=${destination}"
             echo "binaryName=${binaryName}"
@@ -135,10 +137,40 @@ jobs:
         env:
           VERSION: ${{ needs.version.outputs.version }}
 
-      - name: Attest
+
+      - name: cargo install cargo-cyclonedx
+        run: cargo install --locked cargo-cyclonedx
+      
+      - name: Generate SBOM
+        run: cargo cyclonedx --describe binaries --format json ${{ matrix.platforms.features }} --target ${{ matrix.platforms.target }}
+      
+      - name: Rename SBOM
+        shell: bash
+        run: mv crates/bin/${NAME}_bin.cdx.json "${SBOM}"
+        env:
+          SBOM: ${{ steps.variables.outputs.sbom }}
+          ARCHIVE: ${{ steps.variables.outputs.archive }}
+          NAME: ${{ steps.variables.outputs.name }}
+
+      - name: Upload binary
+        shell: bash
+        run: gh release upload "v${VERSION}" dist/* --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.version.outputs.version }}
+          # https://docs.github.com/en/actions/use-cases-and-examples/publishing-packages/publishing-docker-images
+
+      - uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26
+        with:
+          subject-path: "${{ steps.variables.outputs.source }}"
+          sbom-path: "${{ steps.variables.outputs.sbom }}"
+          subject-name: "${{ steps.variables.outputs.archive }}-${{ needs.version.outputs.version }}"
+
+      - name: Attest build provenance
         uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a
         with:
           subject-path: "${{ steps.variables.outputs.source }}"
+          sbom-path: "${{ steps.variables.outputs.sbom }}"
           subject-name: "${{ steps.variables.outputs.archive }}-${{ needs.version.outputs.version }}"
         env:
           VERSION: ${{ needs.version.outputs.version }}
@@ -177,27 +209,6 @@ jobs:
         run: rm -f "dist/${BINARY}"
         env:
           BINARY: ${{ steps.variables.outputs.binaryName }}
-      - name: cargo install cargo-cyclonedx
-
-        run: cargo install --locked cargo-cyclonedx
-      - name: Generate SBOM
-
-        run: cargo cyclonedx --describe binaries --format json ${{ matrix.platforms.features }} --target ${{ matrix.platforms.target }}
-      - name: Rename SBOM
-
-        shell: bash
-        run: mv crates/bin/${NAME}_bin.cdx.json "dist/${ARCHIVE}.cdx.json"
-        env:
-          ARCHIVE: ${{ steps.variables.outputs.archive }}
-          NAME: ${{ steps.variables.outputs.name }}
-      - name: Upload binary
-
-        shell: bash
-        run: gh release upload "v${VERSION}" dist/* --clobber
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ needs.version.outputs.version }}
-          # https://docs.github.com/en/actions/use-cases-and-examples/publishing-packages/publishing-docker-images
 
 
   publish-docker-image:
