@@ -37,7 +37,7 @@ tokio-util = "0.7.18"
 thousands = "0.2.0"
 circular-buffer = "1.1.0"
 copypasta = "0.10.2"
-rayon = "1.11.0"
+rayon = "1.12.0"
 lib = { workspace = true }
 app = { workspace = true }
 tracing = { workspace = true }
