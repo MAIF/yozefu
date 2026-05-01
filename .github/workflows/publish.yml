@@ -229,7 +229,7 @@ jobs:
         uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
       - name: Extract metadata
         id: meta
-        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051
+        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf
         with:
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
