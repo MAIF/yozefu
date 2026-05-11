@@ -85,6 +85,7 @@ ignore = [
     "RUSTSEC-2026-0091", # Out-of-bounds write or crash when transcoding component model strings
     "RUSTSEC-2026-0092", # Panic when transcoding misaligned component model UTF-16 strings
     "RUSTSEC-2026-0093", # Heap OOB read in component model UTF-16 to latin1+utf16 string transcoding
+    "RUSTSEC-2026-0114", # Panic when allocating a table exceeding the size of the host's address space
 
     
     #"RUSTSEC-0000-0000",
@@ -112,8 +113,7 @@ allow = [
     "MPL-2.0",
     "BSD-3-Clause",
     "ISC",
-    "Unicode-3.0",
-    "OpenSSL"
+    "Unicode-3.0"
 ]
 # The confidence threshold for detecting a license from license text.
 # The higher the value, the more closely the license text must be to the
@@ -230,23 +230,13 @@ deny = [
 
 # Certain crates/versions that will be skipped when doing duplicate detection.
 skip = [
-    "windows_x86_64_msvc",
-    "windows-targets@0.52.6",
-    "windows_x86_64_gnu@0.53.1",
-    "windows-sys@ 0.59.0",
-    "windows-sys@ 0.60.2",
     "wast@35.0.2",
-    "toml_edit@0.22.27",
-    "toml_datetime@0.6.11",
-    "toml@0.8.23",
-    "serde_spanned@0.6.9",
     "thiserror-impl@1.0.69",
     "thiserror@1.0.69",
     "rustix@0.38.44",
     "rand_core@0.6.4",
     "linux-raw-sys@0.4.15",
     "rand_chacha@0.3.1",
-    "rand@0.8.5",
     "nom@7.1.3"
     #{ crate = "ansi_term@0.11.0", reason = "you can specify a reason why it can't be updated/removed" },
 ]
