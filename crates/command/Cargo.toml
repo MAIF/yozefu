@@ -19,7 +19,7 @@ rust-version.workspace = true
 
 
 [dependencies]
-clap = { version = "4.6.0", features = [
+clap = { version = "4.6.1", features = [
     "derive",
     "env",
     "color",
@@ -45,8 +45,8 @@ indexmap = "2.14.0"
 tui = { workspace = true }
 app = { workspace = true }
 lib = { workspace = true }
-reqwest = { version = "0.13.2", features = ["json"] }
-const_format = { version = "0.2.35", features = ["rust_1_64"] }
+reqwest = { version = "0.13.3", features = ["json"] }
+const_format = { version = "0.2.36", features = ["rust_1_64"] }
 tracing = { workspace = true }
 tracing-subscriber = { version = "0.3.23", features = ["env-filter"]}
 futures-batch = "0.7.0"
