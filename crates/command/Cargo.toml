@@ -45,7 +45,7 @@ indexmap = "2.14.0"
 tui = { workspace = true }
 app = { workspace = true }
 lib = { workspace = true }
-reqwest = { version = "0.13.3", features = ["json"] }
+reqwest = { version = "0.13.4", features = ["json"] }
 const_format = { version = "0.2.36", features = ["rust_1_64"] }
 tracing = { workspace = true }
 tracing-subscriber = { version = "0.3.23", features = ["env-filter"]}
