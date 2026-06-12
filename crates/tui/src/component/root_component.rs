@@ -1,6 +1,7 @@
 //! This component is handles the main layout of the TUI
 //! and renders components based on the current context.
-use copypasta::{ClipboardContext, ClipboardProvider};
+use copypasta::{ClipboardContext, ClipboardProvider, nop_clipboard::NopClipboardContext};
+
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
@@ -36,6 +37,7 @@ pub(crate) struct RootComponent {
     focus_history: Vec<ComponentName>,
     focus_order: Vec<ComponentName>,
     action_tx: Option<UnboundedSender<Action>>,
+    clipboard: Box<dyn ClipboardProvider + Send>,
 }
 
 impl RootComponent {
@@ -86,6 +88,15 @@ impl RootComponent {
                 (id, c)
             })
             .collect();
+        let clipboard: Box<dyn ClipboardProvider + Send> = match ClipboardContext::new() {
+            Ok(context) => Box::new(context),
+            Err(err) => {
+                warn!(
+                    "Failed to initialize clipboard context: {err}. Using NopClipboardContext instead."
+                );
+                Box::new(NopClipboardContext::new().unwrap())
+            }
+        };
         Self {
             components,
             views: vec![ComponentName::TopicsAndRecords],
@@ -93,6 +104,7 @@ impl RootComponent {
             focus_history: vec![],
             state,
             action_tx: None,
+            clipboard,
         }
     }
 
@@ -349,7 +361,6 @@ impl Component for RootComponent {
                 self.notify_footer()?;
             }
             Action::CopyToClipboard(ref content) => {
-                let mut ctx = ClipboardContext::new().unwrap();
                 self.action_tx
                     .as_ref()
                     .unwrap()
@@ -357,7 +368,7 @@ impl Component for RootComponent {
                         Level::Info,
                         "Copied to clipboard".to_string(),
                     )))?;
-                ctx.set_contents(content.to_string()).unwrap();
+                self.clipboard.set_contents(content.to_string()).unwrap();
             }
             _ => (),
         }

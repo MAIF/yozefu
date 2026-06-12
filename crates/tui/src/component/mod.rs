@@ -78,7 +78,7 @@ pub(crate) trait WithHeight: Component {
     }
 }
 
-pub(crate) trait Component: Send + Sync {
+pub(crate) trait Component: Send {
     fn register_action_handler(&mut self, _tx: UnboundedSender<Action>) {}
 
     fn id(&self) -> ComponentName;
