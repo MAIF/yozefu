@@ -22,8 +22,8 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **version:**
-[e.g. v0.1.0]
+[e.g. v0.0.29]
 
 **Additional context**
 Additional information that may be relevant to the issue.
-[e.g. architecture, OS]
+[e.g. architecture, OS, Desktop environment, etc.]

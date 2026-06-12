@@ -21,11 +21,11 @@ itertools = "0.14.0"
 thousands = "0.2.0"
 indexmap = "2.14.0"
 rdkafka = { version = "0.39.0", features = ["cmake-build"] }
-extism = { version = "1.21.0", features = [] }
+extism = { version = "1.30.0", features = [] }
 url = { version = "2.5.8", features = ["serde"] }
 resolve-path = "0.1.0"
 directories = "6.0.0"
-chrono = "0.4.44"
+chrono = "0.4.45"
 tracing = { workspace = true }
 futures-batch = "0.7.0"
 futures = { workspace = true }
