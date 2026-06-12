@@ -1,7 +1,6 @@
 //! Component showing in real time incoming kafka records.
 
 use app::{configuration::TimestampFormat, search::ValidSearchQuery};
-use copypasta::{ClipboardContext, ClipboardProvider};
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use lib::ExportedKafkaRecord;
 use ratatui::{
@@ -15,13 +14,7 @@ use thousands::Separable;
 use throbber_widgets_tui::ThrobberState;
 use tokio::sync::mpsc::UnboundedSender;
 
-use crate::{
-    Action,
-    action::{Level, Notification},
-    component::RecordsReceiver,
-    error::TuiError,
-    records_buffer::RecordsBuffer,
-};
+use crate::{Action, component::RecordsReceiver, error::TuiError, records_buffer::RecordsBuffer};
 
 use super::{Component, ComponentName, Shortcut, State, styles};
 
@@ -235,13 +228,13 @@ impl Component for RecordsComponent {
             KeyCode::Char('c') => {
                 if let Some(s) = self.state.selected() {
                     let record = self.records.get(s).unwrap();
-                    let mut ctx = ClipboardContext::new().unwrap();
                     let exported_record: ExportedKafkaRecord = record.into();
-                    self.action_tx.as_ref().unwrap().send(Action::Notification(
-                        Notification::new(Level::Info, "Copied to clipboard".to_string()),
-                    ))?;
-                    ctx.set_contents(serde_json::to_string_pretty(&exported_record)?)
-                        .unwrap();
+                    self.action_tx
+                        .as_ref()
+                        .unwrap()
+                        .send(Action::CopyToClipboard(serde_json::to_string_pretty(
+                            &exported_record,
+                        )?))?;
                 }
             }
             KeyCode::Char('f') => self.follow(!self.follow)?,
