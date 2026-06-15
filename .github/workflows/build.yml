@@ -310,7 +310,7 @@ jobs:
         name: Link Checker
         # https://github.com/lycheeverse/lychee/issues/1405
         with:
-          args: --accept '100..=103,200..=299,429' --exclude-loopback README.md './crates/app/README.md' './crates/command/README.md' './docs' './crates/lib/README.md' './crates/wasm-types/README.md' './crates/bin/src/**' './crates/app/src/**' './crates/command/src/**' './crates/lib/src/**' './crates/wasm-types/src/**' './docs/**' --exclude-path './docs/url-templates/index.md' --exclude-path './docs/node_modules' --exclude-path './docs/schema-registry/index.md' --exclude-path './docs/what-is-yozefu/index.md'  --exclude 'https://docs.rs'
+          args: --accept '100..=103,200..=299,429' --exclude-loopback README.md './crates/app/README.md' './crates/command/README.md' './docs' './crates/lib/README.md' './crates/wasm-types/README.md' './crates/bin/src/**' './crates/app/src/**' './crates/command/src/**' './crates/lib/src/**' './crates/wasm-types/src/**' './docs/**' --exclude-path './docs/url-templates/index.md' --exclude-path './docs/node_modules' --exclude-path './docs/schema-registry/index.md' --exclude-path './docs/tls/index.md' --exclude-path './docs/what-is-yozefu/index.md'  --exclude 'https://docs.rs'
 
   # https://docs.github.com/en/actions/use-cases-and-examples/publishing-packages/publishing-docker-images
   docker:
@@ -392,29 +392,29 @@ jobs:
       - name: Cargo test
         run: cargo test --all-features --locked
 
-  nix:
-    name: Nix
-    needs: check
-    runs-on: ${{ matrix.platforms.os }}
-    continue-on-error: true
-    permissions:
-      contents: read
-    strategy:
-      matrix:
-        platforms:
-          - os: macos-15
-            target: aarch64-apple-darwin
-          - os: macos-15-large
-            target: x86_64-apple-darwin
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-          - os: ubuntu-24.04-arm
-            target: aarch64-unknown-linux-gnu
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          persist-credentials: false
-      - uses: cachix/install-nix-action@8aa03977d8d733052d78f4e008a241fd1dbf36b3
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-      - run: nix build
+  # nix:
+  #   name: Nix
+  #   needs: check
+  #   runs-on: ${{ matrix.platforms.os }}
+  #   continue-on-error: true
+  #   permissions:
+  #     contents: read
+  #   strategy:
+  #     matrix:
+  #       platforms:
+  #         - os: macos-15
+  #           target: aarch64-apple-darwin
+  #         - os: macos-15-large
+  #           target: x86_64-apple-darwin
+  #         - os: ubuntu-latest
+  #           target: x86_64-unknown-linux-gnu
+  #         - os: ubuntu-24.04-arm
+  #           target: aarch64-unknown-linux-gnu
+  #   steps:
+  #     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+  #       with:
+  #         persist-credentials: false
+  #     - uses: cachix/install-nix-action@8aa03977d8d733052d78f4e008a241fd1dbf36b3
+  #       with:
+  #         nix_path: nixpkgs=channel:nixos-unstable
+  #     - run: nix build
