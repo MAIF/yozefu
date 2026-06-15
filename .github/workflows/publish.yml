@@ -137,6 +137,8 @@ jobs:
         env:
           VERSION: ${{ needs.version.outputs.version }}
 
+      - name: Create temp dir
+        run: mkdir -p dist
 
       - name: cargo install cargo-cyclonedx
         run: cargo install --locked cargo-cyclonedx
@@ -176,9 +178,6 @@ jobs:
           VERSION: ${{ needs.version.outputs.version }}
           SOURCE: ${{ steps.variables.outputs.source }}
           ARCHIVE: ${{ steps.variables.outputs.archive }}
-
-      - name: Create temp dir
-        run: mkdir -p dist
 
       - name: Rename binary
         shell: bash
