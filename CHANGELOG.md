@@ -1,4 +1,32 @@
 ## What's Changed in 0.0.30
+* chore: Release version v0.0.30 by @Mcdostone in [#326](https://github.com/MAIF/yozefu/pull/326)
+* Changelog for v0.0.30 by @github-actions[bot] in [#325](https://github.com/MAIF/yozefu/pull/325)
+* chore: Release version v0.0.30 by @Mcdostone in [#324](https://github.com/MAIF/yozefu/pull/324)
+* Develop by @Mcdostone in [#305](https://github.com/MAIF/yozefu/pull/305)
+* fix: clipboard content lost on Linux after copy by @Cahb
+* build: update dependencies by @Mcdostone
+* build(deps): bump cachix/install-nix-action from 31.10.4 to 31.10.6 by @dependabot[bot]
+* build(deps): bump acifani/setup-tinygo from 2.0.1 to 3.0.0 by @dependabot[bot]
+* build(deps): bump actions/deploy-pages from 4.0.5 to 5.0.0 by @dependabot[bot]
+* build(deps): bump actions/attest-build-provenance from 3.0.0 to 4.1.0 by @dependabot[bot]
+* build(deps): bump docker/login-action from 3.7.0 to 4.2.0 by @dependabot[bot]
+* build: update deps by @Mcdostone
+* build: update deps by @Mcdostone
+* build(deps): bump EmbarkStudios/cargo-deny-action from 2.0.15 to 2.0.17 by @dependabot[bot]
+* ci: create attestions for artifacts by @Mcdostone
+* build(deps): bump zizmorcore/zizmor-action from 0.5.2 to 0.5.3 by @dependabot[bot]
+* build(deps): bump docker/metadata-action from 5.10.0 to 6.0.0 by @dependabot[bot]
+* build(deps): bump actions/attest-build-provenance from 3.0.0 to 4.1.0 by @dependabot[bot]
+* build(deps): bump crate-ci/typos from 1.45.0 to 1.45.1 by @dependabot[bot]
+* ci: create attestions for artifacts by @Mcdostone
+* docs: add missing command to build the tool from source on ubuntu by @Mcdostone
+
+### New Contributors
+* @Cahb made their first contribution
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.29...v0.0.30
+
+## What's Changed in 0.0.30
 * chore: Release version v0.0.30 by @Mcdostone in [#324](https://github.com/MAIF/yozefu/pull/324)
 * Develop by @Mcdostone in [#305](https://github.com/MAIF/yozefu/pull/305)
 * fix: clipboard content lost on Linux after copy by @Cahb
