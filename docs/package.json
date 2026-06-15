@@ -55,7 +55,7 @@
     "regex-recursion": "^6.0.2",
     "regex-utilities": "^2.3.0",
     "rfdc": "^1.4.1",
-    "rollup": "^4.61.1",
+    "rollup": "^4.62.0",
     "shiki": "^4.2.0",
     "source-map-js": "^1.2.1",
     "space-separated-tokens": "^2.0.2",
