@@ -154,14 +154,6 @@ jobs:
           ARCHIVE: ${{ steps.variables.outputs.archive }}
           NAME: ${{ steps.variables.outputs.name }}
 
-      - name: Upload binary
-        shell: bash
-        run: gh release upload "v${VERSION}" dist/* --clobber
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ needs.version.outputs.version }}
-          # https://docs.github.com/en/actions/use-cases-and-examples/publishing-packages/publishing-docker-images
-
       - uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26
         with:
           subject-path: "${{ steps.variables.outputs.source }}"
@@ -208,6 +200,14 @@ jobs:
         run: rm -f "dist/${BINARY}"
         env:
           BINARY: ${{ steps.variables.outputs.binaryName }}
+
+      - name: Upload binary
+        shell: bash
+        run: gh release upload "v${VERSION}" dist/* --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.version.outputs.version }}
+          # https://docs.github.com/en/actions/use-cases-and-examples/publishing-packages/publishing-docker-images
 
 
   publish-docker-image:
