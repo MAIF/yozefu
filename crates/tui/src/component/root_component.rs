@@ -61,6 +61,7 @@ impl RootComponent {
             Arc::new(Mutex::new(RecordsComponent::new(
                 records_receiver,
                 state.workspace().config().timestamp_format.clone(),
+                state.workspace().config().display_order.clone(),
             ))),
             Arc::new(Mutex::new(TopicDetailsComponent::default())),
             Arc::new(Mutex::new(RecordDetailsComponent::new(highlighter.clone()))),
