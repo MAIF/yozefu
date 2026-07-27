@@ -80,7 +80,7 @@ impl ValidSearchQuery {
         let filters = query.filters();
         for filter in filters {
             let name = filter.name;
-            let path = filters_directory.join(format!("{}.wasm", &name));
+            let path = filters_directory.join(format!("{}.wasm", name));
             let url = Wasm::file(&path);
             let manifest = Manifest::new([url]);
             let mut filters = CACHED_FILTERS.lock().unwrap();
@@ -106,7 +106,7 @@ impl ValidSearchQuery {
                 error!(
                     "Error when calling '{PARSE_PARAMETERS_FUNCTION_NAME}' from wasm module '{name}': {e:?}"
                 );
-                return Err(lib::Error::Error(format!("{}: {e}", &name)));
+                return Err(lib::Error::Error(format!("{}: {e}", name)));
             }
         }
 

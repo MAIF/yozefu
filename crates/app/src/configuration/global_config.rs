@@ -67,6 +67,28 @@ pub struct GlobalConfig {
     /// Show the timestamp as a date time or as "X minutes ago"
     #[serde(default = "TimestampFormat::default")]
     pub timestamp_format: TimestampFormat,
+    #[serde(default)]
+    pub display_order: DisplayOrder,
+}
+
+/// The order in which records are displayed in the TUI
+#[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Default)]
+#[cfg_attr(test, derive(schemars::JsonSchema))]
+pub enum DisplayOrder {
+    #[default]
+    #[serde(rename = "ascending")]
+    Ascending,
+    #[serde(rename = "descending")]
+    Descending,
+}
+
+impl DisplayOrder {
+    pub fn toggle(&mut self) -> Self {
+        match self {
+            DisplayOrder::Ascending => DisplayOrder::Descending,
+            DisplayOrder::Descending => DisplayOrder::Ascending,
+        }
+    }
 }
 
 fn default_url_template() -> String {
@@ -108,6 +130,7 @@ impl GlobalConfig {
             consumer: ConsumerConfig::default(),
             log_file: None,
             timestamp_format: TimestampFormat::default(),
+            display_order: DisplayOrder::default(),
         }
     }
 

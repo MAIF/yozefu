@@ -1,4 +1,6 @@
 //! This component is a layout component that renders `[TopicsComponent]` and `[RecordsComponent]`.
+#[cfg(test)]
+use app::configuration::DisplayOrder;
 use ratatui::{
     Frame,
     layout::{Constraint, Direction, Layout, Rect},
@@ -87,7 +89,7 @@ fn test_draw() {
 
     let topics_component = TopicsComponent::new(vec!["topic1".to_string()]);
     let (tx, rx) = unbounded_channel();
-    let records_component = RecordsComponent::new(rx, Default::default());
+    let records_component = RecordsComponent::new(rx, Default::default(), DisplayOrder::default());
 
     tx.send(RecordsAndStats {
         records: vec![KafkaRecord {
