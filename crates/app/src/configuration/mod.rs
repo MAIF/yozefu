@@ -15,6 +15,7 @@ pub use cluster_config::KAFKA_PROPERTIES_WITH_LOCATIONS;
 pub use cluster_config::SENSITIVE_KAFKA_PROPERTIES;
 pub use cluster_config::SchemaRegistryConfig;
 pub use consumer_config::ConsumerConfig;
+pub use global_config::DisplayOrder;
 pub use global_config::GlobalConfig;
 pub use global_config::TimestampFormat;
 pub use internal_config::InternalConfig;

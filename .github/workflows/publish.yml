@@ -54,7 +54,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Create github release
-        run: gh release create "v${VERSION}" --generate-notes
+        run: gh release create "v${VERSION}" --generate-notes --draft
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ needs.version.outputs.version }}
@@ -293,3 +293,19 @@ jobs:
       - run: cargo publish --workspace
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+
+  make-release-immutable:
+    runs-on: ubuntu-latest
+    name: Make the current release immutable
+    needs: [version, publish-to-registry]
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - name: Create github release
+        run: gh release edit "v${VERSION}" --draft=false
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.version.outputs.version }}

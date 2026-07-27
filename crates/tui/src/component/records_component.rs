@@ -1,7 +1,11 @@
 //! Component showing in real time incoming kafka records.
 
-use app::{configuration::TimestampFormat, search::ValidSearchQuery};
+use app::{
+    configuration::{DisplayOrder, TimestampFormat},
+    search::ValidSearchQuery,
+};
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
+use itertools::Either;
 use lib::ExportedKafkaRecord;
 use ratatui::{
     Frame,
@@ -31,10 +35,15 @@ pub(crate) struct RecordsComponent {
     key_events_buffer: Vec<KeyEvent>,
     column_size: u16,
     timestamp_format: TimestampFormat,
+    display_order: DisplayOrder,
 }
 
 impl RecordsComponent {
-    pub fn new(receiver: RecordsReceiver, timestamp_format: TimestampFormat) -> Self {
+    pub fn new(
+        receiver: RecordsReceiver,
+        timestamp_format: TimestampFormat,
+        display_order: DisplayOrder,
+    ) -> Self {
         Self {
             records: RecordsBuffer::new(),
             receiver,
@@ -48,6 +57,7 @@ impl RecordsComponent {
             key_events_buffer: Vec::default(),
             column_size: 0,
             timestamp_format,
+            display_order,
         }
     }
 
@@ -241,6 +251,14 @@ impl Component for RecordsComponent {
             KeyCode::Char('v') | KeyCode::Enter => {
                 self.show_details()?;
             }
+            KeyCode::Char('r') => {
+                self.display_order = self.display_order.toggle();
+                self.action_tx
+                    .as_ref()
+                    .unwrap()
+                    .send(Action::RefreshShortcuts)?;
+            }
+
             KeyCode::Char('e') if key.modifiers.contains(KeyModifiers::CONTROL) => {
                 for record in self.records.iter() {
                     self.action_tx
@@ -349,7 +367,11 @@ impl Component for RecordsComponent {
 
         let normal_style = Style::default();
         let header_cells = vec![
-            Cell::new(Text::from("Timestamp")).bold(),
+            match self.display_order {
+                DisplayOrder::Ascending => Cell::new(Text::from("Timestamp ↑")),
+                DisplayOrder::Descending => Cell::new(Text::from("Timestamp ↓")),
+            }
+            .bold(),
             Cell::new(Text::from("Topic").alignment(Alignment::Right)).bold(),
             Cell::new(Text::from("Offset").alignment(Alignment::Right)).bold(),
             Cell::new(Text::from("Key").alignment(Alignment::Right)).bold(),
@@ -360,16 +382,12 @@ impl Component for RecordsComponent {
             .height(1)
             .bottom_margin(1);
 
-        // TODO render only records in the viewport
-        let rows = self.records.iter().enumerate().map(|(index, item)| {
-            if let Some(s) = self.state.selected() {
-                let is_visible = (s + rect.height as usize) > index
-                    && s.saturating_sub(rect.height as usize) <= index;
-                if !is_visible {
-                    return Row::new(Vec::<Cell>::new()).height(1_u16);
-                }
-            }
+        let iterator = match self.display_order {
+            DisplayOrder::Ascending => Either::Left(self.records.iter()),
+            DisplayOrder::Descending => Either::Right(self.records.iter().rev()),
+        };
 
+        let rows = iterator.map(|item| {
             let cells = vec![
                 Cell::new(
                     styles::colorize_timestamp(item, &state.theme, &self.timestamp_format)
@@ -480,11 +498,15 @@ impl Component for RecordsComponent {
                 "F",
                 match self.follow {
                     true => "Unfollow",
-                    false => "Follow",
+                    false => "Follow  ",
                 },
             ),
             Shortcut::new("T", "Timestamp format"),
             Shortcut::new("⇄", "Resize"),
+            match self.display_order {
+                DisplayOrder::Ascending => Shortcut::new("R", "Descending"),
+                DisplayOrder::Descending => Shortcut::new("R", "Ascending "),
+            },
         ];
 
         shortcuts

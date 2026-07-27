@@ -167,7 +167,7 @@ if [ "$ready" = "0" ]; then
 
     echo " 📦 Repository is '$repo'"
     echo " 🐋 Starting kafka"
-    docker compose -f "${repo}/compose.yml" up kafka schema-registry -d --wait --no-recreate
+    docker compose -f "${repo}/compose.yml" up kafka schema-registry -d --wait --no-recreate || true
     docker compose -f "${repo}/compose.yml" exec -T kafka \
       /usr/bin/kafka-topics \
       --create --if-not-exists          \

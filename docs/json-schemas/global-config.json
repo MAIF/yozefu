@@ -75,6 +75,10 @@
       "description": "Show the timestamp as a date time or as \"X minutes ago\"",
       "$ref": "#/$defs/TimestampFormat",
       "default": "DateTime"
+    },
+    "display_order": {
+      "$ref": "#/$defs/DisplayOrder",
+      "default": "ascending"
     }
   },
   "required": [
@@ -175,6 +179,14 @@
       "enum": [
         "DateTime",
         "Ago"
+      ]
+    },
+    "DisplayOrder": {
+      "description": "The order in which records are displayed in the TUI",
+      "type": "string",
+      "enum": [
+        "ascending",
+        "descending"
       ]
     }
   }
