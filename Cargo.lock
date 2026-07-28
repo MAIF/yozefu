@@ -2660,6 +2660,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "itertools"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8b4baf93f58d4425749ca49a51c50ebab072c5df6994d08fed93541c331481dc"
+dependencies = [
+ "either",
+]
+
+[[package]]
 name = "itoa"
 version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3943,7 +3952,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8a56d757972c98b346a9b766e3f02746cde6dd1cd1d1d563472929fdd74bec4d"
 dependencies = [
  "anyhow",
- "itertools 0.14.0",
+ "itertools 0.13.0",
  "proc-macro2",
  "quote",
  "syn 2.0.117",
@@ -3956,7 +3965,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b570b25f7617e43d59005d0990ccb79e950a423952cea19671b7a876da390adf"
 dependencies = [
  "anyhow",
- "itertools 0.14.0",
+ "itertools 0.13.0",
  "proc-macro2",
  "quote",
  "syn 2.0.117",
@@ -7526,7 +7535,7 @@ dependencies = [
  "futures",
  "futures-batch",
  "indexmap 2.14.0",
- "itertools 0.14.0",
+ "itertools 0.15.0",
  "mock_json",
  "rdkafka",
  "resolve-path",
@@ -7553,7 +7562,7 @@ dependencies = [
  "futures-batch",
  "indexmap 2.14.0",
  "indicatif",
- "itertools 0.14.0",
+ "itertools 0.15.0",
  "rdkafka",
  "reqwest",
  "serde_json",
@@ -7578,7 +7587,7 @@ dependencies = [
  "chrono",
  "fuzzydate",
  "insta",
- "itertools 0.14.0",
+ "itertools 0.15.0",
  "mockito",
  "nom 8.0.0",
  "proptest",
@@ -7605,7 +7614,7 @@ dependencies = [
  "futures-batch",
  "indexmap 2.14.0",
  "insta",
- "itertools 0.14.0",
+ "itertools 0.15.0",
  "nom 8.0.0",
  "open",
  "ratatui",

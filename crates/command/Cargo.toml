@@ -32,7 +32,7 @@ indicatif = { version = "0.18.4", features = ["tokio"] }
 tempfile = "3.27.0"
 tokio-util = "0.7.18"
 futures = { workspace = true }
-itertools = "0.14.0"
+itertools = "0.15.0"
 tokio = { workspace = true, features = ["full", "tracing"] }
 rdkafka = { version = "0.39.0", features = [
     "cmake-build",
