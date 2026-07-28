@@ -43,7 +43,7 @@
     "micromark-util-types": "^2.0.2",
     "minisearch": "^7.2.0",
     "mitt": "^3.0.1",
-    "nanoid": "^5.1.11",
+    "nanoid": "^6.0.0",
     "oniguruma-parser": "^0.12.2",
     "oniguruma-to-es": "^4.3.6",
     "perfect-debounce": "^2.1.0",
