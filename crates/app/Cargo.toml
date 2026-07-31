@@ -17,7 +17,7 @@ rust-version.workspace = true
 serde = { workspace = true }
 serde_json = { workspace = true }
 lib = { workspace = true, features = ["native"] }
-itertools = "0.14.0"
+itertools = { workspace = true}
 thousands = "0.2.0"
 indexmap = "2.14.0"
 rdkafka = { version = "0.39.0", features = ["cmake-build"] }
