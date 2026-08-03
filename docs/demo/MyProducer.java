@@ -145,7 +145,7 @@ class MyProducer implements Callable<Integer> {
 
         props.putIfAbsent("bootstrap.servers", "localhost:9092");
         props.putIfAbsent("schema.registry.url", System.getenv().getOrDefault("YOZEFU_SCHEMA_REGISTRY_URL", "http://localhost:8081"));
-        props.putIfAbsent(KafkaAvroSerializerConfig.AUTO_REGISTER_SCHEMAS, false);
+        props.putIfAbsent(KafkaAvroSerializerConfig.AUTO_REGISTER_SCHEMAS, true);
         props.putIfAbsent("use.latest.version", true);
         var schemaRegistryUrl = props.getProperty("schema.registry.url");
         System.err.printf(" 📖 schema registry URL is %s\n", schemaRegistryUrl);
@@ -178,10 +178,10 @@ class MyProducer implements Callable<Integer> {
                 produce(producer, new IntoJsonSchema(), data, topic, registryClient);
             }
             case protobuf -> {
-                System.err.printf(" ⚠️ Protobuf serialization is experimental and may not work as expected\n");
+                System.err.printf(" 🏗️  Protobuf serialization\n");
                 props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaProtobufSerializer.class.getName());
                 props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaProtobufSerializer.class.getName());
-                KafkaProducer<Object, Object> producer = new KafkaProducer<>(props);
+                KafkaProducer<DynamicMessage, DynamicMessage> producer = new KafkaProducer<>(props);
                 produce(producer, new IntoProtobuf(), data, topic, registryClient);
             }
             case text -> {
