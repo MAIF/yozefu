@@ -783,9 +783,9 @@ dependencies = [
 
 [[package]]
 name = "circular-buffer"
-version = "1.1.0"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "23bdce1da528cadbac4654b5632bfcd8c6c63e25b1d42cea919a95958790b51d"
+checksum = "09ab86cb1a7cf40b95c143ba62bd239560008f45c97d7c1d9a3cdee9bc7b3ba5"
 
 [[package]]
 name = "clang-sys"
