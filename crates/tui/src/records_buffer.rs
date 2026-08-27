@@ -19,7 +19,7 @@ pub const BUFFER_SIZE: usize = 500;
 #[cfg(target_family = "windows")]
 pub const BUFFER_SIZE: usize = 120;
 
-/// Wrapper around [`CircularBuffer`]
+/// Wrapper around [`FixedCircularBuffer`]
 pub(crate) struct RecordsBuffer {
     buffer: FixedCircularBuffer<KafkaRecord, BUFFER_SIZE>,
     stats: Stats,

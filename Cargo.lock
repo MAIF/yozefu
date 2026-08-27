@@ -7388,7 +7388,7 @@ dependencies = [
 
 [[package]]
 name = "yozefu"
-version = "0.0.31"
+version = "0.0.32"
 dependencies = [
  "assert_cmd",
  "testcontainers",
@@ -7398,7 +7398,7 @@ dependencies = [
 
 [[package]]
 name = "yozefu-app"
-version = "0.0.31"
+version = "0.0.32"
 dependencies = [
  "chrono",
  "criterion",
@@ -7424,7 +7424,7 @@ dependencies = [
 
 [[package]]
 name = "yozefu-command"
-version = "0.0.31"
+version = "0.0.32"
 dependencies = [
  "chrono",
  "clap",
@@ -7453,7 +7453,7 @@ dependencies = [
 
 [[package]]
 name = "yozefu-lib"
-version = "0.0.31"
+version = "0.0.32"
 dependencies = [
  "apache-avro",
  "byteorder",
@@ -7476,7 +7476,7 @@ dependencies = [
 
 [[package]]
 name = "yozefu-tui"
-version = "0.0.31"
+version = "0.0.32"
 dependencies = [
  "bytesize",
  "chrono",
@@ -7513,7 +7513,7 @@ dependencies = [
 
 [[package]]
 name = "yozefu-wasm-types"
-version = "0.0.31"
+version = "0.0.32"
 dependencies = [
  "serde",
  "serde_json",
