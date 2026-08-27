@@ -76,6 +76,10 @@ ignore = [
     "RUSTSEC-2026-0009", # time Denial of Service via Stack Exhaustion
     "RUSTSEC-2026-0194", # quick-xml 0.38.4
     "RUSTSEC-2026-0195", # quick-xml 0.38.4
+    "RUSTSEC-2026-0222", # wasmtime 43.0.2, Stores can mix up type indices between engines,
+    "RUSTSEC-2026-0251", # The sized-chunks crate is unmaintained
+    "RUSTSEC-2026-0250", # The im-rc crate is unmaintained
+    "RUSTSEC-2026-0247", # The bitmaps crate is unmaintained
 
     #"RUSTSEC-0000-0000",
     #{ id = "RUSTSEC-0000-0000", reason = "you can specify a reason the advisory is ignored" },
