@@ -2,6 +2,8 @@
 use super::SchemaRegistryClient;
 #[cfg(feature = "native")]
 use super::avro::avro_to_json;
+#[cfg(feature = "native")]
+//use super::protobuf::protobuf_to_json;
 use super::data_type::DataType;
 use super::schema::Schema as SchemaRef;
 #[cfg(feature = "native")]
@@ -212,15 +214,10 @@ impl KafkaRecord {
     }
 
     fn deserialize_protobuf(payload: Option<&[u8]>, schema: &str) -> DataType {
-        let payload = payload.unwrap_or_default();
-        DataType::String(format!(
-            "  Error: Protobuf deserialization is not supported yet in Yozefu. Any contribution is welcome!\n Github: https://github.com/MAIF/yozefu\nPayload: {:?}\n String: {}\n Schema:\n{}",
-            payload,
-            String::from_utf8(payload.to_vec())
-                .unwrap_or_default()
-                .trim(),
-            schema,
-        ))
+        // let payload = payload.unwrap_or_default();
+        // let json_value = protobuf_to_json(payload, schema);
+        // DataType::Json(json_value)
+        DataType::String("".to_string())
     }
 
     /// Extract the data section from the payload prefixed with a schema section.

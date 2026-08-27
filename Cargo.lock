@@ -7464,6 +7464,8 @@ dependencies = [
  "mockito",
  "nom 8.0.0",
  "proptest",
+ "prost 0.13.5",
+ "prost-types",
  "rdkafka",
  "reqwest",
  "schemars 1.2.2",

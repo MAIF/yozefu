@@ -10,7 +10,7 @@ use crate::{
     schema_detail::{ExportedSchemasDetails, SchemaDetail},
 };
 use crossterm::event::{KeyCode, KeyEvent};
-use lib::kafka::Schema;
+use lib::kafka::;
 use ratatui::{
     Frame,
     layout::Rect,
