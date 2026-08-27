@@ -32,3 +32,6 @@ docs/.vitepress/cache
 docs/node_modules
 .rumdl_cache
 .vibe/
+crates/app/src/consumer_test.rs
+flamegraph.svg
+profile.json.gz

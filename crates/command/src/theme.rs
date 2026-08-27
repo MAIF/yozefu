@@ -1,3 +1,4 @@
+use reqwest::Client;
 use std::{fs, path::PathBuf};
 
 use app::configuration::Workspace;
@@ -17,34 +18,8 @@ pub(crate) async fn init_themes_file(workspace: &Workspace) -> Result<PathBuf, E
         return Ok(path);
     }
 
-    let default_theme = Theme::light();
-    let mut default_themes = IndexMap::new();
-    default_themes.insert(default_theme.name.clone(), default_theme);
-
-    let content = match reqwest::get(
-        "https://raw.githubusercontent.com/MAIF/yozefu/refs/heads/main/crates/command/themes.json",
-    )
-    .await
-    {
-        Ok(response) => match response.status().is_success() {
-            true => response.text().await.unwrap(),
-            false => {
-                warn!("HTTP {} when downloading theme file", response.status());
-                serde_json::to_string_pretty(&default_themes).unwrap()
-            }
-        },
-        Err(e) => {
-            warn!("Error while downloading theme file: {e}");
-            serde_json::to_string_pretty(&default_themes).unwrap()
-        }
-    };
-
-    let e: IndexMap<String, Theme> = match serde_json::from_str(&content) {
-        Ok(themes) => themes,
-        Err(_) => default_themes,
-    };
-
-    fs::write(&path, &serde_json::to_string_pretty(&e)?)?;
+    let themes = get_themes_from_github().await;
+    fs::write(&path, &serde_json::to_string_pretty(&themes)?)?;
     Ok(path)
 }
 
@@ -59,22 +34,7 @@ pub(crate) async fn update_themes(workspace: &Workspace) -> Result<PathBuf, Erro
     let mut local_themes: IndexMap<String, Theme> = serde_json::from_str(&content)?;
 
     info!("Updating themes file from {THEMES_URL}");
-    let content = match reqwest::get(THEMES_URL).await {
-        Ok(response) => match response.status().is_success() {
-            true => response.text().await.unwrap(),
-            false => {
-                warn!("HTTP {} when downloading theme file", response.status());
-                "{}".to_string()
-            }
-        },
-        Err(e) => {
-            warn!("Error while downloading theme file: {e}");
-            "{}".to_string()
-        }
-    };
-
-    let new_themes = serde_json::from_str::<IndexMap<String, Theme>>(&content)?;
-
+    let new_themes = get_themes_from_github().await;
     for (name, theme) in new_themes {
         if !local_themes.contains_key(&name) {
             info!("Theme '{name}' added");
@@ -84,6 +44,41 @@ pub(crate) async fn update_themes(workspace: &Workspace) -> Result<PathBuf, Erro
 
     fs::write(&path, &serde_json::to_string_pretty(&local_themes)?)?;
     Ok(path)
+}
+
+async fn get_themes_from_github() -> IndexMap<String, Theme> {
+    let default_theme = Theme::light();
+    let mut default_themes = IndexMap::new();
+    default_themes.insert(default_theme.name.clone(), default_theme);
+
+    let http_client = Client::new();
+    let content = match http_client
+        .get(THEMES_URL)
+        .timeout(std::time::Duration::from_millis(1_000))
+        .send()
+        .await
+    {
+        Ok(response) => match response.status().is_success() {
+            true => response.text().await.unwrap(),
+            false => {
+                warn!("HTTP {} when downloading theme file", response.status());
+                serde_json::to_string_pretty(&default_themes).unwrap_or_default()
+            }
+        },
+        Err(e) => {
+            warn!("Error while downloading the theme file: {e}");
+            serde_json::to_string_pretty(&default_themes).unwrap_or_default()
+        }
+    };
+
+    let themes: IndexMap<String, Theme> = match serde_json::from_str(&content) {
+        Ok(themes) => themes,
+        Err(e) => {
+            warn!("Error while parsing themes from GitHub: {e}");
+            default_themes
+        }
+    };
+    themes
 }
 
 #[test]
