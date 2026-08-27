@@ -149,7 +149,11 @@ jobs:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
       - name: Check lockfile is updated
-        run: cargo update --locked
+        run: cargo update --locked -Z min-publish-age
+        env:
+          # TODO: Remove RUSTC_BOOTSTRAP and -Z once min-publish-age is stable.
+          RUSTC_BOOTSTRAP: "1"
+          CARGO_REGISTRY_GLOBAL_MIN_PUBLISH_AGE: "7 days"
 
   clippy:
     needs: check
