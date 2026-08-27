@@ -4,7 +4,7 @@
 //! This should be possible to increase the size but the more you display events,
 //! the more the tool gets laggy. I need to work on it.
 
-use circular_buffer::{CircularBuffer, Iter};
+use circular_buffer::{FixedCircularBuffer, Iter};
 use lib::{
     KafkaRecord,
     search::{Order, OrderBy, order::OrderKeyword},
@@ -21,7 +21,7 @@ pub const BUFFER_SIZE: usize = 120;
 
 /// Wrapper around [`CircularBuffer`]
 pub(crate) struct RecordsBuffer {
-    buffer: CircularBuffer<BUFFER_SIZE, KafkaRecord>,
+    buffer: FixedCircularBuffer<KafkaRecord, BUFFER_SIZE>,
     stats: Stats,
     last_time_sorted: usize,
 }
@@ -47,7 +47,7 @@ impl Default for RecordsBuffer {
 impl RecordsBuffer {
     pub fn new() -> Self {
         Self {
-            buffer: CircularBuffer::<BUFFER_SIZE, KafkaRecord>::new(),
+            buffer: FixedCircularBuffer::<KafkaRecord, BUFFER_SIZE>::new(),
             stats: Stats::default(),
             last_time_sorted: 0,
         }
