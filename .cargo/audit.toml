@@ -17,7 +17,11 @@ ignore = [
     "RUSTSEC-2026-0092",
     "RUSTSEC-2026-0093",
     "RUSTSEC-2026-0195",
-    "RUSTSEC-2026-0194"
+    "RUSTSEC-2026-0194",
+    "RUSTSEC-2026-0222", # wasmtime 43.0.2, Stores can mix up type indices between engines,
+    "RUSTSEC-2026-0251", # The sized-chunks crate is unmaintained
+    "RUSTSEC-2026-0250", # The im-rc crate is unmaintained
+    "RUSTSEC-2026-0247", # The bitmaps crate is unmaintained
 
 ]
 informational_warnings = ["unmaintained"] # warn for categories of informational advisories
