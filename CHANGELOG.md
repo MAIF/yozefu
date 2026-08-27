@@ -1,3 +1,22 @@
+## What's Changed in 0.0.31
+* release 0.31.0 by @Mcdostone in [#334](https://github.com/MAIF/yozefu/pull/334)
+* build: update dependencies by @Mcdostone
+* feat: feature to show records in ascending or descending order by @Mcdostone
+* build(deps): bump open from 5.3.5 to 5.4.0 by @dependabot[bot]
+* build(deps): bump futures from 0.3.32 to 0.3.33 by @dependabot[bot]
+* build(deps): bump throbber-widgets-tui from 0.11.0 to 0.11.1 by @dependabot[bot]
+* build(deps): bump bytesize from 2.4.0 to 2.4.2 by @dependabot[bot]
+* build(deps): bump serde from 1.0.228 to 1.0.229 by @dependabot[bot]
+* build(deps): bump indicatif from 0.18.4 to 0.18.6 by @dependabot[bot]
+* build(deps): bump clap from 4.6.1 to 4.6.3 by @dependabot[bot]
+* build(deps): bump tokio from 1.52.3 to 1.53.1 by @dependabot[bot]
+* build(deps): bump rollup from 4.62.0 to 4.62.2 in /docs by @dependabot[bot]
+* build(deps-dev): bump vitepress in /docs by @dependabot[bot]
+* build(deps): bump nanoid from 5.1.11 to 6.0.0 in /docs by @dependabot[bot]
+* build(deps): bump vite from 8.0.16 to 8.1.5 in /docs by @dependabot[bot]
+
+**Full Changelog**: https://github.com/MAIF/yozefu/compare/v0.0.30...v0.0.31
+
 ## What's Changed in 0.0.30
 * Develop by @Mcdostone in [#329](https://github.com/MAIF/yozefu/pull/329)
 * chore: Release version v0.0.30 by @Mcdostone in [#326](https://github.com/MAIF/yozefu/pull/326)
